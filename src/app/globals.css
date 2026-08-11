@@ -1,0 +1,345 @@
+@import "tailwindcss";
+
+/* ============================================================
+   CS — Sistema visual (CS Branding Book, 2026)
+   Branco · Ouro · Precisão
+   ============================================================ */
+
+@theme {
+  /* 05 / SISTEMA CROMÁTICO */
+  --color-branco: #ffffff;
+  --color-porcelana: #f7f5f2;
+  --color-ouro: #c7a06a;
+  --color-ouro-profundo: #8c673f;
+  --color-grafite: #1d1b19;
+
+  /* Papel do render 3D — usado para que a placa do logotipo funda no fundo */
+  --color-papel: #e8e3e1;
+  --color-papel-claro: #f1edea;
+  --color-papel-escuro: #ded9d6;
+
+  /* 06 / TIPOGRAFIA */
+  --font-display: var(--font-garamond), "EB Garamond", Georgia, serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  /* 07 / LINHAS — 0,5 a 1,5 pt. Sempre delicadas. */
+  --color-linha: color-mix(in srgb, #1d1b19 12%, transparent);
+  --color-linha-ouro: color-mix(in srgb, #c7a06a 38%, transparent);
+}
+
+/* O Tailwind v4 remove variáveis de tema cujo valor aponta para outra variável
+   (o caso das fontes do next/font). Redeclaradas aqui para existirem de fato. */
+:root {
+  color-scheme: light;
+  --font-display: var(--font-garamond), "EB Garamond", Georgia, serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* respiro: a âncora não cola no header */
+  scroll-padding-top: 6rem;
+}
+
+body {
+  background: var(--color-porcelana);
+  color: var(--color-grafite);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* 06 / Hierarquia: título 48–72 pt, subtítulo 20–32 pt, texto 10–14 pt */
+@utility t-display {
+  font-family: var(--font-display);
+  font-size: clamp(2.75rem, 6.2vw, 4.5rem);
+  line-height: 1.04;
+  letter-spacing: -0.021em;
+  font-weight: 400;
+}
+
+@utility t-title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 3.9vw, 3rem);
+  line-height: 1.12;
+  letter-spacing: -0.016em;
+  font-weight: 400;
+}
+
+@utility t-sub {
+  font-size: clamp(1.125rem, 1.7vw, 1.375rem);
+  line-height: 1.55;
+  font-weight: 400;
+}
+
+@utility t-eyebrow {
+  font-size: 0.6875rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* 07 / LINGUAGEM GRÁFICA — a seta vira ritmo visual */
+@utility rule-gold {
+  background-image: linear-gradient(
+    90deg,
+    var(--color-ouro) 0%,
+    color-mix(in srgb, var(--color-ouro) 22%, transparent) 100%
+  );
+}
+
+/* Placa do logotipo: reproduz o papel do render para o recorte desaparecer */
+@utility paper {
+  background-image: linear-gradient(
+    142deg,
+    var(--color-papel-claro) 0%,
+    var(--color-papel) 52%,
+    var(--color-papel-escuro) 100%
+  );
+}
+
+/* 08 / Diagonais — ângulos consistentes e direcionais */
+@utility diagonals {
+  background-image: repeating-linear-gradient(
+    58deg,
+    transparent 0 22px,
+    var(--color-linha) 22px 23px
+  );
+}
+
+/* ============================================================
+   MOVIMENTO
+   Animações orientadas por scroll (animation-timeline), nativas
+   do CSS — sem biblioteca, sem JavaScript, sem custo de bundle.
+   09 / DIREÇÃO: "movimento orientado para cima".
+   ============================================================ */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Entrada da dobra — roda uma vez, no carregamento. */
+.rise {
+  animation: rise 0.9s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes draw {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes drift {
+  to {
+    transform: translateY(-2.5rem);
+  }
+}
+
+/* O estado escondido só existe onde a timeline funciona: sem suporte
+   (ou com movimento reduzido) o conteúdo simplesmente aparece. */
+
+/* Cada elemento surge ao entrar no viewport. */
+@utility reveal {
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 8% cover 26%;
+    }
+  }
+}
+
+/* Linhas de ouro que se desenham da esquerda para a direita. */
+@utility draw-in {
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      transform-origin: left center;
+      animation: draw linear both;
+      animation-timeline: view();
+      animation-range: entry 12% cover 24%;
+    }
+  }
+}
+
+/* Paralaxe leve: a placa do logotipo sobe mais devagar que a página. */
+@utility drift {
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      animation: drift linear both;
+      animation-timeline: view();
+      animation-range: cover 10% cover 100%;
+    }
+  }
+}
+
+/* Escalonamento dentro de uma grade: cada filho entra na sua vez. */
+@utility stagger {
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      & > * {
+        animation: reveal linear both;
+        animation-timeline: view();
+        animation-range: entry 4% cover 22%;
+      }
+    }
+  }
+}
+
+/* Barra de progresso da leitura, presa ao topo (scroll-timeline nativa). */
+@keyframes progresso {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.barra-progresso {
+  transform-origin: left center;
+  transform: scaleX(0);
+}
+
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .barra-progresso {
+      animation: progresso linear both;
+      animation-timeline: scroll(root block);
+    }
+  }
+}
+
+/* Abertura fluida do acordeão: de 0 até `auto`, sem JS medindo altura.
+   ::details-content + interpolate-size fazem o trabalho que antes exigia
+   uma biblioteca inteira. */
+@supports (interpolate-size: allow-keywords) {
+  :root {
+    interpolate-size: allow-keywords;
+  }
+}
+
+@supports selector(details::details-content) {
+  @media (prefers-reduced-motion: no-preference) {
+    details::details-content {
+      block-size: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition:
+        block-size 0.42s cubic-bezier(0.22, 0.61, 0.36, 1),
+        opacity 0.3s ease,
+        content-visibility 0.42s allow-discrete;
+    }
+
+    details[open]::details-content {
+      block-size: auto;
+      opacity: 1;
+    }
+  }
+}
+
+/* Transições entre páginas (404 → início). */
+@view-transition {
+  navigation: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-ouro) 30%, transparent);
+  color: var(--color-grafite);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-ouro-profundo);
+  outline-offset: 3px;
+}
+
+/* As trilhas da biblioteca sangram até a borda, mas o primeiro cartão
+   precisa nascer alinhado ao Container (max-w-6xl + px-6/8/12). */
+@utility pista {
+  padding-inline: 1.5rem;
+
+  @media (width >= 40rem) {
+    padding-inline: 2rem;
+  }
+
+  @media (width >= 64rem) {
+    padding-inline: max(3rem, calc((100% - 72rem) / 2 + 3rem));
+  }
+}
+
+/* Painel de detalhe da biblioteca: entra e sai com movimento.
+   `@starting-style` + `allow-discrete` animam `display` e `overlay`,
+   coisa que até pouco tempo exigia JavaScript. */
+dialog {
+  opacity: 0;
+  translate: 0 12px;
+  max-height: calc(100svh - 3rem);
+  transition:
+    opacity 0.3s ease,
+    translate 0.3s cubic-bezier(0.22, 0.61, 0.36, 1),
+    overlay 0.3s allow-discrete,
+    display 0.3s allow-discrete;
+}
+
+dialog[open] {
+  opacity: 1;
+  translate: 0 0;
+}
+
+@starting-style {
+  dialog[open] {
+    opacity: 0;
+    translate: 0 12px;
+  }
+}
+
+dialog::backdrop {
+  opacity: 0;
+  transition:
+    opacity 0.3s ease,
+    overlay 0.3s allow-discrete,
+    display 0.3s allow-discrete;
+}
+
+dialog[open]::backdrop {
+  opacity: 1;
+}
+
+@starting-style {
+  dialog[open]::backdrop {
+    opacity: 0;
+  }
+}
