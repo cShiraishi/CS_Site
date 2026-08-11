@@ -6,6 +6,24 @@
  * Uma ideia principal por mensagem. Frases curtas. Verbos de ação.
  */
 
+/**
+ * Endereço público do site. Alimenta canonical, Open Graph, sitemap,
+ * robots e todos os @id do JSON-LD — cravar um domínio aqui faria o site
+ * publicado apontar para outro lugar.
+ *
+ * Ordem: o que você definir manualmente, depois o domínio de produção que
+ * a Vercel injeta sozinha, e por fim o localhost do desenvolvimento.
+ */
+function enderecoDoSite(): string {
+  const definido = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (definido) return definido.replace(/\/+$/, "");
+
+  const vercel = process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL?.trim();
+  if (vercel) return `https://${vercel.replace(/^https?:\/\//, "")}`;
+
+  return "http://localhost:3000";
+}
+
 export const marca = {
   nome: "Carlos Seiti",
   monograma: "CS",
@@ -18,7 +36,7 @@ export const marca = {
   linkedin: "https://www.linkedin.com/in/carlosseiti",
   whatsapp: "https://wa.me/message/HRZB5A4TF2GKA1",
   email: "contato@carlosseiti.com",
-  site: "https://carlosseiti.com",
+  site: enderecoDoSite(),
 } as const;
 
 /** Hrefs absolutos: os mesmos links funcionam na home e nas outras páginas. */
