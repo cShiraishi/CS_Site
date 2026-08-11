@@ -4,18 +4,54 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Trilha, Video } from "@/lib/csflix";
 
+function Destaque({ video, total, aoAbrir }: { video: Video; total: number; aoAbrir: () => void }) {
+  return (
+    <section className="relative min-h-[42rem] overflow-hidden pt-32 sm:min-h-[46rem] sm:pt-40 lg:min-h-[50rem]">
+      <Image src={`https://i.ytimg.com/vi/${video.id}/maxresdefault.jpg`} alt="" fill priority sizes="100vw" className="object-cover object-center opacity-70" />
+      <div aria-hidden className="absolute inset-0 bg-linear-to-r from-black via-black/65 to-black/10" />
+      <div aria-hidden className="absolute inset-0 bg-linear-to-t from-black via-black/5 to-black/45" />
+      <div className="relative mx-auto flex min-h-[34rem] w-full max-w-6xl items-end px-6 pb-40 sm:min-h-[38rem] sm:px-8 lg:min-h-[42rem] lg:px-12 lg:pb-44">
+        <div className="max-w-2xl">
+          <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[.16em] text-white/80">
+            <span className="flex size-6 items-center justify-center rounded-sm bg-[#E00513] text-[10px] text-white">CS</span>
+            Seleção CSFlix
+          </p>
+          <h1 className="mt-5 max-w-xl font-display text-4xl leading-[1.02] text-white sm:text-5xl lg:text-6xl">{video.titulo}</h1>
+          <div className="mt-5 flex flex-wrap items-center gap-3 text-sm">
+            <span className="font-semibold text-emerald-400">Novo no canal</span>
+            <span className="rounded border border-white/35 px-1.5 py-0.5 text-[10px] text-white/80">HD</span>
+            {video.duracao && <span className="text-white/65">{video.duracao}</span>}
+            <span className="text-white/65">{total} vídeos selecionados</span>
+          </div>
+          <p className="mt-5 max-w-xl text-base leading-relaxed text-white/75 sm:text-lg">Ciência, treino e nutrição aplicados à vida real. Comece pelo conteúdo mais recente e continue pelas trilhas abaixo.</p>
+          <div className="mt-7 flex flex-wrap gap-3">
+            <button type="button" onClick={aoAbrir} className="inline-flex items-center gap-3 rounded-md bg-white px-7 py-3 text-sm font-semibold text-black transition hover:bg-white/80"><span className="text-lg">▶</span> Assistir agora</button>
+            <a href="#trilhas" className="inline-flex items-center gap-2 rounded-md bg-white/15 px-7 py-3 text-sm font-medium text-white backdrop-blur-md transition hover:bg-white/25">ⓘ Explorar trilhas</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ============================================================
    Cartão de vídeo
    ============================================================ */
-function Cartao({ video, aoAbrir }: { video: Video; aoAbrir: () => void }) {
+function Cartao({ video, aoAbrir, ranking, episodio }: { video: Video; aoAbrir: () => void; ranking?: number; episodio?: number }) {
   return (
+    <div className={`flex shrink-0 items-end ${ranking ? "w-72 sm:w-80 lg:w-[23rem]" : "w-60 sm:w-72 lg:w-80"}`}>
+      {ranking && (
+        <span aria-hidden className="-mr-3 font-display text-[8rem] font-semibold leading-[.72] text-black [-webkit-text-stroke:2px_rgba(255,255,255,.58)] sm:text-[10rem]">
+          {ranking}
+        </span>
+      )}
     <button
       type="button"
       onClick={aoAbrir}
       aria-label={`Ver: ${video.titulo}`}
-      className="group w-60 shrink-0 snap-start text-left sm:w-72 lg:w-80"
+      className="group min-w-0 flex-1 snap-start text-left"
     >
-      <span className="relative block aspect-video overflow-hidden rounded-sm bg-black/60 ring-1 ring-white/10 transition-all duration-300 group-hover:scale-[1.04] group-hover:ring-[#E00513] group-focus-visible:scale-[1.04]">
+      <span className="relative block aspect-video overflow-hidden rounded-md bg-zinc-900 shadow-xl ring-1 ring-white/10 transition-all duration-300 group-hover:z-10 group-hover:-translate-y-2 group-hover:scale-[1.06] group-hover:shadow-2xl group-hover:ring-white/30 group-focus-visible:scale-[1.04]">
         <Image
           src={`https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`}
           alt=""
@@ -23,11 +59,16 @@ function Cartao({ video, aoAbrir }: { video: Video; aoAbrir: () => void }) {
           sizes="(max-width: 640px) 60vw, 320px"
           className="object-cover"
         />
+        {video.duracao && (
+          <span className="absolute right-2 top-2 rounded bg-black/80 px-1.5 py-1 text-[10px] font-medium text-white backdrop-blur-sm">
+            {video.duracao}
+          </span>
+        )}
 
         {/* botão de play, no vermelho da marca */}
         <span className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100">
           <span className="absolute inset-0 bg-black/45" />
-          <span className="relative flex h-14 w-14 items-center justify-center rounded-full bg-[#E00513]">
+          <span className="relative flex h-12 w-12 items-center justify-center rounded-full border-2 border-white bg-black/75 backdrop-blur-md">
             <svg viewBox="0 0 24 24" aria-hidden className="ml-1 h-6 w-6 fill-white">
               <path d="M8 5v14l11-7z" />
             </svg>
@@ -35,10 +76,15 @@ function Cartao({ video, aoAbrir }: { video: Video; aoAbrir: () => void }) {
         </span>
       </span>
 
-      <span className="mt-3 block text-[0.85rem] leading-snug text-white/85 transition-colors group-hover:text-white">
+      <span className="mt-3 block text-[0.85rem] font-medium leading-snug text-white/85 transition-colors group-hover:text-white">
         {video.titulo}
       </span>
+      <span className="mt-2 flex items-center gap-2 text-[10px] uppercase tracking-[.13em] text-white/50">
+        <b className="font-medium text-emerald-400">{episodio ? `Episódio ${String(episodio).padStart(2, "0")}` : "Conteúdo CS"}</b>
+        <span>HD</span>
+      </span>
     </button>
+    </div>
   );
 }
 
@@ -86,7 +132,7 @@ function Faixa({
           <h2 className="font-display text-2xl text-white sm:text-3xl">
             {trilha.nome}
           </h2>
-          <p className="mt-1.5 text-sm text-white/45">{trilha.descricao}</p>
+          <p className="mt-1.5 text-sm text-white/60">{trilha.descricao}</p>
         </div>
 
         <div className="hidden shrink-0 gap-2 lg:flex">
@@ -121,8 +167,14 @@ function Faixa({
         onScroll={medir}
         className="pista mt-5 flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain scroll-smooth pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
-        {trilha.videos.map((v) => (
-          <Cartao key={`${trilha.id}-${v.id}`} video={v} aoAbrir={() => aoAbrir(v)} />
+        {trilha.videos.map((v, i) => (
+          <Cartao
+            key={`${trilha.id}-${v.id}`}
+            video={v}
+            aoAbrir={() => aoAbrir(v)}
+            ranking={trilha.id === "lancamentos" && i < 10 ? i + 1 : undefined}
+            episodio={trilha.id !== "lancamentos" ? i + 1 : undefined}
+          />
         ))}
         <span aria-hidden className="w-2 shrink-0 sm:w-4" />
       </div>
@@ -203,14 +255,18 @@ function Player({ video, aoFechar }: { video: Video | null; aoFechar: () => void
 }
 
 /* ============================================================ */
-export function CSFlix({ trilhas }: { trilhas: Trilha[] }) {
+export function CSFlix({ trilhas, total }: { trilhas: Trilha[]; total: number }) {
   const [aberto, setAberto] = useState<Video | null>(null);
+  const destaque = trilhas[0]?.videos[0];
 
   return (
     <>
-      {trilhas.map((t) => (
-        <Faixa key={t.id} trilha={t} aoAbrir={setAberto} />
-      ))}
+      {destaque && <Destaque video={destaque} total={total} aoAbrir={() => setAberto(destaque)} />}
+      <div id="trilhas" className="relative z-10 -mt-28 pb-16 sm:-mt-32">
+        {trilhas.map((t) => (
+          <Faixa key={t.id} trilha={t} aoAbrir={setAberto} />
+        ))}
+      </div>
       <Player video={aberto} aoFechar={() => setAberto(null)} />
     </>
   );
