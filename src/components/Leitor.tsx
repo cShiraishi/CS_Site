@@ -6,8 +6,14 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { Leitura } from "@/lib/leituras";
 import { Arrow } from "./ui";
 
-/** Quantas folhas em volta da atual carregam imagem de verdade. */
-const JANELA = 3;
+/**
+ * Quantas folhas em volta da atual existem no DOM.
+ *
+ * Cada folha vira duas camadas de GPU por causa do preserve-3d. Com a
+ * janela grande, um livro de 66 páginas trava o navegador na virada.
+ * Duas de cada lado bastam: o resto está sempre atrás da pilha.
+ */
+const JANELA = 2;
 
 export function Leitor({ livro }: { livro: Leitura }) {
   const palco = useRef<HTMLDivElement>(null);
@@ -249,6 +255,12 @@ function LivroDuplo({
         const virada = k < pos;
         const perto = Math.abs(k - pos) <= JANELA;
 
+        // Só as folhas em volta da atual existem no DOM. Num livro de 66
+        // páginas, montar as 33 folhas — cada uma com duas faces em 3D,
+        // sombra e gradiente — trava o navegador. As demais estão sempre
+        // escondidas atrás da pilha, então não há o que mostrar.
+        if (!perto) return null;
+
         return (
           <div
             key={k}
@@ -296,7 +308,7 @@ function Face({
           alt=""
           width={livro.largura}
           height={livro.altura}
-          sizes="(max-width: 900px) 100vw, 50vw"
+          sizes="(max-width: 900px) 92vw, 560px"
           className="h-full w-full object-contain"
         />
       )}
@@ -336,7 +348,7 @@ function LivroUnico({ livro, pos }: { livro: Leitura; pos: number }) {
               alt=""
               width={livro.largura}
               height={livro.altura}
-              sizes="(max-width: 900px) 100vw, 900px"
+              sizes="(max-width: 900px) 96vw, 1000px"
               priority={i === 0}
               className="h-full w-full object-contain"
             />

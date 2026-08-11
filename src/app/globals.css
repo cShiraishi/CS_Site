@@ -403,7 +403,6 @@ dialog[open]::backdrop {
   transition:
     transform 0.75s cubic-bezier(0.34, 0.05, 0.2, 1),
     opacity 0.5s ease 0.25s;
-  will-change: transform;
 }
 
 .folha .face {
