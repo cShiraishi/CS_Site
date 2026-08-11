@@ -3,7 +3,3 @@
 
 node_modules
 .next
-
-# Brand book: material interno de identidade, decidido como nao publicavel.
-# Continua rodando em localhost, so nao vai para producao.
-public/leitura/branding-book/
