@@ -70,9 +70,15 @@ export function Eyebrow({
   );
 }
 
-/** Campo de formulário: só uma linha inferior, que acende em ouro no foco. */
+/**
+ * Campo de formulário: só uma linha inferior, que acende em ouro no foco.
+ *
+ * O placeholder é deliberadamente mais claro que o valor. Com a mesma cor
+ * dos dois, o campo vazio parece preenchido — e o formulário inteiro passa
+ * a impressão de estar pronto quando não está.
+ */
 export const campoBase =
-  "w-full border-b border-linha bg-transparent py-3 text-[0.98rem] text-grafite transition-colors placeholder:text-grafite focus:border-ouro focus:outline-none";
+  "w-full border-b border-linha bg-transparent py-3 text-[0.98rem] text-grafite transition-colors placeholder:text-grafite/40 focus:border-ouro focus:outline-none";
 
 /** Rótulo curto e espaçado, no padrão do manual. */
 export function Rotulo({
