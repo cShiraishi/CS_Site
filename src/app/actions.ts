@@ -17,6 +17,9 @@ const LIMITES = {
   email: 160,
   whatsapp: 32,
   objetivo: 60,
+  experiencia: 100,
+  frequencia: 40,
+  inicio: 60,
   mensagem: 1500,
 } as const;
 
@@ -42,6 +45,9 @@ export async function enviarContato(
     email: texto(formData, "email", LIMITES.email),
     whatsapp: texto(formData, "whatsapp", LIMITES.whatsapp),
     objetivo: texto(formData, "objetivo", LIMITES.objetivo),
+    experiencia: texto(formData, "experiencia", LIMITES.experiencia),
+    frequencia: texto(formData, "frequencia", LIMITES.frequencia),
+    inicio: texto(formData, "inicio", LIMITES.inicio),
     mensagem: texto(formData, "mensagem", LIMITES.mensagem),
   };
 
@@ -51,6 +57,9 @@ export async function enviarContato(
   if (dados.whatsapp.replace(/\D/g, "").length < 8)
     erros.whatsapp = "Informe um WhatsApp com DDD.";
   if (!dados.objetivo) erros.objetivo = "Escolha um objetivo.";
+  if (!dados.experiencia) erros.experiencia = "Informe em que momento você está.";
+  if (!dados.frequencia) erros.frequencia = "Informe sua disponibilidade semanal.";
+  if (!dados.inicio) erros.inicio = "Informe quando gostaria de começar.";
   if (dados.mensagem.length < 10)
     erros.mensagem = "Conte um pouco mais sobre o seu contexto.";
 
@@ -83,6 +92,9 @@ export async function enviarContato(
     ["E-mail", dados.email],
     ["WhatsApp", dados.whatsapp],
     ["Objetivo", dados.objetivo],
+    ["Momento atual", dados.experiencia],
+    ["Disponibilidade", dados.frequencia],
+    ["Início", dados.inicio],
   ]
     .map(([r, v]) => `<tr><td style="padding:4px 16px 4px 0;color:#8C673F">${r}</td><td>${escapar(v)}</td></tr>`)
     .join("");

@@ -35,7 +35,7 @@ export function jsonLd() {
           "Ciência de Alimentos",
           "Treinamento de força",
         ],
-        sameAs: [marca.instagram],
+        sameAs: [marca.instagram, marca.youtube, marca.linkedin],
       },
       {
         "@type": "WebSite",

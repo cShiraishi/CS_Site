@@ -72,7 +72,7 @@ export function Eyebrow({
 
 /** Campo de formulário: só uma linha inferior, que acende em ouro no foco. */
 export const campoBase =
-  "w-full border-b border-linha bg-transparent py-3 text-[0.98rem] text-grafite transition-colors placeholder:text-grafite/35 focus:border-ouro focus:outline-none";
+  "w-full border-b border-linha bg-transparent py-3 text-[0.98rem] text-grafite transition-colors placeholder:text-grafite focus:border-ouro focus:outline-none";
 
 /** Rótulo curto e espaçado, no padrão do manual. */
 export function Rotulo({
@@ -83,7 +83,7 @@ export function Rotulo({
   children: ReactNode;
 }) {
   return (
-    <label htmlFor={htmlFor} className="t-eyebrow block text-grafite/50">
+    <label htmlFor={htmlFor} className="t-eyebrow block text-grafite">
       {children}
     </label>
   );

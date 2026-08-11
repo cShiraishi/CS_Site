@@ -148,7 +148,7 @@ export function Leitor({ livro }: { livro: Leitura }) {
           <Botao aoClicar={() => ir(1)} desativado={pos >= passos} rotulo="Próxima página">
             <Seta direcao="frente" />
           </Botao>
-          <span className="ml-2 text-sm text-porcelana/60 tabular-nums">{rotulo}</span>
+          <span className="ml-2 text-sm text-porcelana/70 tabular-nums">{rotulo}</span>
         </div>
 
         <div className="flex items-center gap-5">
@@ -196,7 +196,7 @@ export function Leitor({ livro }: { livro: Leitura }) {
         </div>
       </div>
 
-      <p className="mt-6 text-xs text-porcelana/35">
+      <p className="mt-6 text-xs text-porcelana/70">
         Use as setas do teclado, clique nas laterais da página ou arraste a barra.
       </p>
     </div>

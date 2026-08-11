@@ -82,7 +82,7 @@ function Cartao({ livro, aoAbrir }: { livro: Livro; aoAbrir: () => void }) {
       <span className="mt-3 block text-[0.82rem] leading-snug text-porcelana/85 transition-colors group-hover:text-ouro">
         {livro.titulo}
       </span>
-      <span className="mt-1 block text-[0.7rem] text-porcelana/45">
+      <span className="mt-1 block text-[0.7rem] text-porcelana/70">
         {livro.autor}
       </span>
     </button>
@@ -137,7 +137,7 @@ function Trilha({
       <div className="pista flex items-end justify-between gap-6">
         <div>
           <h2 className="font-display text-2xl text-porcelana sm:text-3xl">{nome}</h2>
-          <p className="mt-1.5 text-sm text-porcelana/50">{descricao}</p>
+          <p className="mt-1.5 text-sm text-porcelana/70">{descricao}</p>
         </div>
 
         {/* setas: só onde há espaço e ponteiro preciso */}
@@ -218,7 +218,7 @@ function Detalhe({
             <div>
               <p className="t-eyebrow text-ouro-profundo">{livro.nivel}</p>
               <h3 className="t-title mt-4 text-balance">{livro.titulo}</h3>
-              <p className="mt-2.5 text-sm text-grafite/60">
+              <p className="mt-2.5 text-sm text-grafite">
                 {livro.autor}
                 {livro.ano ? ` · ${livro.ano}` : ""}
               </p>
@@ -228,7 +228,7 @@ function Detalhe({
               type="button"
               onClick={aoFechar}
               aria-label="Fechar"
-              className="-mr-2 -mt-2 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-grafite/50 transition-colors hover:bg-linha hover:text-grafite"
+              className="-mr-2 -mt-2 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-grafite transition-colors hover:bg-linha hover:text-grafite"
             >
               <svg
                 viewBox="0 0 16 16"
@@ -246,7 +246,7 @@ function Detalhe({
 
           <span aria-hidden className="rule-gold mt-7 block h-px w-16" />
 
-          <p className="mt-7 leading-relaxed text-grafite/75">{livro.porque}</p>
+          <p className="mt-7 leading-relaxed text-grafite">{livro.porque}</p>
 
           {livro.link && (
             <Link

@@ -59,13 +59,13 @@ export default async function Page({ params }: Props) {
       <main className="bg-grafite text-porcelana">
         <Container className="pt-32 sm:pt-40">
           <nav aria-label="Você está em" className="pt-8">
-            <ol className="flex flex-wrap items-center gap-2 text-xs text-porcelana/45">
+            <ol className="flex flex-wrap items-center gap-2 text-xs text-porcelana/70">
               <li>
                 <Link href="/" className="transition-colors hover:text-ouro">
                   Início
                 </Link>
               </li>
-              <li aria-hidden className="text-porcelana/25">
+              <li aria-hidden className="text-porcelana/70">
                 /
               </li>
               <li>
@@ -76,7 +76,7 @@ export default async function Page({ params }: Props) {
                   Biblioteca
                 </Link>
               </li>
-              <li aria-hidden className="text-porcelana/25">
+              <li aria-hidden className="text-porcelana/70">
                 /
               </li>
               <li aria-current="page" className="text-porcelana/75">
@@ -94,7 +94,7 @@ export default async function Page({ params }: Props) {
                 {livro.titulo}
               </h1>
               {livro.subtitulo && (
-                <p className="mt-3 text-porcelana/55">{livro.subtitulo}</p>
+                <p className="mt-3 text-porcelana/70">{livro.subtitulo}</p>
               )}
             </div>
           </div>

@@ -28,7 +28,7 @@ export default function NotFound() {
             mudou de direção.
           </h1>
 
-          <p className="t-sub mt-7 text-pretty text-grafite/70">
+          <p className="t-sub mt-7 text-pretty text-grafite">
             O endereço não existe ou foi movido. O caminho de volta é curto.
           </p>
 
@@ -44,13 +44,13 @@ export default function NotFound() {
           </div>
 
           <nav aria-label="Seções do site" className="mt-14">
-            <p className="t-eyebrow text-grafite/45">Ou vá direto para</p>
+            <p className="t-eyebrow text-grafite">Ou vá direto para</p>
             <ul className="mt-5 flex flex-wrap gap-x-7 gap-y-3 text-sm">
               {nav.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="border-b border-linha pb-1 text-grafite/70 transition-colors hover:border-ouro hover:text-ouro-profundo"
+                    className="border-b border-linha pb-1 text-grafite transition-colors hover:border-ouro hover:text-ouro-profundo"
                   >
                     {item.label}
                   </Link>
@@ -59,7 +59,7 @@ export default function NotFound() {
             </ul>
           </nav>
 
-          <p className="mt-14 font-display text-lg italic text-grafite/50">
+          <p className="mt-14 font-display text-lg italic text-grafite">
             {marca.assinatura}.
           </p>
         </div>

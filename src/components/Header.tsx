@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Assinatura } from "./Logo";
 import { Container, buttonClass, Arrow } from "./ui";
+import { LanguageSelector } from "./LanguageSelector";
 import { nav, rotas } from "@/lib/content";
 
 /**
@@ -30,8 +31,8 @@ export function Header({ tone = "claro" }: { tone?: "claro" | "escuro" }) {
   }, [aberto]);
 
   const fundo = escuro
-    ? "border-b border-porcelana/12 bg-grafite/85 backdrop-blur-xl"
-    : "border-b border-linha bg-porcelana/85 backdrop-blur-xl";
+    ? "glass-dark border-b"
+    : "glass-light border-b";
   const painel = escuro
     ? "border-porcelana/12 bg-grafite"
     : "border-linha bg-porcelana";
@@ -64,23 +65,28 @@ export function Header({ tone = "claro" }: { tone?: "claro" | "escuro" }) {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`group relative whitespace-nowrap text-sm transition-colors ${
+                  className={`group relative isolate overflow-hidden rounded-full px-3 py-2 text-sm ring-1 ring-transparent transition-all duration-300 before:absolute before:inset-x-2 before:top-0 before:-z-10 before:h-px before:scale-x-0 before:bg-gradient-to-r before:from-transparent before:via-white before:to-transparent before:transition-transform before:duration-300 hover:-translate-y-0.5 hover:before:scale-x-100 ${
                     escuro
-                      ? "text-porcelana/70 hover:text-porcelana"
-                      : "text-grafite/75 hover:text-grafite"
+                      ? "text-porcelana/70 hover:bg-white/10 hover:text-porcelana hover:ring-white/15 hover:shadow-[0_8px_24px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.14)]"
+                      : "text-grafite hover:bg-white/65 hover:text-grafite hover:ring-white/90 hover:shadow-[0_10px_30px_rgba(29,27,25,0.10),inset_0_1px_0_rgba(255,255,255,1)] hover:backdrop-blur-xl"
                   } ${destacado ? "flex items-center gap-2" : ""}`}
                 >
                   {destacado && (
-                    <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-ouro" />
+                    <span
+                      aria-hidden
+                      className="h-1.5 w-1.5 rounded-full bg-ouro transition-transform duration-300 group-hover:scale-150"
+                    />
                   )}
                   {item.label}
-                  <span className="rule-gold absolute -bottom-1.5 left-0 h-px w-0 transition-all duration-300 group-hover:w-full" />
+                  <span className="rule-gold absolute bottom-0 left-3 right-3 h-px origin-left scale-x-0 transition-transform duration-300 group-hover:scale-x-100" />
                 </Link>
               );
             })}
           </nav>
 
           <div className="flex shrink-0 items-center gap-3">
+            <LanguageSelector escuro={escuro} />
+
             {/* O display responsivo fica no invólucro: `buttonClass` já traz
                 `inline-flex`, que venceria um `hidden` no mesmo elemento. */}
             <div className="hidden sm:block">

@@ -13,6 +13,9 @@ export const marca = {
   descritor: "Nutrição Avançada",
   instagram: "https://www.instagram.com/carlosseiti/",
   instagramHandle: "@carlosseiti",
+  youtube: "https://www.youtube.com/@carlosseitiTV",
+  youtubeNome: "Carlos Seiti TV",
+  linkedin: "https://www.linkedin.com/in/carlosseiti",
   whatsapp: "https://wa.me/message/HRZB5A4TF2GKA1",
   email: "contato@carlosseiti.com",
   site: "https://carlosseiti.com",
@@ -164,25 +167,39 @@ export const resultados = {
   eyebrow: "Resultados",
   titulo: "Progresso real, medido.",
   texto:
-    "Transformações e feedbacks de alunos estão nos destaques do Instagram. Resultados variam conforme adesão, ponto de partida e individualidade.",
+    "Pessoas reais, processos individuais. Cada transformação respeita um ponto de partida, uma rotina e um ritmo diferente.",
   cta: "Ver transformações no Instagram",
-  depoimentos: [
+  transformacoes: [
     {
-      texto:
-        "Pela primeira vez segui um plano sem sentir que estava me privando de tudo.",
-      autor: "Aluno — 6 meses de acompanhamento",
+      nome: "Laís",
+      instagram: "@laisdas",
+      link: "https://www.instagram.com/laisdas/",
+      imagem: "/resultados/lais-das.png",
+      largura: 271,
+      altura: 482,
+      alt: "Evolução corporal de Laís, com registros de antes e depois vistos de costas",
     },
     {
-      texto:
-        "O ajuste quinzenal mudou o jogo. Toda vez que travava, o plano mudava junto.",
-      autor: "Aluna — 4 meses de acompanhamento",
+      nome: "Luanito Castro",
+      instagram: "@luanitocastro",
+      link: "https://www.instagram.com/luanitocastro/",
+      imagem: "/resultados/luanito-castro.png",
+      largura: 233,
+      altura: 412,
+      alt: "Evolução corporal de Luanito Castro, com registros de antes e depois",
     },
     {
-      texto:
-        "Entendi o porquê de cada escolha. Hoje consigo me virar sozinho no restaurante.",
-      autor: "Aluno — 8 meses de acompanhamento",
+      nome: "Isaías Santos",
+      instagram: "@isaiassantos_2021",
+      link: "https://www.instagram.com/isaiassantos_2021/",
+      imagem: "/resultados/isaias-santos.png",
+      largura: 334,
+      altura: 342,
+      alt: "Evolução corporal de Isaías Santos, com registros de antes e depois",
     },
   ],
+  aviso:
+    "Resultados variam conforme adesão, ponto de partida e individualidade.",
 } as const;
 
 export const sobre = {

@@ -10,7 +10,8 @@
   --color-branco: #ffffff;
   --color-porcelana: #f7f5f2;
   --color-ouro: #c7a06a;
-  --color-ouro-profundo: #8c673f;
+  /* Tom funcional: escurecido o suficiente para texto pequeno cumprir WCAG AA. */
+  --color-ouro-profundo: #76512e;
   --color-grafite: #1d1b19;
 
   /* Papel do render 3D — usado para que a placa do logotipo funda no fundo */
@@ -33,6 +34,13 @@
   color-scheme: light;
   --font-display: var(--font-garamond), "EB Garamond", Georgia, serif;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --shadow-soft: 0 18px 50px rgb(29 27 25 / 0.06);
+  --shadow-floating: 0 28px 80px rgb(29 27 25 / 0.10);
+  --shadow-glass: 0 12px 40px rgb(29 27 25 / 0.08), inset 0 1px 0 rgb(255 255 255 / 0.88);
+  --ease-editorial: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-fast: 180ms;
+  --motion-standard: 320ms;
+  --motion-editorial: 520ms;
 }
 
 html {
@@ -47,6 +55,38 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+/* Superfícies premium reutilizáveis: uma única linguagem de profundidade. */
+.surface-card {
+  border: 1px solid var(--color-linha);
+  background: color-mix(in srgb, var(--color-branco) 92%, var(--color-porcelana));
+  box-shadow: var(--shadow-soft);
+}
+
+.surface-elevated {
+  border: 1px solid color-mix(in srgb, var(--color-branco) 70%, var(--color-linha));
+  background: color-mix(in srgb, var(--color-branco) 88%, transparent);
+  box-shadow: var(--shadow-floating);
+}
+
+.glass-light {
+  border-color: rgb(255 255 255 / 0.7);
+  background: rgb(255 255 255 / 0.58);
+  box-shadow: var(--shadow-glass);
+  backdrop-filter: blur(24px) saturate(1.5);
+}
+
+.glass-dark {
+  border-color: rgb(255 255 255 / 0.1);
+  background: rgb(29 27 25 / 0.68);
+  box-shadow: 0 12px 40px rgb(0 0 0 / 0.18), inset 0 1px 0 rgb(255 255 255 / 0.08);
+  backdrop-filter: blur(24px) saturate(1.45);
+}
+
+:where(a, button, input, select, textarea, summary):focus-visible {
+  outline: 2px solid var(--color-ouro-profundo);
+  outline-offset: 3px;
 }
 
 /* 06 / Hierarquia: título 48–72 pt, subtítulo 20–32 pt, texto 10–14 pt */
@@ -116,13 +156,21 @@ body {
 
 @keyframes rise {
   from {
-    opacity: 0;
     transform: translateY(14px);
   }
   to {
-    opacity: 1;
     transform: none;
   }
+}
+
+@keyframes accordion-down {
+  from { height: 0; opacity: 0; }
+  to { height: var(--radix-accordion-content-height); opacity: 1; }
+}
+
+@keyframes accordion-up {
+  from { height: var(--radix-accordion-content-height); opacity: 1; }
+  to { height: 0; opacity: 0; }
 }
 
 /* Entrada da dobra — roda uma vez, no carregamento. */
@@ -132,11 +180,9 @@ body {
 
 @keyframes reveal {
   from {
-    opacity: 0;
     transform: translateY(28px);
   }
   to {
-    opacity: 1;
     transform: none;
   }
 }

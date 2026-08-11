@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useId, useMemo, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import {
   ATIVIDADES,
   FORMULAS,
@@ -80,18 +81,46 @@ export function Calculadora() {
   const faltaGordura = formula === "katch" && !gordura;
 
   return (
-    <div className="space-y-20">
+    <div className="space-y-20" ref={(node) => { if (node) node.dataset.interactive = "true"; }}>
+      <nav aria-label="Etapas da calculadora" className="surface-card grid overflow-hidden sm:grid-cols-3">
+        {[
+          ["01", "Seus dados", "#calc-dados"],
+          ["02", "Seu objetivo", "#calc-objetivo"],
+          ["03", "Seu plano", "#calc-resultado"],
+        ].map(([numero, rotulo, href], i) => (
+          <a
+            key={numero}
+            href={href}
+            className={`group flex items-center gap-4 px-5 py-4 transition-colors hover:bg-ouro/10 ${
+              i > 0 ? "border-t border-linha sm:border-l sm:border-t-0" : ""
+            }`}
+          >
+            <span className="font-display text-2xl text-ouro-profundo transition-colors group-hover:text-ouro-profundo">
+              {numero}
+            </span>
+            <span className="text-sm text-grafite">{rotulo}</span>
+            <span aria-hidden className="ml-auto text-ouro-profundo/35 transition-transform group-hover:translate-x-1">↓</span>
+          </a>
+        ))}
+      </nav>
+
       {/* ── 1. Dados ──────────────────────────────────────────── */}
-      <form onSubmit={(e) => e.preventDefault()} aria-label="Seus dados">
+      <form
+        id="calc-dados"
+        onSubmit={(e) => e.preventDefault()}
+        aria-label="Seus dados"
+        className="surface-card scroll-mt-28 bg-white p-6 sm:p-10 lg:p-12"
+      >
         <p className="t-eyebrow flex items-center gap-3 text-ouro-profundo">
           <span aria-hidden className="rule-gold inline-block h-px w-8" />
+          <Icone tipo="pessoa" />
           01 / Seus dados
         </p>
 
         <div className="mt-9 grid gap-x-12 gap-y-9 lg:grid-cols-3">
           <fieldset className="lg:col-span-3">
-            <legend className="t-eyebrow text-grafite/50">Sexo biológico</legend>
-            <div className="mt-3 inline-flex rounded-full border border-linha p-1">
+            <legend className="t-eyebrow text-grafite">Sexo biológico</legend>
+            <div className="mt-3 inline-flex rounded-full border border-linha bg-white p-1 shadow-sm">
               {(["masculino", "feminino"] as const).map((s) => (
                 <button
                   key={s}
@@ -101,14 +130,14 @@ export function Calculadora() {
                   className={`rounded-full px-6 py-2 text-sm capitalize transition-colors duration-300 ${
                     sexo === s
                       ? "bg-grafite text-porcelana"
-                      : "text-grafite/60 hover:text-grafite"
+                      : "text-grafite hover:text-grafite"
                   }`}
                 >
                   {s}
                 </button>
               ))}
             </div>
-            <p className="mt-2.5 text-xs text-grafite/45">
+            <p className="mt-2.5 text-xs text-grafite">
               As equações foram derivadas com esta variável — não é uma pergunta
               sobre identidade.
             </p>
@@ -134,24 +163,67 @@ export function Calculadora() {
             </select>
           </div>
 
-          <div>
-            <Rotulo htmlFor={`${id}-formula`}>Equação</Rotulo>
-            <select
-              id={`${id}-formula`}
-              value={formula}
-              onChange={(e) => setFormula(e.target.value as Formula)}
-              className={`${campoBase} appearance-none`}
-            >
-              {FORMULAS.map((f) => (
-                <option key={f.id} value={f.id}>
-                  {f.nome}
-                </option>
-              ))}
-            </select>
-            <p className="mt-2.5 text-xs text-grafite/50">
-              {FORMULAS.find((f) => f.id === formula)?.nota}
+          <fieldset className="lg:col-span-3">
+            <legend className="t-eyebrow text-grafite">
+              Como calcular seu metabolismo?
+            </legend>
+            <p className="mt-2 text-sm text-grafite">
+              Se estiver em dúvida, mantenha a opção recomendada.
             </p>
-          </div>
+            <div className="mt-4 grid gap-3 md:grid-cols-3">
+              {FORMULAS.map((f) => {
+                const selecionada = formula === f.id;
+                return (
+                  <button
+                    key={f.id}
+                    type="button"
+                    onClick={() => setFormula(f.id)}
+                    aria-pressed={selecionada}
+                    className={`min-h-36 border p-5 text-left transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ouro-profundo ${
+                      selecionada
+                        ? "border-ouro-profundo bg-ouro/10"
+                        : "border-linha bg-white hover:border-ouro/70"
+                    }`}
+                  >
+                    <span className="flex items-start justify-between gap-3">
+                      <span className="flex items-center gap-3">
+                        <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-porcelana text-ouro-profundo">
+                          <Icone
+                            tipo={
+                              f.id === "mifflin"
+                                ? "recomendado"
+                                : f.id === "harris"
+                                  ? "historico"
+                                  : "medicao"
+                            }
+                          />
+                        </span>
+                        <span className="font-display text-xl text-grafite">
+                          {f.nome}
+                        </span>
+                      </span>
+                      <span
+                        aria-hidden
+                        className={`mt-1 flex size-4 shrink-0 items-center justify-center rounded-full border ${
+                          selecionada ? "border-ouro-profundo" : "border-grafite/30"
+                        }`}
+                      >
+                        {selecionada && <span className="size-2 rounded-full bg-ouro-profundo" />}
+                      </span>
+                    </span>
+                    {f.id === "mifflin" && (
+                      <span className="mt-3 inline-block bg-grafite px-2 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-porcelana">
+                        Recomendado
+                      </span>
+                    )}
+                    <span className="mt-3 block text-sm leading-relaxed text-grafite">
+                      {f.nota}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </fieldset>
 
           {formula === "katch" && (
             <div className="lg:col-span-3">
@@ -165,7 +237,7 @@ export function Calculadora() {
                   set={setGordura}
                 />
               </div>
-              <p className="mt-2.5 text-xs text-grafite/50">
+              <p className="mt-2.5 text-xs text-grafite">
                 Use um valor medido (bioimpedância, adipômetro ou DEXA). Chute
                 não melhora o resultado — piora.
               </p>
@@ -175,9 +247,15 @@ export function Calculadora() {
       </form>
 
       {/* ── 2. Objetivo ───────────────────────────────────────── */}
-      <form onSubmit={(e) => e.preventDefault()} aria-label="Seu objetivo">
+      <form
+        id="calc-objetivo"
+        onSubmit={(e) => e.preventDefault()}
+        aria-label="Seu objetivo"
+        className="surface-card scroll-mt-28 bg-white p-6 sm:p-10 lg:p-12"
+      >
         <p className="t-eyebrow flex items-center gap-3 text-ouro-profundo">
           <span aria-hidden className="rule-gold inline-block h-px w-8" />
+          <Icone tipo="alvo" />
           02 / Onde você quer chegar
         </p>
 
@@ -209,14 +287,14 @@ export function Calculadora() {
                   className={`h-10 w-10 rounded-full text-sm transition-colors duration-300 ${
                     refeicoes === n
                       ? "bg-grafite text-porcelana"
-                      : "text-grafite/60 hover:text-grafite"
+                      : "text-grafite hover:text-grafite"
                   }`}
                 >
                   {n}
                 </button>
               ))}
             </div>
-            <p className="mt-2.5 text-xs text-grafite/45">
+            <p className="mt-2.5 text-xs text-grafite">
               O número de refeições não muda o resultado — muda a sua adesão.
               Escolha o que cabe na rotina.
             </p>
@@ -225,19 +303,35 @@ export function Calculadora() {
       </form>
 
       {/* ── 3. Resultado ──────────────────────────────────────── */}
-      <div aria-live="polite">
-        {dados ? (
-          <Resultado {...dados} />
-        ) : (
-          <div className="border-t border-linha-ouro pt-10">
+      <div id="calc-resultado" aria-live="polite" className="scroll-mt-28">
+        <AnimatePresence mode="wait" initial={false}>
+          {dados ? (
+            <motion.div
+              key="resultado"
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.35 }}
+            >
+              <Resultado {...dados} />
+            </motion.div>
+          ) : (
+          <motion.div
+            key="vazio"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="border-t border-linha-ouro pt-10"
+          >
             <span aria-hidden className="rule-gold h-px w-16" />
-            <p className="mt-7 max-w-sm font-display text-2xl leading-snug text-grafite/45">
+            <p className="mt-7 max-w-sm font-display text-2xl leading-snug text-grafite">
               {faltaGordura
                 ? "Informe também o percentual de gordura para usar a Katch-McArdle."
                 : "Preencha idade, peso e altura para ver o plano."}
             </p>
-          </div>
-        )}
+          </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
@@ -265,6 +359,7 @@ function Resultado({ base, plano, macros, pratos, parametros }: DadosCalculados)
     <div className="border-t border-linha-ouro pt-12">
       <p className="t-eyebrow flex items-center gap-3 text-ouro-profundo">
         <span aria-hidden className="rule-gold inline-block h-px w-8" />
+        <Icone tipo="grafico" />
         03 / Seu plano
       </p>
 
@@ -308,7 +403,7 @@ function Resultado({ base, plano, macros, pratos, parametros }: DadosCalculados)
       )}
 
       {plano.limitado && (
-        <p className="mt-7 max-w-2xl border-l-2 border-ouro pl-5 text-sm leading-relaxed text-grafite/75">
+        <p className="mt-7 max-w-2xl border-l-2 border-ouro pl-5 text-sm leading-relaxed text-grafite">
           O ritmo foi reduzido de propósito. Chegar mais rápido exigiria um
           déficit que cai abaixo do seu metabolismo basal — exatamente a dieta
           extrema que não se sustenta e que devolve o peso depois.
@@ -316,7 +411,7 @@ function Resultado({ base, plano, macros, pratos, parametros }: DadosCalculados)
       )}
 
       {/* Macros */}
-      <h3 className="t-eyebrow mt-16 text-grafite/50">Macronutrientes no alvo</h3>
+      <h3 className="t-eyebrow mt-16 text-grafite">Macronutrientes no alvo</h3>
       <dl className="mt-6 grid gap-px overflow-hidden rounded-sm bg-linha sm:grid-cols-3">
         <Macro rotulo="Proteína" dados={macros.proteina} />
         <Macro rotulo="Gordura" dados={macros.gordura} />
@@ -324,7 +419,7 @@ function Resultado({ base, plano, macros, pratos, parametros }: DadosCalculados)
       </dl>
 
       {macros.apertado && (
-        <p className="mt-6 max-w-2xl text-sm leading-relaxed text-grafite/70">
+        <p className="mt-6 max-w-2xl text-sm leading-relaxed text-grafite">
           Sobrou pouco espaço para carboidrato. Num alvo assim, ou o déficit é
           agressivo demais, ou o gasto precisa subir — treinar mais rende melhor
           que comer menos.
@@ -332,7 +427,7 @@ function Resultado({ base, plano, macros, pratos, parametros }: DadosCalculados)
       )}
 
       {/* Distribuição */}
-      <h3 className="t-eyebrow mt-16 text-grafite/50">
+      <h3 className="t-eyebrow mt-16 text-grafite">
         Distribuição em {pratos.length} refeições
       </h3>
 
@@ -340,19 +435,19 @@ function Resultado({ base, plano, macros, pratos, parametros }: DadosCalculados)
         <table className="w-full min-w-[34rem] border-collapse text-sm">
           <thead>
             <tr className="border-b border-linha text-left">
-              <th scope="col" className="py-3 pr-4 font-normal text-grafite/50">
+              <th scope="col" className="py-3 pr-4 font-normal text-grafite">
                 Refeição
               </th>
-              <th scope="col" className="py-3 px-4 text-right font-normal text-grafite/50">
+              <th scope="col" className="py-3 px-4 text-right font-normal text-grafite">
                 kcal
               </th>
-              <th scope="col" className="py-3 px-4 text-right font-normal text-grafite/50">
+              <th scope="col" className="py-3 px-4 text-right font-normal text-grafite">
                 Proteína
               </th>
-              <th scope="col" className="py-3 px-4 text-right font-normal text-grafite/50">
+              <th scope="col" className="py-3 px-4 text-right font-normal text-grafite">
                 Carboidrato
               </th>
-              <th scope="col" className="py-3 pl-4 text-right font-normal text-grafite/50">
+              <th scope="col" className="py-3 pl-4 text-right font-normal text-grafite">
                 Gordura
               </th>
             </tr>
@@ -366,29 +461,29 @@ function Resultado({ base, plano, macros, pratos, parametros }: DadosCalculados)
                 <td className="py-3.5 px-4 text-right font-display text-lg text-ouro-profundo">
                   {num(r.kcal)}
                 </td>
-                <td className="py-3.5 px-4 text-right text-grafite/70">{r.proteina} g</td>
-                <td className="py-3.5 px-4 text-right text-grafite/70">{r.carboidrato} g</td>
-                <td className="py-3.5 pl-4 text-right text-grafite/70">{r.gordura} g</td>
+                <td className="py-3.5 px-4 text-right text-grafite">{r.proteina} g</td>
+                <td className="py-3.5 px-4 text-right text-grafite">{r.carboidrato} g</td>
+                <td className="py-3.5 pl-4 text-right text-grafite">{r.gordura} g</td>
               </tr>
             ))}
           </tbody>
           <tfoot>
             <tr>
-              <th scope="row" className="py-3.5 pr-4 text-left text-xs uppercase tracking-[0.13em] text-grafite/50">
+              <th scope="row" className="py-3.5 pr-4 text-left text-xs uppercase tracking-[0.13em] text-grafite">
                 Total
               </th>
               <td className="py-3.5 px-4 text-right font-display text-lg text-grafite">
                 {num(plano.alvo)}
               </td>
-              <td className="py-3.5 px-4 text-right text-grafite/70">{macros.proteina.g} g</td>
-              <td className="py-3.5 px-4 text-right text-grafite/70">{macros.carboidrato.g} g</td>
-              <td className="py-3.5 pl-4 text-right text-grafite/70">{macros.gordura.g} g</td>
+              <td className="py-3.5 px-4 text-right text-grafite">{macros.proteina.g} g</td>
+              <td className="py-3.5 px-4 text-right text-grafite">{macros.carboidrato.g} g</td>
+              <td className="py-3.5 pl-4 text-right text-grafite">{macros.gordura.g} g</td>
             </tr>
           </tfoot>
         </table>
       </div>
 
-      <p className="mt-6 max-w-2xl text-sm leading-relaxed text-grafite/60">
+      <p className="mt-6 max-w-2xl text-sm leading-relaxed text-grafite">
         A proteína foi dividida por igual de propósito: o estímulo de síntese
         responde à dose por refeição, não ao total jogado de uma vez. Já os
         carboidratos você pode concentrar em volta do treino — é aí que rendem
@@ -400,7 +495,7 @@ function Resultado({ base, plano, macros, pratos, parametros }: DadosCalculados)
 
       {/* Ponte para a consultoria */}
       <div className="mt-14 border-t border-linha pt-9">
-        <p className="max-w-xl leading-relaxed text-grafite/70">{calculadora.ponte}</p>
+        <p className="max-w-xl leading-relaxed text-grafite">{calculadora.ponte}</p>
         <Link
           href="/#contato"
           className="group mt-7 inline-flex items-center gap-2.5 rounded-full bg-grafite px-7 py-3.5 text-sm font-medium tracking-wide text-porcelana transition-all duration-300 hover:bg-ouro-profundo"
@@ -430,7 +525,7 @@ function Numeral({
     <div className={`p-7 ${destaque ? "bg-grafite" : "bg-porcelana"}`}>
       <dt
         className={`text-xs uppercase tracking-[0.13em] ${
-          destaque ? "text-ouro" : "text-grafite/55"
+          destaque ? "text-ouro" : "text-grafite"
         }`}
       >
         {rotulo}
@@ -440,10 +535,17 @@ function Numeral({
           destaque ? "text-porcelana" : "text-grafite"
         }`}
       >
-        {num(valor)}
+        <motion.span
+          key={valor}
+          initial={{ opacity: 0, y: 8, filter: "blur(4px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          transition={{ duration: 0.3 }}
+        >
+          {num(valor)}
+        </motion.span>
         <span
           className={`ml-2.5 font-sans text-sm tracking-wide ${
-            destaque ? "text-porcelana/45" : "text-grafite/40"
+            destaque ? "text-porcelana/70" : "text-grafite"
           }`}
         >
           kcal
@@ -451,7 +553,7 @@ function Numeral({
       </dd>
       <dd
         className={`mt-3.5 text-xs leading-relaxed ${
-          destaque ? "text-porcelana/55" : "text-grafite/55"
+          destaque ? "text-porcelana/70" : "text-grafite"
         }`}
       >
         {nota}
@@ -469,10 +571,10 @@ function Macro({
 }) {
   return (
     <div className="bg-porcelana p-6">
-      <dt className="text-xs uppercase tracking-[0.13em] text-grafite/55">{rotulo}</dt>
+      <dt className="text-xs uppercase tracking-[0.13em] text-grafite">{rotulo}</dt>
       <dd className="mt-3 font-display text-3xl text-grafite">
         {num(dados.g)}
-        <span className="ml-1.5 font-sans text-sm text-grafite/40">g</span>
+        <span className="ml-1.5 font-sans text-sm text-grafite">g</span>
       </dd>
       {/* barra da proporção — ouro como ponto de direção */}
       <dd className="mt-4">
@@ -482,7 +584,7 @@ function Macro({
             style={{ width: `${dados.pct}%` }}
           />
         </span>
-        <span className="mt-2.5 block text-xs text-grafite/50">
+        <span className="mt-2.5 block text-xs text-grafite">
           {dados.pct}% das calorias · {num(dados.kcal)} kcal
         </span>
       </dd>
@@ -493,9 +595,74 @@ function Macro({
 function Traco({ rotulo, valor }: { rotulo: string; valor: string }) {
   return (
     <div>
-      <p className="text-xs uppercase tracking-[0.13em] text-grafite/50">{rotulo}</p>
+      <p className="text-xs uppercase tracking-[0.13em] text-grafite">{rotulo}</p>
       <p className="mt-1.5 font-display text-xl text-grafite">{valor}</p>
     </div>
+  );
+}
+
+type TipoIcone =
+  | "pessoa"
+  | "alvo"
+  | "grafico"
+  | "recomendado"
+  | "historico"
+  | "medicao";
+
+/** Ícones lineares, sem dependência externa, para orientar sem competir com o texto. */
+function Icone({ tipo }: { tipo: TipoIcone }) {
+  const caminhos: Record<TipoIcone, React.ReactNode> = {
+    pessoa: (
+      <>
+        <circle cx="12" cy="8" r="3" />
+        <path d="M5.5 20c.6-4.1 2.8-6 6.5-6s5.9 1.9 6.5 6" />
+      </>
+    ),
+    alvo: (
+      <>
+        <circle cx="12" cy="12" r="7" />
+        <circle cx="12" cy="12" r="3" />
+        <path d="m14 10 5-5m0 0v3m0-3h-3" />
+      </>
+    ),
+    grafico: (
+      <>
+        <path d="M4 19V5m0 14h16" />
+        <path d="m7 15 4-4 3 2 5-6" />
+      </>
+    ),
+    recomendado: (
+      <>
+        <path d="m12 3 2.2 4.5 5 .7-3.6 3.5.9 5-4.5-2.4-4.5 2.4.9-5-3.6-3.5 5-.7L12 3Z" />
+      </>
+    ),
+    historico: (
+      <>
+        <circle cx="12" cy="12" r="8" />
+        <path d="M12 7v5l3 2M5.5 5.5 3 5V2" />
+      </>
+    ),
+    medicao: (
+      <>
+        <path d="M5 19a7 7 0 1 1 14 0H5Z" />
+        <path d="m12 12 3-3M8 17h8" />
+      </>
+    ),
+  };
+
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 24 24"
+      className="size-4 shrink-0"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      {caminhos[tipo]}
+    </svg>
   );
 }
 
@@ -528,7 +695,7 @@ function Numero({
           onChange={(e) => set(e.target.value.replace(/[^\d.,]/g, "").slice(0, 6))}
           className={`${campoBase} border-0 focus:border-0`}
         />
-        <span className="shrink-0 pb-3 text-xs text-grafite/40">{unidade}</span>
+        <span className="shrink-0 pb-3 text-xs text-grafite">{unidade}</span>
       </div>
     </div>
   );

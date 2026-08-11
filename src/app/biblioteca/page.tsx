@@ -44,13 +44,13 @@ export default async function Page() {
 
           <Container className="relative">
             <nav aria-label="Você está em" className="pt-8">
-              <ol className="flex flex-wrap items-center gap-2 text-xs text-porcelana/45">
+              <ol className="flex flex-wrap items-center gap-2 text-xs text-porcelana/70">
                 <li>
                   <Link href="/" className="transition-colors hover:text-ouro">
                     Início
                   </Link>
                 </li>
-                <li aria-hidden className="text-porcelana/25">
+                <li aria-hidden className="text-porcelana/70">
                   /
                 </li>
                 <li aria-current="page" className="text-porcelana/75">
@@ -80,7 +80,7 @@ export default async function Page() {
                   <p className="mt-3 font-display text-2xl text-porcelana">
                     {destaque.titulo}
                   </p>
-                  <p className="mt-1.5 text-sm text-porcelana/50">
+                  <p className="mt-1.5 text-sm text-porcelana/70">
                     {destaque.autor}
                     {destaque.ano ? ` · ${destaque.ano}` : ""}
                   </p>
@@ -153,7 +153,7 @@ export default async function Page() {
                           {l.titulo}
                         </span>
                         {l.subtitulo && (
-                          <span className="mt-1.5 block text-sm text-porcelana/50">
+                          <span className="mt-1.5 block text-sm text-porcelana/70">
                             {l.subtitulo}
                           </span>
                         )}

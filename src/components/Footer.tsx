@@ -30,7 +30,7 @@ export function Footer() {
 
           <div className="grid gap-10 sm:grid-cols-2">
             <nav aria-label="Rodapé">
-              <p className="t-eyebrow text-porcelana/40">Navegação</p>
+              <p className="t-eyebrow text-porcelana/70">Navegação</p>
               <ul className="mt-5 space-y-3 text-sm">
                 {nav.map((item) => (
                   <li key={item.href}>
@@ -46,7 +46,7 @@ export function Footer() {
             </nav>
 
             <div>
-              <p className="t-eyebrow text-porcelana/40">Contato</p>
+              <p className="t-eyebrow text-porcelana/70">Contato</p>
               <ul className="mt-5 space-y-3 text-sm">
                 <li>
                   <Link
@@ -72,6 +72,28 @@ export function Footer() {
                 </li>
                 <li>
                   <Link
+                    href={marca.youtube}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group inline-flex items-center gap-2 text-porcelana/70 transition-colors hover:text-ouro"
+                  >
+                    {marca.youtubeNome}
+                    <Arrow />
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href={marca.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group inline-flex items-center gap-2 text-porcelana/70 transition-colors hover:text-ouro"
+                  >
+                    LinkedIn
+                    <Arrow />
+                  </Link>
+                </li>
+                <li>
+                  <Link
                     href="#contato"
                     className="text-porcelana/70 transition-colors hover:text-ouro"
                   >
@@ -85,7 +107,7 @@ export function Footer() {
 
         <hr className="my-14 h-px border-0 bg-porcelana/12" />
 
-        <div className="flex flex-col gap-6 text-xs text-porcelana/40 lg:flex-row lg:items-start lg:justify-between">
+        <div className="flex flex-col gap-6 text-xs text-porcelana/70 lg:flex-row lg:items-start lg:justify-between">
           <p className="max-w-2xl leading-relaxed">{rodape.disclaimer}</p>
           <p className="shrink-0">
             © {ano} {marca.nome}

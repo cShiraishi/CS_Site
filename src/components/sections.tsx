@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Logo } from "./Logo";
+import { FAQ } from "./FAQ";
 import { Arrow, Button, Container, Eyebrow, Rule, Section, buttonClass } from "./ui";
 import {
   calculadora,
@@ -37,7 +38,7 @@ export function Hero() {
               {hero.titulo}
             </h1>
 
-            <p className="t-sub mt-8 max-w-xl text-pretty text-grafite/72">
+            <p className="t-sub mt-8 max-w-xl text-pretty text-grafite">
               {hero.texto}
             </p>
 
@@ -49,7 +50,7 @@ export function Hero() {
               </Link>
             </div>
 
-            <p className="mt-8 flex items-center gap-2.5 text-xs text-grafite/55">
+            <p className="mt-8 flex items-center gap-2.5 text-xs text-grafite">
               <span aria-hidden className="rule-gold h-px w-6" />
               {hero.nota}
             </p>
@@ -68,7 +69,7 @@ export function Hero() {
                 className="h-full w-full object-cover"
               />
             </div>
-            <p className="mt-6 text-center font-display text-lg italic text-grafite/60">
+            <p className="mt-6 text-center font-display text-lg italic text-grafite">
               {marca.assinatura}
             </p>
           </div>
@@ -82,7 +83,7 @@ export function Hero() {
               <dt className="font-display text-4xl text-ouro-profundo sm:text-5xl">
                 {c.valor}
               </dt>
-              <dd className="mt-2.5 text-xs uppercase tracking-[0.14em] text-grafite/60">
+              <dd className="mt-2.5 text-xs uppercase tracking-[0.14em] text-grafite">
                 {c.rotulo}
               </dd>
             </div>
@@ -115,7 +116,7 @@ export function Pilares() {
             <div key={p.titulo}>
               <span aria-hidden className="rule-gold draw-in block h-px w-10" />
               <h3 className="mt-5 text-sm uppercase tracking-[0.16em]">{p.titulo}</h3>
-              <p className="mt-3 text-[0.95rem] leading-relaxed text-grafite/70">
+              <p className="mt-3 text-[0.95rem] leading-relaxed text-grafite">
                 {p.texto}
               </p>
             </div>
@@ -138,7 +139,7 @@ export function ParaQuem() {
           <h2 className="t-title reveal mt-7 whitespace-pre-line text-balance">
             {paraQuem.titulo}
           </h2>
-          <p className="mt-7 max-w-md text-pretty leading-relaxed text-grafite/70">
+          <p className="mt-7 max-w-md text-pretty leading-relaxed text-grafite">
             {paraQuem.texto}
           </p>
         </div>
@@ -159,10 +160,10 @@ export function ParaQuem() {
           </ul>
 
           <div className="mt-10">
-            <p className="t-eyebrow text-grafite/45">Não é para</p>
+            <p className="t-eyebrow text-grafite">Não é para</p>
             <ul className="mt-4 space-y-2.5">
               {paraQuem.naoE.map((item) => (
-                <li key={item} className="flex items-start gap-3 text-sm text-grafite/55">
+                <li key={item} className="flex items-start gap-3 text-sm text-grafite">
                   <span aria-hidden className="mt-2.5 h-px w-3 shrink-0 bg-grafite/35" />
                   {item}
                 </li>
@@ -184,7 +185,7 @@ export function Metodo() {
       <div className="max-w-2xl">
         <Eyebrow>{metodo.eyebrow}</Eyebrow>
         <h2 className="t-title reveal mt-7 text-balance">{metodo.titulo}</h2>
-        <p className="mt-7 text-pretty leading-relaxed text-grafite/70">{metodo.texto}</p>
+        <p className="mt-7 text-pretty leading-relaxed text-grafite">{metodo.texto}</p>
       </div>
 
       <ol className="stagger mt-20 grid gap-px overflow-hidden rounded-sm bg-linha sm:grid-cols-2">
@@ -194,11 +195,11 @@ export function Metodo() {
               aria-hidden
               className="rule-gold absolute left-0 top-0 h-px w-0 transition-all duration-500 group-hover:w-full"
             />
-            <span className="font-display text-5xl text-ouro/45 transition-colors duration-500 group-hover:text-ouro">
+            <span aria-hidden className="font-display text-5xl text-ouro-profundo transition-colors duration-500 group-hover:text-grafite">
               {e.n}
             </span>
             <h3 className="mt-6 font-display text-2xl">{e.titulo}</h3>
-            <p className="mt-3.5 text-[0.95rem] leading-relaxed text-grafite/70">
+            <p className="mt-3.5 text-[0.95rem] leading-relaxed text-grafite">
               {e.texto}
             </p>
           </li>
@@ -217,7 +218,7 @@ export function Programa() {
       <div className="max-w-2xl">
         <Eyebrow>{programa.eyebrow}</Eyebrow>
         <h2 className="t-title reveal mt-7 text-balance">{programa.titulo}</h2>
-        <p className="mt-7 text-pretty leading-relaxed text-grafite/70">
+        <p className="mt-7 text-pretty leading-relaxed text-grafite">
           {programa.texto}
         </p>
       </div>
@@ -226,13 +227,13 @@ export function Programa() {
         {programa.itens.map((item, i) => (
           <div key={item.titulo}>
             <div className="flex items-baseline gap-3">
-              <span className="font-display text-sm text-ouro-profundo/70">
+              <span className="font-display text-sm text-ouro-profundo">
                 {String(i + 1).padStart(2, "0")}
               </span>
               <span aria-hidden className="rule-gold draw-in h-px flex-1" />
             </div>
             <h3 className="mt-5 font-display text-xl">{item.titulo}</h3>
-            <p className="mt-3 text-[0.93rem] leading-relaxed text-grafite/70">
+            <p className="mt-3 text-[0.93rem] leading-relaxed text-grafite">
               {item.texto}
             </p>
           </div>
@@ -248,12 +249,14 @@ export function Programa() {
 export function Resultados() {
   return (
     <Section id="resultados" tone="grafite">
-      <div className="grid gap-14 lg:grid-cols-[0.9fr_1.1fr] lg:gap-24">
+      <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-end lg:gap-24">
         <div>
           <Eyebrow tone="claro">{resultados.eyebrow}</Eyebrow>
           <h2 className="t-title reveal mt-7 text-balance text-porcelana">
             {resultados.titulo}
           </h2>
+        </div>
+        <div>
           <p className="mt-7 max-w-md text-pretty leading-relaxed text-porcelana/65">
             {resultados.texto}
           </p>
@@ -267,21 +270,50 @@ export function Resultados() {
             <Arrow />
           </Link>
         </div>
-
-        <div className="stagger space-y-px">
-          {resultados.depoimentos.map((d) => (
-            <figure key={d.autor} className="border-t border-porcelana/12 py-8 first:border-t-0 first:pt-0">
-              <blockquote className="font-display text-xl leading-snug text-porcelana/90 sm:text-2xl">
-                <span aria-hidden className="text-ouro">“</span>
-                {d.texto}
-              </blockquote>
-              <figcaption className="mt-4 text-xs uppercase tracking-[0.14em] text-porcelana/45">
-                {d.autor}
-              </figcaption>
-            </figure>
-          ))}
-        </div>
       </div>
+
+      <div className="stagger mt-16 grid items-start gap-5 sm:grid-cols-3">
+        {resultados.transformacoes.map((pessoa) => (
+          <Link
+            key={pessoa.instagram}
+            href={pessoa.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Ver ${pessoa.instagram} no Instagram`}
+            className="group relative isolate overflow-hidden border border-porcelana/12 bg-white/5 transition-all duration-500 hover:-translate-y-2 hover:border-ouro/45 hover:shadow-[0_24px_60px_rgba(0,0,0,0.32)]"
+          >
+            <Image
+              src={pessoa.imagem}
+              alt={pessoa.alt}
+              width={pessoa.largura}
+              height={pessoa.altura}
+              sizes="(max-width: 640px) 100vw, 33vw"
+              className="h-auto w-full opacity-90 transition-all duration-700 group-hover:scale-[1.025] group-hover:opacity-100"
+            />
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-grafite via-grafite/55 to-transparent"
+            />
+            <span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5">
+              <span>
+                <span className="block font-display text-xl text-porcelana">
+                  {pessoa.nome}
+                </span>
+                <span className="mt-1 block text-xs tracking-wide text-porcelana/65">
+                  {pessoa.instagram}
+                </span>
+              </span>
+              <span className="flex size-9 shrink-0 items-center justify-center rounded-full border border-porcelana/25 bg-white/10 text-ouro backdrop-blur-md transition-transform duration-300 group-hover:-translate-y-1 group-hover:translate-x-1">
+                <Arrow />
+              </span>
+            </span>
+          </Link>
+        ))}
+      </div>
+
+      <p className="mt-6 max-w-2xl text-xs leading-relaxed text-porcelana/70">
+        {resultados.aviso}
+      </p>
     </Section>
   );
 }
@@ -292,40 +324,89 @@ export function Resultados() {
 export function Sobre() {
   return (
     <Section id="sobre" tone="branco">
-      <div className="grid gap-16 lg:grid-cols-[0.9fr_1.1fr] lg:gap-24">
-        <div>
-          <Eyebrow>{sobre.eyebrow}</Eyebrow>
-          <h2 className="t-title reveal mt-7 whitespace-pre-line text-balance">
-            {sobre.titulo}
-          </h2>
+      <div className="max-w-2xl">
+        <Eyebrow>{sobre.eyebrow}</Eyebrow>
+        <h2 className="t-title reveal mt-7 whitespace-pre-line text-balance">
+          {sobre.titulo}
+        </h2>
+      </div>
 
-          <figure className="mt-12 border-l border-linha-ouro pl-7">
-            <blockquote className="font-display text-2xl italic leading-snug text-grafite/85">
+      <div className="mt-16 grid gap-14 lg:grid-cols-[0.85fr_1.15fr] lg:items-center lg:gap-24">
+        <figure className="group relative mx-auto w-full max-w-md lg:mx-0">
+          <span
+            aria-hidden
+            className="absolute -bottom-3 -right-3 h-full w-full border border-linha-ouro transition-transform duration-500 group-hover:translate-x-1 group-hover:translate-y-1"
+          />
+          <div className="relative overflow-hidden bg-grafite shadow-[0_24px_70px_rgba(29,27,25,0.16)]">
+            <Image
+              src="/sobre/carlos-seiti.png"
+              alt="Carlos Seiti em ambiente de treino"
+              width={1087}
+              height={1448}
+              sizes="(max-width: 1024px) 100vw, 40vw"
+              className="h-auto w-full transition-transform duration-700 group-hover:scale-[1.025]"
+            />
+            <span
+              aria-hidden
+              className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-grafite/75 to-transparent"
+            />
+            <figcaption className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-6 text-porcelana">
+              <span>
+                <span className="block font-display text-2xl">{marca.nome}</span>
+                <span className="mt-1 block text-xs uppercase tracking-[0.14em] text-porcelana/70">
+                  Ciência aplicada à vida real
+                </span>
+              </span>
+              <Logo size={44} className="ring-porcelana/25" />
+            </figcaption>
+          </div>
+        </figure>
+
+        <div className="stagger space-y-6">
+          <figure className="mb-10 border-l border-linha-ouro pl-7">
+            <blockquote className="font-display text-2xl italic leading-snug text-grafite/85 sm:text-3xl">
               {sobre.citacao}
             </blockquote>
           </figure>
-        </div>
 
-        <div className="stagger space-y-6">
           {sobre.paragrafos.map((p) => (
-            <p key={p.slice(0, 24)} className="text-pretty leading-[1.75] text-grafite/75">
+            <p key={p.slice(0, 24)} className="text-pretty leading-[1.75] text-grafite">
               {p}
             </p>
           ))}
 
-          <div className="flex items-center gap-4 pt-6">
-            <Logo size={52} />
-            <div className="text-sm leading-relaxed text-grafite/60">
-              <p className="font-display tracking-[0.14em] text-grafite">
-                {marca.nome.toUpperCase()}
-              </p>
+          <div className="flex flex-wrap items-center gap-x-7 gap-y-4 pt-6 text-sm leading-relaxed text-grafite">
+            <div>
               <Link
                 href={marca.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="transition-colors hover:text-ouro-profundo"
+                className="group inline-flex items-center gap-2 border-b border-linha-ouro pb-1.5 transition-colors hover:text-ouro-profundo"
               >
                 {marca.instagramHandle}
+                <Arrow />
+              </Link>
+            </div>
+            <div>
+              <Link
+                href={marca.youtube}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-center gap-2 border-b border-linha-ouro pb-1.5 transition-colors hover:text-ouro-profundo"
+              >
+                {marca.youtubeNome}
+                <Arrow />
+              </Link>
+            </div>
+            <div>
+              <Link
+                href={marca.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-center gap-2 border-b border-linha-ouro pb-1.5 transition-colors hover:text-ouro-profundo"
+              >
+                LinkedIn
+                <Arrow />
               </Link>
             </div>
           </div>
@@ -347,28 +428,7 @@ export function Duvidas() {
           <h2 className="t-title mt-7 text-balance">{duvidas.titulo}</h2>
         </div>
 
-        <div>
-          {duvidas.itens.map((item) => (
-            <details
-              key={item.p}
-              className="group border-b border-linha py-6 first:border-t first:border-linha"
-            >
-              <summary className="flex cursor-pointer list-none items-start justify-between gap-8 text-[1.02rem] leading-snug text-grafite marker:hidden [&::-webkit-details-marker]:hidden">
-                {item.p}
-                <span
-                  aria-hidden
-                  className="relative mt-2 h-3 w-3 shrink-0 text-ouro-profundo"
-                >
-                  <span className="absolute left-0 top-1/2 h-px w-3 bg-current" />
-                  <span className="absolute left-1/2 top-0 h-3 w-px bg-current transition-transform duration-300 group-open:rotate-90 group-open:opacity-0" />
-                </span>
-              </summary>
-              <p className="mt-4 max-w-2xl pr-10 text-[0.95rem] leading-relaxed text-grafite/70">
-                {item.r}
-              </p>
-            </details>
-          ))}
-        </div>
+        <FAQ itens={duvidas.itens} />
       </div>
     </Section>
   );
@@ -404,7 +464,7 @@ export function Ferramenta() {
               {calculadora.cta}
               <Arrow />
             </Link>
-            <span className="text-xs text-porcelana/45">
+            <span className="text-xs text-porcelana/70">
               Gratuito · sem cadastro
             </span>
           </div>
@@ -421,16 +481,16 @@ export function Ferramenta() {
             <div key={c.r} className="bg-grafite p-7">
               <p className="font-display text-3xl text-ouro sm:text-4xl">
                 {c.n}
-                <span className="ml-1.5 font-sans text-xs text-porcelana/40">
+                <span className="ml-1.5 font-sans text-xs text-porcelana/70">
                   {c.u}
                 </span>
               </p>
-              <p className="mt-2.5 text-xs uppercase tracking-[0.13em] text-porcelana/50">
+              <p className="mt-2.5 text-xs uppercase tracking-[0.13em] text-porcelana/70">
                 {c.r}
               </p>
             </div>
           ))}
-          <p className="col-span-2 bg-grafite px-7 pb-7 text-xs leading-relaxed text-porcelana/40">
+          <p className="col-span-2 bg-grafite px-7 pb-7 text-xs leading-relaxed text-porcelana/70">
             Exemplo — homem, 32 anos, 78 kg, 176 cm, treinando 4× por semana.
           </p>
         </div>

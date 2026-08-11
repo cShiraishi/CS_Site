@@ -33,7 +33,7 @@ export function CapturaPlano({ parametros }: { parametros: Parametros }) {
       <div className="mt-14 border-t border-linha-ouro pt-10">
         <span aria-hidden className="rule-gold h-px w-16" />
         <h3 className="t-title mt-6">Enviado.</h3>
-        <p className="mt-4 max-w-md leading-relaxed text-grafite/70">
+        <p className="mt-4 max-w-md leading-relaxed text-grafite">
           {calculadora.captura.sucesso}
         </p>
       </div>
@@ -45,7 +45,7 @@ export function CapturaPlano({ parametros }: { parametros: Parametros }) {
       <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
         <div>
           <h3 className="t-title text-balance">{calculadora.captura.titulo}</h3>
-          <p className="mt-5 max-w-sm leading-relaxed text-grafite/70">
+          <p className="mt-5 max-w-sm leading-relaxed text-grafite">
             {calculadora.captura.texto}
           </p>
         </div>
@@ -101,7 +101,7 @@ export function CapturaPlano({ parametros }: { parametros: Parametros }) {
           )}
 
           <div className="flex flex-wrap items-center justify-between gap-6">
-            <p className="max-w-xs text-xs leading-relaxed text-grafite/45">
+            <p className="max-w-xs text-xs leading-relaxed text-grafite">
               {calculadora.captura.nota}
             </p>
             <Botao />

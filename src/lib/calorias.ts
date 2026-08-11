@@ -28,17 +28,17 @@ export const FORMULAS = [
   {
     id: "mifflin",
     nome: "Mifflin-St Jeor",
-    nota: "Padrão atual. Menor erro médio em adultos.",
+    nota: "Use esta se não souber qual escolher. Funciona bem para a maioria das pessoas.",
   },
   {
     id: "harris",
     nome: "Harris-Benedict",
-    nota: "Revisada em 1984. Tende a superestimar com sobrepeso.",
+    nota: "Uma estimativa alternativa, baseada em uma equação mais antiga.",
   },
   {
     id: "katch",
     nome: "Katch-McArdle",
-    nota: "A mais precisa — exige percentual de gordura medido.",
+    nota: "Escolha apenas se você conhece seu percentual de gordura medido.",
   },
 ] as const satisfies ReadonlyArray<{ id: Formula; nome: string; nota: string }>;
 
