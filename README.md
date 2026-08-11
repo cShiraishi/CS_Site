@@ -140,6 +140,15 @@ Opções: `--largura` (padrão 1600 px), `--qualidade` (padrão 82) e
 
 Requer `pip install pymupdf`.
 
+### Publicar é uma decisão à parte
+
+O script escreve em `public/leitura/`, mas nada ali sobe sozinho: cada livro
+entra no repositório de propósito, com `git add public/leitura/<slug>`.
+
+O `branding-book` está no `.gitignore` — ele roda localmente como demonstração
+do leitor, mas é material interno de identidade e não conteúdo de consultoria.
+Para publicá-lo mesmo assim, remova a linha correspondente do `.gitignore`.
+
 ### Por que imagens e não pdf.js
 
 Renderizar PDF no navegador custa cerca de 1 MB de JavaScript. Aqui as páginas

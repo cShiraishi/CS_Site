@@ -46,3 +46,8 @@ next-env.d.ts
 desktop.ini
 *:Zone.Identifier
 Thumbs.db
+
+# Livros de leitura online: cada um é uma decisão de publicação.
+# O brand book fica só na máquina — é material interno de identidade.
+# Livros novos não são bloqueados; entram com `git add public/leitura/<slug>`.
+/public/leitura/branding-book/
