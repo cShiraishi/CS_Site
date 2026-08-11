@@ -137,15 +137,40 @@ export default async function Page() {
                       href={`/leitura/${l.slug}`}
                       className="group flex h-full flex-col gap-5 p-7 transition-colors hover:bg-porcelana/[0.04]"
                     >
-                      <span className="relative block overflow-hidden rounded-sm ring-1 ring-porcelana/12">
-                        <Image
-                          src={`/leitura/${l.slug}/${l.paginas[0].arquivo}`}
-                          alt={`Primeira página de ${l.titulo}`}
-                          width={l.largura}
-                          height={l.altura}
-                          sizes="(max-width: 640px) 90vw, 340px"
-                          className="h-auto w-full"
-                        />
+                      {/* Ao passar o rato, a capa abre e mostra o miolo —
+                          o mesmo gesto do leitor, em miniatura. */}
+                      <span className="capa-3d relative block">
+                        <span
+                          className="relative block overflow-hidden rounded-sm ring-1 ring-porcelana/12"
+                          style={{ aspectRatio: `${l.proporcao}` }}
+                        >
+                          {l.paginas[1] && (
+                            <Image
+                              src={`/leitura/${l.slug}/${l.paginas[1].arquivo}`}
+                              alt=""
+                              width={l.largura}
+                              height={l.altura}
+                              sizes="(max-width: 640px) 90vw, 340px"
+                              className="absolute inset-0 h-full w-full object-cover"
+                            />
+                          )}
+
+                          <span className="capa-folha absolute inset-0 origin-left overflow-hidden rounded-sm">
+                            <Image
+                              src={`/leitura/${l.slug}/${l.paginas[0].arquivo}`}
+                              alt={`Capa de ${l.titulo}`}
+                              width={l.largura}
+                              height={l.altura}
+                              sizes="(max-width: 640px) 90vw, 340px"
+                              className="h-full w-full object-cover"
+                            />
+                            {/* sombra da lombada, que aparece com a abertura */}
+                            <span
+                              aria-hidden
+                              className="capa-vinco pointer-events-none absolute inset-y-0 left-0 w-1/4"
+                            />
+                          </span>
+                        </span>
                       </span>
 
                       <span className="mt-auto">

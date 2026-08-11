@@ -450,3 +450,48 @@ input[type="range"]::-moz-range-thumb {
   background: var(--color-ouro);
   cursor: pointer;
 }
+
+/* ============================================================
+   CAPA QUE ABRE — cartões de leitura na biblioteca
+   O mesmo gesto do leitor, em miniatura: a capa gira na lombada
+   e mostra a página de dentro. Sem JavaScript.
+   ============================================================ */
+.capa-3d {
+  perspective: 1100px;
+  perspective-origin: left center;
+}
+
+.capa-folha {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  transition:
+    transform 0.65s cubic-bezier(0.34, 0.05, 0.2, 1),
+    box-shadow 0.65s ease;
+}
+
+/* O vinco só existe enquanto a capa está aberta. */
+.capa-vinco {
+  opacity: 0;
+  background: linear-gradient(
+    to right,
+    rgba(29, 27, 25, 0.45) 0%,
+    transparent 100%
+  );
+  transition: opacity 0.65s ease;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .group:hover .capa-folha,
+  .group:focus-visible .capa-folha {
+    transform: rotateY(-52deg);
+    box-shadow: 14px 0 34px -12px rgba(0, 0, 0, 0.75);
+  }
+
+  .group:hover .capa-vinco,
+  .group:focus-visible .capa-vinco {
+    opacity: 1;
+  }
+}
+
+/* Sem hover (toque) a capa fica fechada: abrir com o dedo em cima
+   esconderia justamente o que a pessoa quer ver. */
