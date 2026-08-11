@@ -125,11 +125,16 @@ justificativa escrita. Revise e troque pelo que você de fato recomenda.
 `/leitura/<slug>` — o PDF vira um livro que se folheia no navegador, com virada
 de página em três dimensões, teclado, tela cheia e download do original.
 
-### Adicionar um PDF
+### Adicionar um livro
+
+Aceita PDF ou Word:
 
 ```bash
-python scripts/preparar-livro.py caminho/do/arquivo.pdf meu-guia     --titulo "Guia de macros" --subtitulo "Do básico ao ajuste"
+python scripts/preparar-livro.py "Meu Guia.docx" meu-guia     --titulo "Guia de macros" --subtitulo "Do básico ao ajuste"
 ```
+
+Arquivo do Word é exportado para PDF pelo próprio Word antes de começar — é o
+que preserva a diagramação. Exige Windows com Word instalado.
 
 O script converte cada página em WebP, extrai o texto e escreve o manifesto em
 `public/leitura/meu-guia/`. A rota, o sitemap, o JSON-LD e a listagem na

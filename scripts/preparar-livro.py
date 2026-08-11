@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Prepara um PDF para o leitor online.
+Prepara um livro para o leitor online. Aceita PDF ou Word (.docx/.doc).
 
     python scripts/preparar-livro.py caminho/do/arquivo.pdf meu-livro \
         --titulo "Título" --subtitulo "Uma linha"
@@ -8,6 +8,10 @@ Prepara um PDF para o leitor online.
 Converte cada página em WebP, extrai o texto (para leitores de tela e
 para o Ctrl+F do navegador) e escreve um manifesto. Depois disso o
 livro já aparece em /leitura/meu-livro — nenhum código precisa mudar.
+
+Arquivo do Word é exportado para PDF pelo próprio Word antes de
+começar, que é o que preserva a diagramação. Exige Windows com Word
+instalado; em outro sistema, exporte para PDF à mão e passe o PDF.
 
 Por que imagens e não pdf.js: renderizar PDF no navegador custa cerca
 de 1 MB de JavaScript. Aqui as páginas são imagens comuns, passam pela
@@ -19,7 +23,9 @@ Requer PyMuPDF:  pip install pymupdf
 import argparse
 import json
 import shutil
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 try:
@@ -29,6 +35,43 @@ except ImportError:
 
 
 RAIZ = Path(__file__).resolve().parent.parent
+
+
+def word_para_pdf(docx: Path) -> Path:
+    """Exporta um documento do Word para PDF, usando o próprio Word."""
+    if sys.platform != "win32":
+        sys.exit(
+            "Converter .docx exige Windows com Word. Exporte para PDF à mão "
+            "e passe o PDF para este script."
+        )
+
+    saida = Path(tempfile.gettempdir()) / f"{docx.stem}.pdf"
+
+    # 17 = wdExportFormatPDF. O documento abre em modo leitura para não
+    # disparar caixas de diálogo que travariam o script.
+    script = f"""
+$ErrorActionPreference = 'Stop'
+$word = New-Object -ComObject Word.Application
+$word.Visible = $false
+$word.DisplayAlerts = 0
+try {{
+    $doc = $word.Documents.Open('{docx}', $false, $true)
+    $doc.ExportAsFixedFormat('{saida}', 17, $false, 0, 0, 0, 0, 0, $true, $true, 0, $true, $true, $false)
+    $doc.Close(0)
+}} finally {{
+    $word.Quit()
+}}
+"""
+    print(f"Exportando {docx.name} pelo Word…")
+    r = subprocess.run(
+        ["powershell", "-NoProfile", "-NonInteractive", "-Command", script],
+        capture_output=True,
+        text=True,
+    )
+    if r.returncode != 0 or not saida.is_file():
+        sys.exit(f"O Word não conseguiu exportar:\n{r.stderr.strip()}")
+
+    return saida
 
 
 def preparar(
@@ -42,6 +85,10 @@ def preparar(
 ) -> None:
     if not pdf.is_file():
         sys.exit(f"Não encontrei o arquivo: {pdf}")
+
+    original = pdf
+    if pdf.suffix.lower() in {".docx", ".doc"}:
+        pdf = word_para_pdf(pdf)
 
     destino = RAIZ / "public" / "leitura" / slug
     if destino.exists():
@@ -78,6 +125,10 @@ def preparar(
         arquivo_pdf = f"{slug}.pdf"
         shutil.copy2(pdf, destino / arquivo_pdf)
 
+    # O título cai no nome do arquivo de origem, não no do PDF temporário
+    if titulo is None:
+        titulo = original.stem.replace("_", " ")
+
     manifesto = {
         "slug": slug,
         "titulo": titulo or pdf.stem.replace("_", " "),
@@ -108,8 +159,10 @@ def preparar(
 
 
 def main() -> None:
-    p = argparse.ArgumentParser(description="Prepara um PDF para o leitor online.")
-    p.add_argument("pdf", type=Path, help="caminho do PDF")
+    p = argparse.ArgumentParser(
+        description="Prepara um livro (PDF ou Word) para o leitor online."
+    )
+    p.add_argument("pdf", type=Path, help="caminho do PDF ou do arquivo do Word")
     p.add_argument("slug", help="identificador na URL, ex.: guia-de-macros")
     p.add_argument("--titulo", help="título exibido no leitor")
     p.add_argument("--subtitulo", help="uma linha abaixo do título")
