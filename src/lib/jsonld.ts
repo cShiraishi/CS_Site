@@ -1,5 +1,5 @@
-import { LIVROS } from "./biblioteca";
 import { calculadora, duvidas, marca, metodo, programa, rotas } from "./content";
+import type { Leitura } from "./leituras";
 
 /**
  * Dados estruturados. Um único bloco @graph, com os tipos que
@@ -143,7 +143,7 @@ export function jsonLdCalculadora() {
  * Biblioteca: CollectionPage com um ItemList de Book.
  * Cada livro entra com título, autor e o motivo de estar na lista.
  */
-export function jsonLdBiblioteca() {
+export function jsonLdBiblioteca(livros: Leitura[]) {
   const url = `${marca.site}${rotas.biblioteca}`;
 
   return {
@@ -157,20 +157,21 @@ export function jsonLdBiblioteca() {
         inLanguage: "pt-BR",
         author: { "@id": `${marca.site}/#pessoa` },
         description:
-          "Livros de nutrição, treino e comportamento recomendados por Carlos Seiti, cada um com a justificativa da indicação.",
+          "Guias de nutrição, treino, postura e método escritos por Carlos Seiti, para ler online.",
         mainEntity: {
           "@type": "ItemList",
-          numberOfItems: LIVROS.length,
-          itemListElement: LIVROS.map((livro, i) => ({
+          numberOfItems: livros.length,
+          itemListElement: livros.map((livro, i) => ({
             "@type": "ListItem",
             position: i + 1,
             item: {
               "@type": "Book",
               name: livro.titulo,
-              author: { "@type": "Person", name: livro.autor },
-              ...(livro.ano ? { datePublished: String(livro.ano) } : {}),
-              description: livro.chamada,
+              ...(livro.subtitulo ? { description: livro.subtitulo } : {}),
+              numberOfPages: livro.total,
+              author: { "@id": `${marca.site}/#pessoa` },
               inLanguage: "pt-BR",
+              url: `${marca.site}/leitura/${livro.slug}`,
             },
           })),
         },
@@ -187,10 +188,6 @@ export function jsonLdBiblioteca() {
   };
 }
 
-/**
- * Uma leitura online. `Book` com `readOnlineUrl` é o par certo:
- * diz ao buscador que o conteúdo pode ser lido no próprio site.
- */
 export function jsonLdLeitura(livro: {
   slug: string;
   titulo: string;

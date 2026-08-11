@@ -56,3 +56,26 @@ export async function todasAsLeituras(): Promise<Leitura[]> {
   const livros = await Promise.all(slugs.map(lerLeitura));
   return livros.filter((l): l is Leitura => l !== null);
 }
+
+/**
+ * Ordem editorial da biblioteca. O primeiro da lista é o destaque.
+ * Livro preparado e não listado aqui entra no fim, por ordem alfabética.
+ */
+export const ORDEM = [
+  "macro-e-micro",
+  "postura",
+  "pre-treinos-naturais",
+  "mente-em-foco",
+  "estude-menos",
+] as const;
+
+export async function bibliotecaOrdenada(): Promise<Leitura[]> {
+  const livros = await todasAsLeituras();
+  const posicao = (slug: string) => {
+    const i = ORDEM.indexOf(slug as (typeof ORDEM)[number]);
+    return i === -1 ? ORDEM.length : i;
+  };
+  return livros.sort(
+    (a, b) => posicao(a.slug) - posicao(b.slug) || a.titulo.localeCompare(b.titulo),
+  );
+}

@@ -15,7 +15,7 @@ export default defineConfig({
     { name: "mobile", use: { ...devices["Pixel 7"] } },
   ],
   webServer: {
-    command: "npm run dev -- -p 3210",
+    command: "npm run dev -- --webpack -p 3210",
     url: "http://localhost:3210",
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

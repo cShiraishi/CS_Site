@@ -37,21 +37,16 @@ function Destaque({ video, total, aoAbrir }: { video: Video; total: number; aoAb
 /* ============================================================
    Cartão de vídeo
    ============================================================ */
-function Cartao({ video, aoAbrir, ranking, episodio }: { video: Video; aoAbrir: () => void; ranking?: number; episodio?: number }) {
+function Cartao({ video, aoAbrir, novidade, episodio }: { video: Video; aoAbrir: () => void; novidade?: boolean; episodio?: number }) {
   return (
-    <div className={`flex shrink-0 items-end ${ranking ? "w-72 sm:w-80 lg:w-[23rem]" : "w-60 sm:w-72 lg:w-80"}`}>
-      {ranking && (
-        <span aria-hidden className="-mr-3 font-display text-[8rem] font-semibold leading-[.72] text-black [-webkit-text-stroke:2px_rgba(255,255,255,.58)] sm:text-[10rem]">
-          {ranking}
-        </span>
-      )}
+    <div className="w-60 shrink-0 sm:w-72 lg:w-80">
     <button
       type="button"
       onClick={aoAbrir}
       aria-label={`Ver: ${video.titulo}`}
       className="group min-w-0 flex-1 snap-start text-left"
     >
-      <span className="relative block aspect-video overflow-hidden rounded-md bg-zinc-900 shadow-xl ring-1 ring-white/10 transition-all duration-300 group-hover:z-10 group-hover:-translate-y-2 group-hover:scale-[1.06] group-hover:shadow-2xl group-hover:ring-white/30 group-focus-visible:scale-[1.04]">
+      <span className="relative block aspect-video overflow-hidden rounded-xl bg-zinc-900 shadow-[0_18px_45px_rgba(0,0,0,.28)] ring-1 ring-white/10 transition-all duration-500 group-hover:z-10 group-hover:-translate-y-2 group-hover:scale-[1.025] group-hover:shadow-[0_28px_70px_rgba(0,0,0,.55)] group-hover:ring-ouro/45 group-focus-visible:scale-[1.025]">
         <Image
           src={`https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`}
           alt=""
@@ -62,6 +57,11 @@ function Cartao({ video, aoAbrir, ranking, episodio }: { video: Video; aoAbrir: 
         {video.duracao && (
           <span className="absolute right-2 top-2 rounded bg-black/80 px-1.5 py-1 text-[10px] font-medium text-white backdrop-blur-sm">
             {video.duracao}
+          </span>
+        )}
+        {novidade && (
+          <span className="absolute left-3 top-3 rounded-full border border-white/20 bg-black/55 px-2.5 py-1 text-[9px] font-medium uppercase tracking-[.14em] text-white backdrop-blur-md">
+            Novo
           </span>
         )}
 
@@ -76,7 +76,7 @@ function Cartao({ video, aoAbrir, ranking, episodio }: { video: Video; aoAbrir: 
         </span>
       </span>
 
-      <span className="mt-3 block text-[0.85rem] font-medium leading-snug text-white/85 transition-colors group-hover:text-white">
+      <span className="mt-3.5 block text-[0.85rem] font-medium leading-snug text-white/85 transition-colors group-hover:text-ouro">
         {video.titulo}
       </span>
       <span className="mt-2 flex items-center gap-2 text-[10px] uppercase tracking-[.13em] text-white/50">
@@ -172,7 +172,7 @@ function Faixa({
             key={`${trilha.id}-${v.id}`}
             video={v}
             aoAbrir={() => aoAbrir(v)}
-            ranking={trilha.id === "lancamentos" && i < 10 ? i + 1 : undefined}
+            novidade={trilha.id === "lancamentos" && i < 3}
             episodio={trilha.id !== "lancamentos" ? i + 1 : undefined}
           />
         ))}
