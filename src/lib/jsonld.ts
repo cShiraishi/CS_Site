@@ -186,3 +186,52 @@ export function jsonLdBiblioteca() {
     ],
   };
 }
+
+/**
+ * Uma leitura online. `Book` com `readOnlineUrl` é o par certo:
+ * diz ao buscador que o conteúdo pode ser lido no próprio site.
+ */
+export function jsonLdLeitura(livro: {
+  slug: string;
+  titulo: string;
+  subtitulo: string | null;
+  total: number;
+}) {
+  const url = `${marca.site}/leitura/${livro.slug}`;
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Book",
+        "@id": `${url}#livro`,
+        name: livro.titulo,
+        ...(livro.subtitulo ? { description: livro.subtitulo } : {}),
+        numberOfPages: livro.total,
+        inLanguage: "pt-BR",
+        author: { "@id": `${marca.site}/#pessoa` },
+        workExample: {
+          "@type": "Book",
+          bookFormat: "https://schema.org/EBook",
+          readOnlineUrl: url,
+          isAccessibleForFree: true,
+          inLanguage: "pt-BR",
+        },
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${url}#breadcrumb`,
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Início", item: marca.site },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Biblioteca",
+            item: `${marca.site}${rotas.biblioteca}`,
+          },
+          { "@type": "ListItem", position: 3, name: livro.titulo, item: url },
+        ],
+      },
+    ],
+  };
+}

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { Biblioteca } from "@/components/Biblioteca";
 import { Footer } from "@/components/Footer";
@@ -7,6 +8,7 @@ import { Arrow, Container, Eyebrow } from "@/components/ui";
 import { LIVROS, destaque, tomDaCapa } from "@/lib/biblioteca";
 import { marca, rotas } from "@/lib/content";
 import { jsonLdBiblioteca } from "@/lib/jsonld";
+import { todasAsLeituras } from "@/lib/leituras";
 
 const titulo = "Biblioteca — livros que eu recomendo de verdade";
 
@@ -24,8 +26,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function Page() {
+export default async function Page() {
   const capa = tomDaCapa(destaque.slug);
+  const leituras = await todasAsLeituras();
 
   return (
     <>
@@ -117,6 +120,55 @@ export default function Page() {
             </div>
           </Container>
         </section>
+
+        {/* ── Leitura online ────────────────────────────────── */}
+        {leituras.length > 0 && (
+          <Container className="pb-20">
+            <div className="border-t border-porcelana/12 pt-12">
+              <Eyebrow tone="claro">Leia aqui mesmo</Eyebrow>
+              <h2 className="t-title mt-6 text-balance text-porcelana">
+                Sem download, sem cadastro.
+              </h2>
+
+              <ul className="stagger mt-10 grid gap-px overflow-hidden rounded-sm bg-porcelana/12 sm:grid-cols-2 lg:grid-cols-3">
+                {leituras.map((l) => (
+                  <li key={l.slug} className="bg-grafite">
+                    <Link
+                      href={`/leitura/${l.slug}`}
+                      className="group flex h-full flex-col gap-5 p-7 transition-colors hover:bg-porcelana/[0.04]"
+                    >
+                      <span className="relative block overflow-hidden rounded-sm ring-1 ring-porcelana/12">
+                        <Image
+                          src={`/leitura/${l.slug}/${l.paginas[0].arquivo}`}
+                          alt={`Primeira página de ${l.titulo}`}
+                          width={l.largura}
+                          height={l.altura}
+                          sizes="(max-width: 640px) 90vw, 340px"
+                          className="h-auto w-full"
+                        />
+                      </span>
+
+                      <span className="mt-auto">
+                        <span className="block font-display text-xl text-porcelana transition-colors group-hover:text-ouro">
+                          {l.titulo}
+                        </span>
+                        {l.subtitulo && (
+                          <span className="mt-1.5 block text-sm text-porcelana/50">
+                            {l.subtitulo}
+                          </span>
+                        )}
+                        <span className="mt-4 inline-flex items-center gap-2 text-xs uppercase tracking-[0.14em] text-ouro">
+                          Ler as {l.total} páginas
+                          <Arrow />
+                        </span>
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </Container>
+        )}
 
         {/* ── Trilhas ───────────────────────────────────────── */}
         <div className="pb-24 sm:pb-32">

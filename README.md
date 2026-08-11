@@ -35,6 +35,7 @@ npm run dev
 | Ordem das seções | `src/app/page.tsx` |
 | Equações e regras da calculadora | `src/lib/calorias.ts` |
 | **Livros da biblioteca** | `src/lib/biblioteca.ts` |
+| **Adicionar um PDF para ler online** | `scripts/preparar-livro.py` |
 | Campos do formulário | `src/components/Contato.tsx` + `src/app/actions.ts` |
 | Logotipo | `public/brand/` e `src/app/icon.png` |
 | Redirects 301, headers, imagens | `next.config.ts` |
@@ -119,6 +120,48 @@ renderizações). Para usar arte real, coloque o arquivo em
 Os dez títulos que já estão lá são um ponto de partida — livros reais, com a
 justificativa escrita. Revise e troque pelo que você de fato recomenda.
 
+## Leitura online
+
+`/leitura/<slug>` — o PDF vira um livro que se folheia no navegador, com virada
+de página em três dimensões, teclado, tela cheia e download do original.
+
+### Adicionar um PDF
+
+```bash
+python scripts/preparar-livro.py caminho/do/arquivo.pdf meu-guia     --titulo "Guia de macros" --subtitulo "Do básico ao ajuste"
+```
+
+O script converte cada página em WebP, extrai o texto e escreve o manifesto em
+`public/leitura/meu-guia/`. A rota, o sitemap, o JSON-LD e a listagem na
+biblioteca aparecem sozinhos — nenhum código precisa mudar.
+
+Opções: `--largura` (padrão 1600 px), `--qualidade` (padrão 82) e
+`--sem-download` para não publicar o PDF original.
+
+Requer `pip install pymupdf`.
+
+### Por que imagens e não pdf.js
+
+Renderizar PDF no navegador custa cerca de 1 MB de JavaScript. Aqui as páginas
+são imagens comuns: passam pela otimização do `next/image` (AVIF/WebP), a
+página é estática e o bundle não cresce um byte. O texto de cada página vai
+junto no manifesto e é publicado numa camada invisível — leitor de tela e
+Ctrl+F continuam funcionando.
+
+### Dois formatos
+
+O script mede a proporção da primeira página e decide:
+
+- **retrato** → página dupla, como um livro aberto, com folhas girando na
+  lombada. Capa e contracapa deslocam meia página para o livro abrir centrado.
+- **paisagem** → página única virando. Duas páginas 16:9 lado a lado dariam
+  algo como 32:9, largo demais para ler.
+
+Em tela estreita o modo duplo cai para página única automaticamente.
+
+O tamanho do livro sai do menor entre a largura disponível e o que a altura da
+janela permite, então ele nunca estoura a tela nem distorce.
+
 ## Formulário de contato
 
 Sem `RESEND_API_KEY` o formulário funciona, mas só registra o lead no log do
@@ -163,6 +206,7 @@ Next.js sozinho e cada `git push` vira um deploy.
 | JSON-LD home: `Person`, `WebSite`, `Service` + `OfferCatalog`, `FAQPage` | `src/lib/jsonld.ts` |
 | JSON-LD calculadora: `WebApplication` + `Offer`, `BreadcrumbList` | `src/lib/jsonld.ts` |
 | JSON-LD biblioteca: `CollectionPage` + `ItemList` de `Book`, `BreadcrumbList` | `src/lib/jsonld.ts` |
+| JSON-LD leitura: `Book` + `readOnlineUrl`, `BreadcrumbList` | `src/lib/jsonld.ts` |
 | Breadcrumb visível na calculadora | `src/app/calculadora-de-calorias/page.tsx` |
 | Um `<h1>`, hierarquia H2/H3 sem saltos | verificado no navegador |
 | `alt` descritivo em 100 % das imagens | — |

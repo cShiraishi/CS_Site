@@ -1,13 +1,15 @@
 import type { MetadataRoute } from "next";
 import { marca, rotas } from "@/lib/content";
+import { listarLeituras } from "@/lib/leituras";
 
 /**
  * Regenerado a cada build — `lastModified` acompanha o deploy.
  * As seções da home são âncoras, não URLs, e âncoras não entram
  * em sitemap (o Google as descobre pelo conteúdo).
  */
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const agora = new Date();
+  const leituras = await listarLeituras();
 
   return [
     {
@@ -28,5 +30,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.7,
     },
+    ...leituras.map((slug) => ({
+      url: `${marca.site}/leitura/${slug}`,
+      lastModified: agora,
+      changeFrequency: "yearly" as const,
+      priority: 0.6,
+    })),
   ];
 }

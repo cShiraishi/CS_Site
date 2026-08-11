@@ -343,3 +343,65 @@ dialog[open]::backdrop {
     opacity: 0;
   }
 }
+
+/* ============================================================
+   LEITOR — o livro em três dimensões
+   ============================================================ */
+.livro {
+  perspective: 2600px;
+  perspective-origin: center 45%;
+}
+
+.folha {
+  transform-style: preserve-3d;
+  transition:
+    transform 0.75s cubic-bezier(0.34, 0.05, 0.2, 1),
+    opacity 0.5s ease 0.25s;
+  will-change: transform;
+}
+
+.folha .face {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Sombra da lombada: mais escura junto à dobra, some em direção à borda */
+.folha .face::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to right,
+    rgba(29, 27, 25, 0.16) 0%,
+    transparent 7%
+  );
+}
+
+.folha .face[style*="180"]::after {
+  background: linear-gradient(
+    to left,
+    rgba(29, 27, 25, 0.16) 0%,
+    transparent 7%
+  );
+}
+
+/* Barra de páginas: o polegar segue a marca da casa */
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--color-ouro);
+  cursor: pointer;
+  margin-top: -6px;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 13px;
+  height: 13px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--color-ouro);
+  cursor: pointer;
+}
