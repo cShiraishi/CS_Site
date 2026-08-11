@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
   images: {
     // AVIF primeiro, WebP como alternativa. O JPEG do render nunca é servido cru.
     formats: ["image/avif", "image/webp"],
+    // miniaturas dos vídeos do canal, no CSFlix
+    remotePatterns: [{ protocol: "https", hostname: "i.ytimg.com" }],
   },
 
   async headers() {

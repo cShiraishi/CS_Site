@@ -273,3 +273,31 @@ export function jsonLdRaioX() {
     ],
   };
 }
+
+/** CSFlix — coleção de vídeos do canal. */
+export function jsonLdCSFlix(total: number) {
+  const url = `${marca.site}${rotas.csflix}`;
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CollectionPage",
+        "@id": `${url}#pagina`,
+        url,
+        name: "CSFlix",
+        inLanguage: "pt-BR",
+        author: { "@id": `${marca.site}/#pessoa` },
+        description: `Os vídeos do canal Carlos Seiti TV organizados por área: treino, culturismo de competição, nutrição e método. ${total} vídeos em exibição.`,
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${url}#breadcrumb`,
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Início", item: marca.site },
+          { "@type": "ListItem", position: 2, name: "CSFlix", item: url },
+        ],
+      },
+    ],
+  };
+}

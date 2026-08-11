@@ -46,8 +46,9 @@ export const nav = [
   { label: "Calculadora", href: "/calculadora-de-calorias", topo: true },
   { label: "Raio-X", href: "/raio-x-postural", topo: true },
   { label: "Biblioteca", href: "/biblioteca", topo: true },
-  { label: "Resultados", href: "/#resultados", topo: true },
-  { label: "Sobre", href: "/#sobre", topo: true },
+  { label: "CSFlix", href: "/csflix", topo: true },
+  { label: "Resultados", href: "/#resultados", topo: false },
+  { label: "Sobre", href: "/#sobre", topo: false },
   { label: "Dúvidas", href: "/#duvidas", topo: false },
 ] as const;
 
@@ -55,6 +56,7 @@ export const rotas = {
   calculadora: "/calculadora-de-calorias",
   biblioteca: "/biblioteca",
   raioX: "/raio-x-postural",
+  csflix: "/csflix",
 } as const;
 
 export const hero = {

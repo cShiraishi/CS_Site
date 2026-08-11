@@ -31,6 +31,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     },
     {
+      url: `${marca.site}${rotas.csflix}`,
+      lastModified: agora,
+      changeFrequency: "weekly",
+      priority: 0.7,
+    },
+    {
       url: `${marca.site}${rotas.biblioteca}`,
       lastModified: agora,
       changeFrequency: "monthly",
