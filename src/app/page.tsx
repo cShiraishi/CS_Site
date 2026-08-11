@@ -2,6 +2,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Contato } from "@/components/Contato";
 import {
+  Cinema,
   Duvidas,
   Ferramenta,
   Hero,
@@ -26,6 +27,7 @@ export default function Home() {
         <Metodo />
         <Programa />
         <Resultados />
+        <Cinema />
         <Sobre />
         <Duvidas />
         <Contato />

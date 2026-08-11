@@ -12,11 +12,27 @@ function Destaque({ video, total, aoAbrir }: { video: Video; total: number; aoAb
       <div aria-hidden className="absolute inset-0 bg-linear-to-t from-black via-black/5 to-black/45" />
       <div className="relative mx-auto flex min-h-[34rem] w-full max-w-6xl items-end px-6 pb-40 sm:min-h-[38rem] sm:px-8 lg:min-h-[42rem] lg:px-12 lg:pb-44">
         <div className="max-w-2xl">
-          <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[.16em] text-white/80">
-            <span className="flex size-6 items-center justify-center rounded-sm bg-[#E00513] text-[10px] text-white">CS</span>
-            Seleção CSFlix
+          {/* A marca identifica a página; o título do vídeo vem abaixo dela. */}
+          <h1>
+            <span className="sr-only">CSFlix</span>
+            <Image
+              src="/csflix/csflix.png"
+              alt=""
+              width={851}
+              height={273}
+              priority
+              className="h-auto w-40 drop-shadow-[0_4px_18px_rgba(0,0,0,0.7)] sm:w-52"
+            />
+          </h1>
+
+          <p className="mt-6 flex items-center gap-2.5 text-xs font-semibold uppercase tracking-[.16em] text-white/70">
+            <span aria-hidden className="h-3.5 w-0.5 bg-[#E00513]" />
+            Seleção do canal
           </p>
-          <h1 className="mt-5 max-w-xl font-display text-4xl leading-[1.02] text-white sm:text-5xl lg:text-6xl">{video.titulo}</h1>
+
+          <p className="mt-3 max-w-xl font-display text-4xl leading-[1.02] text-white sm:text-5xl lg:text-6xl">
+            {video.titulo}
+          </p>
           <div className="mt-5 flex flex-wrap items-center gap-3 text-sm">
             <span className="font-semibold text-emerald-400">Novo no canal</span>
             <span className="rounded border border-white/35 px-1.5 py-0.5 text-[10px] text-white/80">HD</span>

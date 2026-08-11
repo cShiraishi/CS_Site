@@ -5,6 +5,7 @@ import { FAQ } from "./FAQ";
 import { Arrow, Button, Container, Eyebrow, Rule, Section, buttonClass } from "./ui";
 import {
   calculadora,
+  rotas,
   credenciais,
   duvidas,
   hero,
@@ -496,5 +497,51 @@ export function Ferramenta() {
         </div>
       </div>
     </Section>
+  );
+}
+
+/* ============================================================
+   CINEMA — a ponte da home para o CSFlix
+   Faixa em preto: a marca é de outro território visual, e o
+   contraste com a porcelana é o que a faz existir na página.
+   ============================================================ */
+export function Cinema() {
+  return (
+    <section className="relative overflow-hidden bg-black py-24 sm:py-28">
+      {/* clarão vermelho, discreto */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -left-40 top-1/2 h-[26rem] w-[46rem] -translate-y-1/2 rounded-full bg-[#E00513]/12 blur-[110px]"
+      />
+
+      <Container className="relative">
+        <div className="flex flex-col items-start justify-between gap-10 lg:flex-row lg:items-center lg:gap-20">
+          <div className="max-w-xl">
+            <Image
+              src="/csflix/csflix.png"
+              alt="CSFlix"
+              width={851}
+              height={273}
+              sizes="240px"
+              className="h-auto w-40 sm:w-48"
+            />
+
+            <p className="mt-7 text-pretty leading-relaxed text-white/70">
+              Os vídeos do canal organizados em séries — treino, competição,
+              ciência e bastidores. Sem Shorts, sem garimpo.
+            </p>
+          </div>
+
+          <Link
+            href={rotas.csflix}
+            className="group inline-flex shrink-0 items-center gap-3 rounded-md bg-[#E00513] px-8 py-4 text-sm font-semibold tracking-wide text-white transition-all duration-300 hover:bg-white hover:text-black"
+          >
+            <span aria-hidden className="text-base">▶</span>
+            Entrar no CSFlix
+            <Arrow />
+          </Link>
+        </div>
+      </Container>
+    </section>
   );
 }
