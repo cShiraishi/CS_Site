@@ -44,6 +44,7 @@ export const nav = [
   { label: "Método", href: "/#metodo", topo: true },
   { label: "Programa", href: "/#programa", topo: false },
   { label: "Calculadora", href: "/calculadora-de-calorias", topo: true },
+  { label: "Raio-X", href: "/raio-x-postural", topo: true },
   { label: "Biblioteca", href: "/biblioteca", topo: true },
   { label: "Resultados", href: "/#resultados", topo: true },
   { label: "Sobre", href: "/#sobre", topo: true },
@@ -53,6 +54,7 @@ export const nav = [
 export const rotas = {
   calculadora: "/calculadora-de-calorias",
   biblioteca: "/biblioteca",
+  raioX: "/raio-x-postural",
 } as const;
 
 export const hero = {

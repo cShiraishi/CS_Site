@@ -235,3 +235,41 @@ export function jsonLdLeitura(livro: {
     ],
   };
 }
+
+/** Raio-X Postural — ferramenta gratuita, como a calculadora. */
+export function jsonLdRaioX() {
+  const url = `${marca.site}${rotas.raioX}`;
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "@id": `${url}#app`,
+        name: "Raio-X Postural",
+        url,
+        applicationCategory: "HealthApplication",
+        operatingSystem: "Todos — roda no navegador",
+        inLanguage: "pt-BR",
+        description:
+          "Identifica o padrão postural pelo teste da parede e devolve os exercícios correspondentes, com dose e ponto de falha.",
+        featureList: [
+          "Teste da parede guiado",
+          "Quatro padrões posturais ilustrados",
+          "Doze exercícios com dose e execução",
+          "Protocolo de oito semanas em três fases",
+        ],
+        author: { "@id": `${marca.site}/#pessoa` },
+        offers: { "@type": "Offer", price: "0", priceCurrency: "BRL" },
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${url}#breadcrumb`,
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Início", item: marca.site },
+          { "@type": "ListItem", position: 2, name: "Raio-X Postural", item: url },
+        ],
+      },
+    ],
+  };
+}
