@@ -2,6 +2,7 @@
 
 import { marca } from "@/lib/content";
 import type { EstadoContato } from "@/lib/contato";
+import { criarSupabaseServer } from "@/lib/supabase/server";
 import {
   type Atividade,
   type Formula,
@@ -30,6 +31,63 @@ function texto(formData: FormData, campo: string, limite: number) {
 
 /** Validação simples e permissiva: barra o inválido óbvio, não o formato incomum. */
 const RE_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+type Lead = {
+  tipo: "avaliacao" | "plano";
+  nome: string;
+  email: string;
+  whatsapp: string;
+  objetivo?: string;
+  experiencia?: string;
+  frequencia?: string;
+  inicio?: string;
+  mensagem?: string;
+  plano?: unknown;
+};
+
+/**
+ * Grava o lead antes de qualquer tentativa de envio.
+ *
+ * O e-mail é aviso, não registro: provedor fora do ar, chave ausente ou caixa
+ * cheia não podem apagar um contato que a pessoa acabou de deixar. Quando a
+ * gravação também falha, sobra o log — que é pouco, mas é melhor que nada, e
+ * fica explícito no aviso.
+ *
+ * Devolve `true` só quando a linha entrou no banco.
+ */
+async function registrarLead(lead: Lead): Promise<boolean> {
+  try {
+    const supabase = await criarSupabaseServer();
+    if (!supabase) {
+      console.warn(`[${lead.tipo}] Supabase não configurado — lead só no log.`);
+      return false;
+    }
+
+    // Se a pessoa já entrou na área do cliente, o lead fica ligado à conta.
+    const { data } = await supabase.auth.getUser();
+
+    const { error } = await supabase
+      .from("leads")
+      .insert({ ...lead, user_id: data.user?.id ?? null });
+
+    if (error) {
+      console.error(`[${lead.tipo}] falha ao gravar o lead`, error.message);
+      return false;
+    }
+    return true;
+  } catch (e) {
+    console.error(`[${lead.tipo}] erro inesperado ao gravar o lead`, e);
+    return false;
+  }
+}
+
+/** Último recurso: o lead não some sem deixar rastro. */
+function registrarNoLog(tipo: string, dados: unknown) {
+  console.warn(
+    `[${tipo}] lead NÃO gravado no banco — conteúdo abaixo para recuperação manual.\n` +
+      JSON.stringify(dados, null, 2),
+  );
+}
 
 export async function enviarContato(
   _anterior: EstadoContato,
@@ -71,20 +129,18 @@ export async function enviarContato(
     };
   }
 
+  // Grava primeiro. A resposta que a pessoa lê na tela é uma promessa, e a
+  // promessa só se sustenta se o contato estiver guardado em algum lugar.
+  const gravado = await registrarLead({ tipo: "avaliacao", ...dados });
+  if (!gravado) registrarNoLog("avaliacao", dados);
+
   const apiKey = process.env.RESEND_API_KEY;
   const destino = process.env.CONTATO_EMAIL ?? marca.email;
   const remetente = process.env.CONTATO_REMETENTE ?? "Site CS <onboarding@resend.dev>";
 
   if (!apiKey) {
-    // Sem provedor configurado: o lead não se perde no ar, fica no log do servidor.
-    console.warn(
-      "[contato] RESEND_API_KEY ausente — lead registrado apenas no log.\n" +
-        JSON.stringify(dados, null, 2),
-    );
-    return {
-      status: "ok",
-      mensagem: "Respondo em até 24 horas.",
-    };
+    // Sem provedor de e-mail, o lead já está no banco: nada se perde, só o aviso.
+    return { status: "ok", mensagem: "Respondo em até 24 horas." };
   }
 
   const linhas = [
@@ -211,16 +267,42 @@ export async function enviarPlano(
   const refeicoes = Math.min(6, Math.max(2, numero("refeicoes") || 4));
   const pratos = distribuir(plano.alvo, m, refeicoes);
 
+  // Guarda os números que a pessoa viu, e não só o contato: é o que permite
+  // retomar a conversa com contexto, em vez de pedir tudo outra vez.
+  const registro = {
+    entrada,
+    tmb: base.tmb,
+    get: base.get,
+    alvo: plano.alvo,
+    direcao: plano.direcao,
+    ritmoSemanal: plano.ritmoSemanal,
+    semanas: plano.semanas,
+    macros: { proteina: m.proteina.g, carboidrato: m.carboidrato.g, gordura: m.gordura.g },
+    refeicoes,
+  };
+
+  const gravado = await registrarLead({
+    tipo: "plano",
+    nome,
+    email,
+    whatsapp,
+    plano: registro,
+  });
+  if (!gravado) registrarNoLog("plano", { nome, email, whatsapp, ...registro });
+
   const apiKey = process.env.RESEND_API_KEY;
   const copia = process.env.CONTATO_EMAIL ?? marca.email;
   const remetente = process.env.CONTATO_REMETENTE ?? "Carlos Seiti <onboarding@resend.dev>";
 
   if (!apiKey) {
-    console.warn(
-      `[plano] RESEND_API_KEY ausente — lead registrado apenas no log.\n` +
-        JSON.stringify({ nome, email, whatsapp, entrada, plano, macros: m }, null, 2),
-    );
-    return { status: "ok" };
+    // O lead está guardado e o plano aparece na tela; o que falta é a cópia
+    // por e-mail. Dizer "confira a caixa de entrada" aqui seria mentira, e o
+    // "ok" continua correto: o resultado completo foi liberado.
+    return {
+      status: "ok",
+      mensagem:
+        "Recebi seus dados e liberei o plano completo aqui embaixo. A cópia por e-mail está temporariamente indisponível — se quiser recebê-la, me chame no WhatsApp.",
+    };
   }
 
   const linhas = pratos

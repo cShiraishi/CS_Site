@@ -59,9 +59,12 @@ export function CapturaPlano({ parametros, onLiberar }: { parametros: Parametros
     return (
       <div className="surface-elevated mt-10 bg-white p-7 sm:p-10">
         <span aria-hidden className="rule-gold h-px w-16" />
-        <h3 className="t-title mt-6">Enviado.</h3>
+        {/* A ação manda a própria mensagem quando o e-mail não saiu. Anunciar
+            "confira a caixa de entrada" nesse caso seria prometer o que não
+            aconteceu — e o plano na tela, esse, foi mesmo liberado. */}
+        <h3 className="t-title mt-6">{estado.mensagem ? "Recebido." : "Enviado."}</h3>
         <p className="mt-4 max-w-md leading-relaxed text-grafite">
-          {calculadora.captura.sucesso}
+          {estado.mensagem ?? calculadora.captura.sucesso}
         </p>
       </div>
     );
