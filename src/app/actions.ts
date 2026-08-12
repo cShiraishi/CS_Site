@@ -168,10 +168,13 @@ export async function enviarPlano(
 
   const nome = texto(formData, "nome", LIMITES.nome);
   const email = texto(formData, "email", LIMITES.email);
+  const whatsapp = texto(formData, "whatsapp", LIMITES.whatsapp);
 
   const erros: Record<string, string> = {};
   if (nome.length < 2) erros.nome = "Informe seu nome.";
   if (!RE_EMAIL.test(email)) erros.email = "Informe um e-mail válido.";
+  if (whatsapp.replace(/\D/g, "").length < 8)
+    erros.whatsapp = "Informe um WhatsApp com DDD.";
   if (Object.keys(erros).length > 0) {
     return { status: "erro", mensagem: "Revise os campos destacados.", erros };
   }
@@ -215,7 +218,7 @@ export async function enviarPlano(
   if (!apiKey) {
     console.warn(
       `[plano] RESEND_API_KEY ausente — lead registrado apenas no log.\n` +
-        JSON.stringify({ nome, email, entrada, plano, macros: m }, null, 2),
+        JSON.stringify({ nome, email, whatsapp, entrada, plano, macros: m }, null, 2),
     );
     return { status: "ok" };
   }
@@ -252,6 +255,7 @@ export async function enviarPlano(
             </p>
 
             <p style="font-size:15px">Olá, ${escapar(nome)}.</p>
+            <p style="font-size:12px;color:#777">WhatsApp informado: ${escapar(whatsapp)}</p>
             <p style="font-size:15px">Segue o plano que a calculadora montou com os seus dados.</p>
 
             <table style="width:100%;font-size:15px;margin:24px 0">

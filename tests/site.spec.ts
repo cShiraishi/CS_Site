@@ -29,6 +29,11 @@ test("calculadora gera plano a partir dos dados básicos", async ({ page }) => {
   await page.getByRole("textbox", { name: "Altura", exact: true }).fill("176");
   await page.getByRole("textbox", { name: "Peso desejado", exact: true }).fill("72");
 
+  await page.getByRole("textbox", { name: "Nome", exact: true }).fill("Cliente Teste");
+  await page.getByRole("textbox", { name: "E-mail", exact: true }).fill("cliente@teste.com");
+  await page.getByRole("textbox", { name: "WhatsApp", exact: true }).fill("11999999999");
+  await page.getByRole("button", { name: "Liberar meu plano" }).click();
+
   await expect(page.getByText("Metabolismo basal", { exact: true }).first()).toBeVisible();
   await expect(page.getByText("03 / Seu plano")).toBeVisible();
 });

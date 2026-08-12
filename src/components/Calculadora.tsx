@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useId, useMemo, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import {
   ATIVIDADES,
@@ -19,6 +19,7 @@ import {
   planejar,
 } from "@/lib/calorias";
 import { calculadora } from "@/lib/content";
+import { criarSupabaseBrowser } from "@/lib/supabase/client";
 import { CapturaPlano, type Parametros } from "./CapturaPlano";
 import { Arrow, Rotulo, campoBase } from "./ui";
 
@@ -37,6 +38,34 @@ export function Calculadora() {
   const [atividade, setAtividade] = useState<Atividade>("moderado");
   const [formula, setFormula] = useState<Formula>("mifflin");
   const [refeicoes, setRefeicoes] = useState(4);
+
+  useEffect(() => {
+    const supabase = criarSupabaseBrowser();
+    if (!supabase) return;
+    void (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const [{ data: perfil }, { data: medida }, { data: ultimo }] = await Promise.all([
+        supabase.from("profiles").select("nascimento,sexo,altura_cm").eq("id", user.id).maybeSingle(),
+        supabase.from("measurements").select("weight_kg,body_fat_pct").eq("user_id", user.id).order("measured_at", { ascending: false }).limit(1).maybeSingle(),
+        supabase.from("calculator_results").select("activity,formula,meals_per_day,target_weight_kg").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1).maybeSingle(),
+      ]);
+      if (perfil?.sexo === "masculino" || perfil?.sexo === "feminino") setSexo(perfil.sexo);
+      if (perfil?.altura_cm) setAltura(String(perfil.altura_cm));
+      if (perfil?.nascimento) {
+        const hoje = new Date(); const nascimento = new Date(`${perfil.nascimento}T12:00:00`);
+        let anos = hoje.getFullYear() - nascimento.getFullYear();
+        if (hoje < new Date(hoje.getFullYear(), nascimento.getMonth(), nascimento.getDate())) anos--;
+        if (anos > 0) setIdade(String(anos));
+      }
+      if (medida?.weight_kg) setPeso(String(medida.weight_kg));
+      if (medida?.body_fat_pct) setGordura(String(medida.body_fat_pct));
+      if (ultimo?.target_weight_kg) setPesoAlvo(String(ultimo.target_weight_kg));
+      if (ultimo && ATIVIDADES.some((a) => a.id === ultimo.activity)) setAtividade(ultimo.activity as Atividade);
+      if (ultimo && FORMULAS.some((f) => f.id === ultimo.formula)) setFormula(ultimo.formula as Formula);
+      if (ultimo?.meals_per_day) setRefeicoes(ultimo.meals_per_day);
+    })();
+  }, []);
 
   const dados = useMemo(() => {
     const base = calcular(
@@ -348,6 +377,27 @@ type DadosCalculados = {
 };
 
 function Resultado({ base, plano, macros, pratos, parametros }: DadosCalculados) {
+  const [liberado, setLiberado] = useState(false);
+  const salvo = useRef(false);
+  const liberar = useCallback(async () => {
+    setLiberado(true);
+    if (salvo.current) return;
+    const supabase = criarSupabaseBrowser();
+    if (!supabase) return;
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    salvo.current = true;
+    await Promise.all([
+      supabase.from("measurements").insert({ user_id: user.id, weight_kg: dec(parametros.peso), body_fat_pct: parametros.gordura ? dec(parametros.gordura) : null }),
+      supabase.from("calculator_results").insert({
+        user_id: user.id, bmr: base.tmb, daily_expenditure: base.get,
+        target_calories: plano.alvo, direction: plano.direcao,
+        protein_g: macros.proteina.g, carbohydrate_g: macros.carboidrato.g, fat_g: macros.gordura.g,
+        target_weight_kg: dec(parametros.pesoAlvo), activity: parametros.atividade,
+        formula: parametros.formula, meals_per_day: parametros.refeicoes,
+      }),
+    ]);
+  }, [base, plano, macros, parametros]);
   const rumo =
     plano.direcao === "perder"
       ? "Emagrecimento"
@@ -362,6 +412,31 @@ function Resultado({ base, plano, macros, pratos, parametros }: DadosCalculados)
         <Icone tipo="grafico" />
         03 / Seu plano
       </p>
+
+      {!liberado && (
+        <>
+          <div aria-hidden className="relative mt-10 overflow-hidden rounded-xl border border-linha bg-white p-6 sm:p-8">
+            <div className="grid gap-4 blur-[7px] select-none sm:grid-cols-3">
+              {["Metabolismo basal", "Seu alvo diário", "Macronutrientes"].map((item) => (
+                <div key={item} className="bg-porcelana p-6">
+                  <p className="text-xs uppercase tracking-wider">{item}</p>
+                  <p className="mt-4 font-display text-4xl">2.000</p>
+                  <span className="mt-5 block h-1 w-3/4 bg-ouro/40" />
+                </div>
+              ))}
+            </div>
+            <div className="absolute inset-0 flex items-center justify-center bg-white/20">
+              <span className="rounded-full border border-white/80 bg-white/80 px-4 py-2 text-xs font-medium text-grafite shadow-lg backdrop-blur-xl">
+                Resultado reservado para você
+              </span>
+            </div>
+          </div>
+          <CapturaPlano parametros={parametros} onLiberar={liberar} />
+        </>
+      )}
+
+      {liberado && (
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
 
       {/* Números principais */}
       <dl className="mt-10 grid gap-px overflow-hidden rounded-sm bg-linha sm:grid-cols-3">
@@ -490,9 +565,6 @@ function Resultado({ base, plano, macros, pratos, parametros }: DadosCalculados)
         mais.
       </p>
 
-      {/* Captura — a pessoa já viu tudo; agora pode levar por escrito */}
-      <CapturaPlano parametros={parametros} />
-
       {/* Ponte para a consultoria */}
       <div className="mt-14 border-t border-linha pt-9">
         <p className="max-w-xl leading-relaxed text-grafite">{calculadora.ponte}</p>
@@ -504,6 +576,8 @@ function Resultado({ base, plano, macros, pratos, parametros }: DadosCalculados)
           <Arrow />
         </Link>
       </div>
+      </motion.div>
+      )}
     </div>
   );
 }
