@@ -1,8 +1,12 @@
 # O deploy pelo CLI envia os arquivos locais e NAO le o .gitignore.
 # Sem esta lista, coisas deliberadamente fora do repositorio vao ao ar.
+#
+# Os caminhos comecam com "/" de proposito: um padrao solto como "supabase"
+# casa com qualquer pasta desse nome em qualquer nivel -- e apagaria tambem
+# o src/lib/supabase, que o build precisa.
 
-node_modules
-.next
+/node_modules
+/.next
 
 # Segredos ficam nas variaveis do projeto na Vercel, nunca no pacote enviado.
 # O modelo continua a subir: nao tem segredo e serve de documentacao.
@@ -10,9 +14,9 @@ node_modules
 .env.*
 !.env.example
 
-# Testes e artefatos locais nao pertencem ao deploy.
-tests
-playwright-report
-test-results
-playwright.config.ts
-supabase
+# Testes, migracoes e artefatos locais nao pertencem ao deploy.
+/tests
+/playwright-report
+/test-results
+/playwright.config.ts
+/supabase

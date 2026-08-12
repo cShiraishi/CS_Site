@@ -1,7 +1,8 @@
 import { Suspense } from "react";
 import { LoginOtp } from "@/components/LoginOtp";
 
-export const metadata = { title: "Acessar minha conta | Carlos Seiti" };
+// O layout ja acrescenta "| Carlos Seiti" pelo template do title.
+export const metadata = { title: "Acessar minha conta" };
 
 export default function EntrarPage() {
   return (
