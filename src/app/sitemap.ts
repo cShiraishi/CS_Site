@@ -25,6 +25,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     },
     {
+      url: `${marca.site}${rotas.prato}`,
+      lastModified: agora,
+      changeFrequency: "yearly",
+      priority: 0.8,
+    },
+    {
       url: `${marca.site}${rotas.raioX}`,
       lastModified: agora,
       changeFrequency: "yearly",

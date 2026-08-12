@@ -3,3 +3,16 @@
 
 node_modules
 .next
+
+# Segredos ficam nas variaveis do projeto na Vercel, nunca no pacote enviado.
+# O modelo continua a subir: nao tem segredo e serve de documentacao.
+.env
+.env.*
+!.env.example
+
+# Testes e artefatos locais nao pertencem ao deploy.
+tests
+playwright-report
+test-results
+playwright.config.ts
+supabase

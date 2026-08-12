@@ -44,6 +44,7 @@ export const nav = [
   { label: "Método", href: "/#metodo", topo: true },
   { label: "Programa", href: "/#programa", topo: false },
   { label: "Calculadora", href: "/calculadora-de-calorias", topo: true },
+  { label: "Prato", href: "/calculadora-do-prato", topo: true },
   { label: "Raio-X", href: "/raio-x-postural", topo: true },
   { label: "Biblioteca", href: "/biblioteca", topo: true },
   { label: "CSFlix", href: "/csflix", topo: true },
@@ -54,6 +55,7 @@ export const nav = [
 
 export const rotas = {
   calculadora: "/calculadora-de-calorias",
+  prato: "/calculadora-do-prato",
   biblioteca: "/biblioteca",
   raioX: "/raio-x-postural",
   csflix: "/csflix",
@@ -319,6 +321,19 @@ export const calculadora = {
       texto:
         "Ele cai conforme você emagrece. Por isso o protocolo é revisado a cada quinze dias, e não calculado uma vez só.",
     },
+  ],
+} as const;
+
+export const prato = {
+  slug: rotas.prato,
+  eyebrow: "Ferramenta gratuita",
+  titulo: "Quanto pesa\no prato de hoje.",
+  texto:
+    "Você vai almoçar fora e não faz ideia do que aquilo custa no dia. Monte o prato aqui — em conchas e palmas, não em gramas — e veja calorias e macros antes de sentar à mesa.",
+  destaques: [
+    "70 alimentos de restaurante brasileiro",
+    "Medida pela mão, sem balança",
+    "Resultado em faixa, não em número falso",
   ],
 } as const;
 

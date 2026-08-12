@@ -271,6 +271,45 @@ export function jsonLdRaioX() {
   };
 }
 
+/** Calculadora do Prato — ferramenta gratuita, como as outras duas. */
+export function jsonLdPrato() {
+  const url = `${marca.site}${rotas.prato}`;
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "@id": `${url}#app`,
+        name: "Calculadora do Prato",
+        url,
+        applicationCategory: "HealthApplication",
+        operatingSystem: "Todos — roda no navegador",
+        inLanguage: "pt-BR",
+        description:
+          "Monta o prato de restaurante com referências visuais de porção e estima calorias, proteína, carboidrato e gordura em faixa.",
+        featureList: [
+          "Tabela de alimentos de restaurante brasileiro",
+          "Porção medida pela mão, sem balança",
+          "Calorias e macros como faixa de estimativa",
+          "Comparação com a meta diária de calorias",
+          "Sugestão de trocas de menor densidade energética",
+        ],
+        author: { "@id": `${marca.site}/#pessoa` },
+        offers: { "@type": "Offer", price: "0", priceCurrency: "BRL" },
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${url}#breadcrumb`,
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Início", item: marca.site },
+          { "@type": "ListItem", position: 2, name: "Calculadora do Prato", item: url },
+        ],
+      },
+    ],
+  };
+}
+
 /** CSFlix — coleção de vídeos do canal. */
 export function jsonLdCSFlix(total: number) {
   const url = `${marca.site}${rotas.csflix}`;

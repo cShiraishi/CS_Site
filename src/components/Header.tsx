@@ -58,14 +58,16 @@ export function Header({ tone = "claro" }: { tone?: "claro" | "escuro" }) {
             <Assinatura size={40} priority tone={escuro ? "porcelana" : "grafite"} />
           </Link>
 
-          <nav className="hidden items-center gap-8 xl:flex" aria-label="Principal">
+          {/* gap-6 no xl: com seis itens, gap-8 fazia "Raio-X" quebrar em
+              duas linhas. Volta a gap-8 quando há largura para isso. */}
+          <nav className="hidden items-center gap-6 xl:flex 2xl:gap-8" aria-label="Principal">
             {superior.map((item) => {
               const destacado = item.href === rotas.calculadora;
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`group relative isolate overflow-hidden rounded-full px-3 py-2 text-sm ring-1 ring-transparent transition-all duration-300 before:absolute before:inset-x-2 before:top-0 before:-z-10 before:h-px before:scale-x-0 before:bg-gradient-to-r before:from-transparent before:via-white before:to-transparent before:transition-transform before:duration-300 hover:-translate-y-0.5 hover:before:scale-x-100 ${
+                  className={`group relative isolate overflow-hidden whitespace-nowrap rounded-full px-3 py-2 text-sm ring-1 ring-transparent transition-all duration-300 before:absolute before:inset-x-2 before:top-0 before:-z-10 before:h-px before:scale-x-0 before:bg-gradient-to-r before:from-transparent before:via-white before:to-transparent before:transition-transform before:duration-300 hover:-translate-y-0.5 hover:before:scale-x-100 ${
                     escuro
                       ? "text-porcelana/70 hover:bg-white/10 hover:text-porcelana hover:ring-white/15 hover:shadow-[0_8px_24px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.14)]"
                       : "text-grafite hover:bg-white/65 hover:text-grafite hover:ring-white/90 hover:shadow-[0_10px_30px_rgba(29,27,25,0.10),inset_0_1px_0_rgba(255,255,255,1)] hover:backdrop-blur-xl"
