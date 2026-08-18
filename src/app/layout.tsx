@@ -17,7 +17,9 @@ const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
   display: "swap",
-  weight: ["400", "500"],
+  // O 700 existe por causa do @carlosseiti da página /links; o browser só
+  // baixa o peso que a página usa de facto.
+  weight: ["400", "500", "700"],
 });
 
 /** 50 caracteres — dentro da faixa que o Google exibe sem truncar. */

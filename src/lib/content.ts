@@ -37,6 +37,13 @@ export const marca = {
   whatsapp: "https://wa.me/message/HRZB5A4TF2GKA1",
   email: "contato@carlosseiti.com",
   site: enderecoDoSite(),
+  /**
+   * Formulário de captação da consultoria (LeadConnector). Só o endereço do
+   * questionário: os parâmetros de campanha entram por quem monta o link.
+   */
+  formulario:
+    process.env.NEXT_PUBLIC_FORMULARIO_CONSULTORIA ??
+    "https://api.leadconnectorhq.com/widget/survey/x7MWU1CgJHNOEMYZfWWa",
 } as const;
 
 /** Hrefs absolutos: os mesmos links funcionam na home e nas outras páginas. */
@@ -59,6 +66,7 @@ export const rotas = {
   biblioteca: "/biblioteca",
   raioX: "/raio-x-postural",
   csflix: "/csflix",
+  links: "/links",
 } as const;
 
 export const hero = {

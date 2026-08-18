@@ -35,10 +35,16 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // Quando algum endereço antigo precisar apontar para cá, é aqui:
-  // async redirects() {
-  //   return [{ source: "/consultoria", destination: "/#programa", permanent: true }];
-  // },
+  async redirects() {
+    return [
+      // Herdeiros do Linktree: as variações que alguém já possa ter guardado
+      // chegam todas à mesma página. Temporário (307) de propósito: 301 fica
+      // gravado no navegador e impede mudar o destino depois.
+      { source: "/link", destination: "/links", permanent: false },
+      { source: "/linktree", destination: "/links", permanent: false },
+      { source: "/bio", destination: "/links", permanent: false },
+    ];
+  },
 };
 
 export default nextConfig;
