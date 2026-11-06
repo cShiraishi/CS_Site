@@ -271,6 +271,46 @@ export function jsonLdRaioX() {
   };
 }
 
+/** Calculadora de gordura corporal — porta de entrada do tráfego social. */
+export function jsonLdGordura() {
+  const url = `${marca.site}${rotas.gordura}`;
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "@id": `${url}#app`,
+        name: "Calculadora de gordura corporal",
+        url,
+        applicationCategory: "HealthApplication",
+        operatingSystem: "Todos — roda no navegador",
+        inLanguage: "pt-BR",
+        description:
+          "Estima o percentual de gordura corporal por circunferências (método da Marinha dos EUA) e devolve calorias, macros e prazo até o percentual desejado.",
+        featureList: [
+          "Estimativa por fita métrica, sem bioimpedância",
+          "Resultado em faixa, com o erro do método declarado",
+          "Classificação nas faixas do American Council on Exercise",
+          "Escala visual para escolher o percentual desejado",
+          "Peso alvo com massa magra preservada",
+          "Calorias, macros e prazo estimado em semanas",
+        ],
+        author: { "@id": `${marca.site}/#pessoa` },
+        offers: { "@type": "Offer", price: "0", priceCurrency: "BRL" },
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${url}#breadcrumb`,
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Início", item: marca.site },
+          { "@type": "ListItem", position: 2, name: "Calculadora de gordura corporal", item: url },
+        ],
+      },
+    ],
+  };
+}
+
 /** Calculadora do Prato — ferramenta gratuita, como as outras duas. */
 export function jsonLdPrato() {
   const url = `${marca.site}${rotas.prato}`;

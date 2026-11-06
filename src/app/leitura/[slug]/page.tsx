@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { Leitor } from "@/components/Leitor";
-import { Arrow, Container, Eyebrow } from "@/components/ui";
+import { Arrow, Container, Eyebrow, buttonClass } from "@/components/ui";
 import { listarLeituras, lerLeitura } from "@/lib/leituras";
 import { marca, rotas } from "@/lib/content";
 import { jsonLdLeitura } from "@/lib/jsonld";
@@ -118,9 +118,9 @@ export default async function Page({ params }: Props) {
             <div className="mt-10 flex flex-wrap items-center gap-4">
               <Link
                 href="/#contato"
-                className="group inline-flex items-center gap-2.5 rounded-full bg-ouro px-8 py-4 text-sm font-medium tracking-wide text-grafite transition-all duration-300 hover:bg-porcelana"
+                className={buttonClass("consultoria")}
               >
-                Solicitar avaliação
+                Começar consultoria
                 <Arrow />
               </Link>
               <Link

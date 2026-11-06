@@ -173,14 +173,26 @@ export type Macros = {
 };
 
 /**
+ * Gramas de proteína por quilo de peso corporal.
+ *
+ * Exportado porque não é usado só aqui: os protocolos em PDF convertem
+ * esta meta em palmas de frango, e uma segunda cópia do número
+ * acabaria por divergir desta no primeiro ajuste. Mais alta no corte,
+ * onde protege massa magra e sacia mais por caloria.
+ */
+export const PROTEINA_POR_KG: Record<Direcao, number> = {
+  perder: 2.0,
+  ganhar: 1.8,
+  manter: 1.8,
+};
+
+/**
  * Proteína e gordura primeiro (são as que têm mínimo fisiológico),
  * carboidrato com o que sobra — é a divisão que a literatura de
  * nutrição esportiva usa.
  */
 export function macros(alvoKcal: number, peso: number, direcao: Direcao): Macros {
-  // Proteína mais alta no corte: protege massa magra e sacia mais.
-  const gProteinaKg = direcao === "perder" ? 2.0 : 1.8;
-  const proteinaG = Math.round(peso * gProteinaKg);
+  const proteinaG = Math.round(peso * PROTEINA_POR_KG[direcao]);
 
   // Gordura: 25 % das calorias, com piso de 0,6 g/kg (função hormonal).
   const gorduraG = Math.round(

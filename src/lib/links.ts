@@ -6,8 +6,21 @@
  */
 import { marca } from "./content";
 
-/** Miniatura à esquerda do cartão — as mesmas do Linktree. */
-export type IconeDoLink = "marca" | "youtube" | "zumub";
+/**
+ * Miniatura à esquerda do cartão — as mesmas do Linktree.
+ *
+ * `Miniatura` desenha as três primeiras; o resto são os glifos de traço de
+ * `links/IconeDoLink.tsx`, que ainda não está ligado a nenhum cartão.
+ */
+export type IconeDoLink =
+  | "marca"
+  | "youtube"
+  | "zumub"
+  | "consultoria"
+  | "site"
+  | "cupom"
+  | "instagram"
+  | "whatsapp";
 
 export type LinkDaBio = {
   /** Título tal como aparece no cartão. */

@@ -38,8 +38,9 @@ export const marca = {
   email: "contato@carlosseiti.com",
   site: enderecoDoSite(),
   /**
-   * Formulário de captação da consultoria (LeadConnector). Só o endereço do
-   * questionário: os parâmetros de campanha entram por quem monta o link.
+   * Formulário de captação da consultoria (LeadConnector). Só o endereço
+   * do questionário: os parâmetros de campanha são montados em
+   * `lib/campanha.ts`, a partir do que a própria visita trouxe.
    */
   formulario:
     process.env.NEXT_PUBLIC_FORMULARIO_CONSULTORIA ??
@@ -49,22 +50,33 @@ export const marca = {
 /** Hrefs absolutos: os mesmos links funcionam na home e nas outras páginas. */
 export const nav = [
   { label: "Método", href: "/#metodo", topo: true },
+  /* Rótulo "90 Dias" e não "Programa": a âncora da home abaixo já se chama
+     assim, e dois itens com o mesmo nome no mesmo menu não se distinguem —
+     nem a olho, nem em leitor de tela. */
+  { label: "90 Dias", href: "/programa-90-dias", topo: true },
   { label: "Programa", href: "/#programa", topo: false },
   { label: "Calculadora", href: "/calculadora-de-calorias", topo: true },
+  { label: "Gordura", href: "/calculadora-de-gordura-corporal", topo: true },
   { label: "Prato", href: "/calculadora-do-prato", topo: true },
   { label: "Raio-X", href: "/raio-x-postural", topo: true },
+  { label: "Postura", href: "/postura", topo: true },
   { label: "Biblioteca", href: "/biblioteca", topo: true },
   { label: "CSFlix", href: "/csflix", topo: true },
   { label: "Resultados", href: "/#resultados", topo: false },
   { label: "Sobre", href: "/#sobre", topo: false },
-  { label: "Dúvidas", href: "/#duvidas", topo: false },
 ] as const;
 
 export const rotas = {
+  /* Porta única da consultoria: um endereço que se dita num Reel e um só
+     lugar para trocar quando o formulário mudar de casa. */
+  consultoria: "/consultoria",
   calculadora: "/calculadora-de-calorias",
+  gordura: "/calculadora-de-gordura-corporal",
+  programa: "/programa-90-dias",
   prato: "/calculadora-do-prato",
   biblioteca: "/biblioteca",
   raioX: "/raio-x-postural",
+  postura: "/postura",
   csflix: "/csflix",
   links: "/links",
 } as const;
@@ -73,9 +85,9 @@ export const hero = {
   eyebrow: "Consultoria online de treino e dieta",
   titulo: "Emagreça sem\ndietas extremas.",
   texto:
-    "Um protocolo de nutrição e treino construído sobre evidência, ajustado ao seu corpo e à sua rotina. Sem restrição desnecessária. Sem promessa vazia.",
-  cta: "Solicitar avaliação",
-  ctaSecundario: "Calcular minhas calorias",
+    "Nutrição e treino com base em evidência, ajustados ao seu corpo e à sua rotina. Sem restrição desnecessária. Sem promessa vazia.",
+  cta: "Começar consultoria online",
+  ctaSecundario: "Calcular meu % de gordura",
   nota: "Vagas limitadas por turma — acompanhamento individual.",
 } as const;
 
@@ -102,7 +114,7 @@ export const pilares = [
 export const credenciais = [
   { valor: "2×", rotulo: "Mestrado concluído" },
   { valor: "PhD", rotulo: "Doutorando em Alimentos" },
-  { valor: "4,5 mil", rotulo: "Seguidores no Instagram" },
+  { valor: "39", rotulo: "Vidas transformadas" },
   { valor: "100%", rotulo: "Acompanhamento individual" },
 ] as const;
 
@@ -110,12 +122,11 @@ export const paraQuem = {
   eyebrow: "Para quem é",
   titulo: "Você já tentou o difícil.\nFalta o consistente.",
   texto:
-    "A maioria dos planos falha porque é insustentável, não porque você falhou. O trabalho aqui começa pelo que cabe na sua vida.",
+    "A maioria dos planos falha porque é insustentável, não porque você falhou. O trabalho começa pelo que cabe na sua vida.",
   itens: [
     "Já perdeu peso antes e recuperou tudo depois.",
     "Treina, mas não vê o corpo mudar há meses.",
     "Cansou de cortar grupos alimentares inteiros.",
-    "Quer entender o porquê, não só receber uma folha de dieta.",
     "Tem rotina cheia e precisa de um plano que caiba nela.",
   ],
   naoE: [
@@ -125,34 +136,34 @@ export const paraQuem = {
 } as const;
 
 export const metodo = {
-  eyebrow: "02 / Método",
+  eyebrow: "Método",
   titulo: "Direção antes de esforço.",
   texto:
-    "Quatro etapas. Cada uma existe para reduzir a chance de você abandonar o processo no meio.",
+    "Quatro etapas, cada uma para reduzir a chance de você abandonar no meio.",
   etapas: [
     {
       n: "01",
       titulo: "Diagnóstico",
       texto:
-        "Anamnese completa, histórico de peso, exames, rotina, preferências e limitações. O ponto de partida define o caminho.",
+        "Histórico, exames, rotina e limitações. O ponto de partida define o caminho.",
     },
     {
       n: "02",
       titulo: "Protocolo",
       texto:
-        "Plano alimentar e treino montados juntos, calibrados ao seu gasto real e ao que você consegue sustentar.",
+        "Dieta e treino montados juntos, no seu gasto real e no que você consegue sustentar.",
     },
     {
       n: "03",
       titulo: "Execução",
       texto:
-        "Suporte direto durante a semana. Dúvida respondida no dia é adesão preservada.",
+        "Suporte direto na semana. Dúvida respondida no dia é adesão preservada.",
     },
     {
       n: "04",
       titulo: "Ajuste",
       texto:
-        "Revisão periódica com dados: peso, medidas, foto, treino e energia. O plano acompanha o corpo, não o contrário.",
+        "Revisão quinzenal com os seus dados. O plano acompanha o corpo, não o contrário.",
     },
   ],
 } as const;
@@ -160,37 +171,27 @@ export const metodo = {
 export const programa = {
   eyebrow: "Programa",
   titulo: "O que está incluso.",
-  texto:
-    "Acompanhamento individual, do diagnóstico ao ajuste. Sem plano genérico.",
+  texto: "Acompanhamento individual, do diagnóstico ao ajuste.",
   itens: [
     {
       titulo: "Plano alimentar individual",
       texto:
-        "Construído com os alimentos que você come, com substituições reais para cada refeição.",
+        "Montado com os alimentos que você já come, com substituição para cada refeição.",
     },
     {
       titulo: "Treino periodizado",
       texto:
-        "Estruturado para o seu nível, equipamento disponível e frequência semanal possível.",
+        "Para o seu nível, o equipamento que você tem e a frequência que cabe na semana.",
     },
     {
-      titulo: "Ajustes quinzenais",
+      titulo: "Ajuste quinzenal",
       texto:
-        "Revisão de carga, volume e calorias com base no que os dados mostram.",
+        "Carga, volume e calorias revistos pelos seus dados — suplementação incluída, quando faz diferença.",
     },
     {
       titulo: "Suporte direto",
-      texto: "Canal aberto para dúvidas ao longo da semana.",
-    },
-    {
-      titulo: "Estratégia de suplementação",
       texto:
-        "Apenas o que tem respaldo na literatura — e apenas se fizer diferença para você.",
-    },
-    {
-      titulo: "Educação alimentar",
-      texto:
-        "Você termina o processo sabendo se manter sozinho. Esse é o objetivo.",
+        "Canal aberto na semana. Você termina sabendo se manter sozinho: esse é o objetivo.",
     },
   ],
 } as const;
@@ -199,7 +200,7 @@ export const resultados = {
   eyebrow: "Resultados",
   titulo: "Progresso real, medido.",
   texto:
-    "Pessoas reais, processos individuais. Cada transformação respeita um ponto de partida, uma rotina e um ritmo diferente.",
+    "Pessoas reais, cada uma com ponto de partida, rotina e ritmo diferentes.",
   cta: "Ver transformações no Instagram",
   transformacoes: [
     {
@@ -207,7 +208,7 @@ export const resultados = {
       instagram: "@laisdas",
       link: "https://www.instagram.com/laisdas/",
       imagem: "/resultados/lais-das.png",
-      largura: 271,
+      largura: 272,
       altura: 482,
       alt: "Evolução corporal de Laís, com registros de antes e depois vistos de costas",
     },
@@ -217,7 +218,7 @@ export const resultados = {
       link: "https://www.instagram.com/luanitocastro/",
       imagem: "/resultados/luanito-castro.png",
       largura: 233,
-      altura: 412,
+      altura: 372,
       alt: "Evolução corporal de Luanito Castro, com registros de antes e depois",
     },
     {
@@ -225,7 +226,7 @@ export const resultados = {
       instagram: "@isaiassantos_2021",
       link: "https://www.instagram.com/isaiassantos_2021/",
       imagem: "/resultados/isaias-santos.png",
-      largura: 334,
+      largura: 336,
       altura: 342,
       alt: "Evolução corporal de Isaías Santos, com registros de antes e depois",
     },
@@ -238,9 +239,8 @@ export const sobre = {
   eyebrow: "Sobre",
   titulo: "Ciência aplicada\nao seu dia.",
   paragrafos: [
-    "Sou Carlos Seiti. Trabalho com nutrição e treino a partir de uma formação acadêmica em Ciência de Alimentos — dois mestrados concluídos e doutorado em andamento.",
-    "Minha pesquisa é em ciência de alimentos e quimioinformática: passo o dia lendo dados. Trouxe esse mesmo rigor para a consultoria, porque a maior parte do que circula sobre emagrecimento não sobrevive a uma leitura crítica da evidência.",
-    "Também treino e compito. Sei o que é sustentar um protocolo na vida real, com trabalho, prazo e cansaço — e é por isso que nenhum plano meu depende de você ser perfeito.",
+    "Sou Carlos Seiti. Trabalho com nutrição e treino a partir de uma formação acadêmica em Ciência de Alimentos — dois mestrados concluídos, doutorado em andamento — e passo o dia lendo dados. Trouxe esse rigor para a consultoria, porque a maior parte do que circula sobre emagrecimento não sobrevive a uma leitura crítica da evidência.",
+    "Também treino e compito. Sei o que é sustentar um protocolo com trabalho, prazo e cansaço — por isso nenhum plano meu depende de você ser perfeito.",
   ],
   citacao: "Evolução não é pressa. É direção.",
 } as const;
@@ -266,10 +266,6 @@ export const duvidas = {
       r: "Não necessariamente. O treino é montado com o que você tem disponível, incluindo opções para casa.",
     },
     {
-      p: "Como funciona o acompanhamento?",
-      r: "Você recebe o protocolo completo, tem canal direto para dúvidas durante a semana e passa por uma revisão de dados a cada quinze dias.",
-    },
-    {
       p: "Isso substitui consulta com nutricionista ou médico?",
       r: "Não. A consultoria é um serviço de orientação em treino e nutrição esportiva e não substitui acompanhamento clínico. Se você tem condição de saúde diagnosticada, faz uso de medicação contínua ou está gestante, siga também com seu médico.",
     },
@@ -280,8 +276,29 @@ export const contato = {
   eyebrow: "Próximo passo",
   titulo: "O próximo passo\ncomeça agora.",
   texto:
-    "Conte o seu contexto. Respondo pessoalmente com uma avaliação inicial e o caminho recomendado — sem compromisso.",
+    "Conte o seu contexto. Respondo pessoalmente com o caminho recomendado, sem compromisso.",
   nota: "Suas informações são usadas apenas para responder a este contato.",
+  cta: "Começar minha consultoria",
+  /* O que a pessoa encontra depois do clique. Dizer as três etapas antes
+     de abrir o questionário reduz o abandono na primeira pergunta: quem
+     sabe onde o caminho termina não desiste no meio. */
+  passos: [
+    {
+      numero: "01",
+      titulo: "Questionário curto",
+      nota: "Objetivo, rotina e histórico — cinco minutos",
+    },
+    {
+      numero: "02",
+      titulo: "Análise do seu caso",
+      nota: "Leio tudo antes de responder qualquer coisa",
+    },
+    {
+      numero: "03",
+      titulo: "Avaliação inicial",
+      nota: "Respondo com o caminho recomendado, sem compromisso",
+    },
+  ],
   objetivos: [
     "Emagrecer",
     "Ganhar massa muscular",
@@ -343,6 +360,115 @@ export const prato = {
     "Medida pela mão, sem balança",
     "Resultado em faixa, não em número falso",
   ],
+} as const;
+
+/**
+ * Porta de entrada do tráfego de Instagram. Quem chega aqui veio de um
+ * vídeo de 30 segundos, no celular, e decide em poucos segundos se fica —
+ * por isso a copy é curta e a primeira tela já é o formulário de medidas.
+ */
+export const gordura = {
+  slug: rotas.gordura,
+  eyebrow: "Ferramenta gratuita",
+  titulo: "Quanta gordura\nvocê carrega hoje.",
+  texto:
+    "Dois minutos, nenhum equipamento. Descubra quanta gordura você carrega e o que separa você do corpo que quer.",
+  destaques: [
+    "Sem balança de bioimpedância",
+    "Resultado em faixa, não em número falso",
+    "O plano sai junto com o resultado",
+  ],
+  /**
+   * A estimativa rápida vem primeiro e é a que já vem marcada. Quem chega
+   * de um anúncio não tem fita métrica na mão, e pedir uma antes de
+   * mostrar qualquer coisa perde a pessoa na porta. Quem tem fita troca em
+   * um toque e ganha bem mais precisão — o que continua dito aqui, e o
+   * resultado por IMC continua rotulado como estimativa fraca.
+   */
+  metodos: [
+    {
+      id: "imc",
+      titulo: "Não tenho fita",
+      nota: "Estimativa rápida, só com peso e altura.",
+    },
+    {
+      id: "fita",
+      titulo: "Tenho fita métrica",
+      nota: "Bem mais preciso. Pede pescoço e cintura.",
+    },
+  ],
+  avisos: {
+    fita: "Erro de 3 a 4 pontos para cada lado — por isso o resultado vem como faixa.",
+    imc: "Estimativa fraca: sem as circunferências o erro passa de 5 pontos. Com uma fita, troque acima.",
+  },
+  comoMedir: {
+    pescoco: "Abaixo do pomo de adão, sem apertar.",
+    cintura: "Na altura do umbigo, sem prender a barriga.",
+    quadril: "Na parte mais larga dos glúteos.",
+  },
+  alvo: {
+    titulo: "Onde você quer chegar",
+    texto: "Escolha o que você quer manter, não o que impressiona mais.",
+    nota: "Faixas do American Council on Exercise.",
+  },
+  /**
+   * O bloco da home. Os números da prévia saem da própria ferramenta, com
+   * as medidas do exemplo — não são ilustrativos: qualquer um pode repetir
+   * a conta e chegar neles.
+   */
+  home: {
+    eyebrow: "Ferramenta gratuita",
+    cta: "Descobrir meu percentual",
+    nota: "Gratuito · sem cadastro · 2 minutos",
+    texto:
+      "Uma fita métrica basta. A calculadora estima quanta gordura você carrega, você escolhe na escala o abdômen que quer ter, e ela devolve as calorias, os macros e quantas semanas separam um do outro.",
+    previa: [
+      { n: "27,7", u: "%", r: "Gordura corporal hoje" },
+      { n: "22", u: "%", r: "Meta escolhida na escala" },
+      { n: "85,3", u: "kg", r: "Peso com a massa magra mantida" },
+      { n: "11", u: "semanas", r: "Tempo estimado" },
+    ],
+    exemplo:
+      "Exemplo — homem, 34 anos, 92 kg, 176 cm, pescoço 41 cm e cintura 104 cm.",
+    outra: "Prefere começar pelas calorias?",
+  },
+  plano: {
+    titulo: "O que separa você desse ponto",
+    /**
+     * O fecho é a única parte da página que pede alguma coisa. Ele fala
+     * do que a calculadora não resolve — a execução — e usa os números que
+     * a própria pessoa acabou de gerar, porque um convite genérico depois
+     * de um diagnóstico específico soa como anúncio.
+     */
+    fecho: {
+      eyebrow: "O próximo passo",
+      titulo: "A conta é a parte fácil.",
+      texto:
+        "O que decide o resultado é o que acontece entre hoje e lá — e é aí que eu entro.",
+      itens: [
+        "Plano alimentar montado com o que você já come",
+        "Treino periodizado para a sua frequência real",
+        "Revisão a cada quinze dias, com os seus números na mesa",
+      ],
+      cta: "Quero esse plano comigo",
+      urgencia: "Vagas limitadas por turma — o acompanhamento é individual.",
+      nota: "Formulário de 2 minutos. Eu leio e respondo pessoalmente.",
+      privacidade: "Nada do que você digitou sai do seu navegador.",
+      /**
+       * A prova ao lado do pedido. A calculadora entrega um número; a foto
+       * mostra que o número vira corpo em alguém real.
+       */
+      prova: {
+        imagem: "/resultados/transformacao-antes-depois.jpg",
+        largura: 900,
+        altura: 1600,
+        alt: "Antes e depois de uma aluna acompanhada por Carlos Seiti: à esquerda, sem definição; à direita, abdômen e pernas marcados",
+        legenda: "Acompanhamento individual, com ajuste a cada quinze dias.",
+      },
+    },
+    cta: "Quero esse plano comigo",
+    ctaNota: "Formulário de 2 minutos. Eu leio e respondo pessoalmente.",
+  },
 } as const;
 
 export const rodape = {

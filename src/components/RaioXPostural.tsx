@@ -13,7 +13,8 @@ import {
   type PadraoId,
   exerciciosDe,
 } from "@/lib/postura";
-import { Arrow, Eyebrow } from "./ui";
+import { rotas } from "@/lib/content";
+import { Arrow, Eyebrow, buttonClass } from "./ui";
 
 /** Padrões 3 e 4 são mutuamente exclusivos — pedem protocolos opostos. */
 const OPOSTOS: Partial<Record<PadraoId, PadraoId>> = { p3: "p4", p4: "p3" };
@@ -179,7 +180,7 @@ export function RaioXPostural() {
                           alt=""
                           fill
                           sizes="180px"
-                          className="object-contain transition-transform duration-500 group-hover:-translate-y-1"
+                          className="object-contain invert hue-rotate-180 transition-transform duration-500 group-hover:-translate-y-1"
                         />
                       </span>
                       <span className="mt-4 text-[0.62rem] uppercase tracking-[0.16em] text-ouro-profundo">
@@ -218,7 +219,7 @@ export function RaioXPostural() {
               <article key={p.id}>
                 <div className="flex items-start gap-6">
                   <span className="relative hidden h-32 w-20 shrink-0 sm:block">
-                    <Image src={p.figura} alt="" fill sizes="80px" className="object-contain" />
+                    <Image src={p.figura} alt="" fill sizes="80px" className="object-contain invert hue-rotate-180" />
                   </span>
                   <div>
                     <p className="t-eyebrow text-ouro-profundo">{p.numero}</p>
@@ -354,13 +355,13 @@ export function RaioXPostural() {
               no treino que já fazes — e ajustar quando o corpo responde.
             </p>
             <div className="mt-7 flex flex-wrap items-center gap-4">
-              <Link
-                href="/#contato"
-                className="group inline-flex items-center gap-2.5 rounded-full bg-grafite px-7 py-3.5 text-sm font-medium tracking-wide text-porcelana transition-all duration-300 hover:bg-ouro-profundo"
+              <a
+                href={`${rotas.consultoria}?de=raio-x`}
+                className={`${buttonClass("consultoria")}`}
               >
-                Solicitar avaliação
+                Começar consultoria
                 <Arrow />
-              </Link>
+              </a>
               <Link
                 href="/leitura/postura"
                 className="group inline-flex items-center gap-2.5 border-b border-linha-ouro pb-1.5 text-sm text-ouro-profundo"

@@ -1,13 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Logo } from "./Logo";
-import { FAQ } from "./FAQ";
 import { Arrow, Button, Container, Eyebrow, Rule, Section, buttonClass } from "./ui";
 import {
-  calculadora,
   rotas,
+  contato,
   credenciais,
-  duvidas,
+  gordura,
   hero,
   marca,
   metodo,
@@ -17,6 +16,20 @@ import {
   resultados,
   sobre,
 } from "@/lib/content";
+
+/*
+ * A home tem cinco seções, mais o fecho em `Aplicar`:
+ *
+ *   Hero → Para quem é → Método → Programa (com os resultados dentro) →
+ *   Sobre → Aplicar
+ *
+ * O que saiu daqui não foi apagado do site: os pilares da marca viraram
+ * uma faixa dentro de "Para quem é", a calculadora de gordura continua no
+ * botão secundário do hero e no menu, o CSFlix vive na própria página e as
+ * dúvidas passaram para o fecho, onde a objeção aparece no momento em que
+ * ela de facto trava a decisão. Uma página longa não é mais completa: é
+ * só mais longa.
+ */
 
 /* ============================================================
    HERO — um único foco visual, muita área de silêncio.
@@ -44,15 +57,35 @@ export function Hero() {
             </p>
 
             <div className="mt-11 flex flex-wrap items-center gap-4">
-              <Button href="#contato">{hero.cta}</Button>
-              <Link href={calculadora.slug} className={buttonClass("outline")}>
+              <Button nativo variant="consultoria" href={`${rotas.consultoria}?de=hero`}>{hero.cta}</Button>
+              <Link href={gordura.slug} className={buttonClass("outline")}>
                 {hero.ctaSecundario}
                 <Arrow />
               </Link>
             </div>
 
-            <p className="mt-8 flex items-center gap-2.5 text-xs text-grafite">
-              <span aria-hidden className="rule-gold h-px w-6" />
+            {/* Como começar, colado ao botão: quem sabe o que vem depois do
+                clique não trava nele. Os mesmos três passos do fecho. */}
+            <ol className="mt-9 grid max-w-xl gap-px overflow-hidden rounded-xl border border-verde/25 bg-verde/20 sm:grid-cols-3">
+              {contato.passos.map((p, i) => (
+                <li key={p.numero} className="flex items-start gap-3 bg-porcelana/95 p-4">
+                  <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-verde text-[0.7rem] font-bold text-[#06140b]">
+                    {i + 1}
+                  </span>
+                  <span>
+                    <span className="block text-sm font-semibold leading-tight text-grafite">
+                      {p.titulo}
+                    </span>
+                    <span className="mt-1 block text-xs leading-snug text-grafite/60">
+                      {p.nota}
+                    </span>
+                  </span>
+                </li>
+              ))}
+            </ol>
+
+            <p className="mt-6 flex items-center gap-2.5 text-xs text-grafite/70">
+              <span aria-hidden className="size-1.5 rounded-full bg-verde" />
               {hero.nota}
             </p>
           </div>
@@ -96,44 +129,15 @@ export function Hero() {
 }
 
 /* ============================================================
-   PILARES — 01 / essência da marca
-   ============================================================ */
-export function Pilares() {
-  return (
-    <Section tone="branco">
-      <div className="grid gap-14 lg:grid-cols-[0.85fr_1.15fr] lg:gap-24">
-        <div>
-          <Eyebrow>Essência</Eyebrow>
-          <h2 className="t-title reveal mt-7 text-balance">
-            Clareza que direciona.
-            <br />
-            <span className="italic text-ouro-profundo">Consistência</span> que
-            transforma.
-          </h2>
-        </div>
+   PARA QUEM É — com os quatro pilares da marca ao pé.
 
-        <div className="stagger grid gap-x-12 gap-y-11 sm:grid-cols-2">
-          {pilares.map((p) => (
-            <div key={p.titulo}>
-              <span aria-hidden className="rule-gold draw-in block h-px w-10" />
-              <h3 className="mt-5 text-sm uppercase tracking-[0.16em]">{p.titulo}</h3>
-              <p className="mt-3 text-[0.95rem] leading-relaxed text-grafite">
-                {p.texto}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </Section>
-  );
-}
-
-/* ============================================================
-   PARA QUEM É
+   Os pilares tinham seção própria, com título e tudo. Eles dizem como o
+   trabalho é feito, e isso só interessa a quem acabou de se reconhecer na
+   lista acima — por isso agora são uma linha de quatro, e não uma parada.
    ============================================================ */
 export function ParaQuem() {
   return (
-    <Section>
+    <Section tone="branco">
       <div className="grid gap-14 lg:grid-cols-2 lg:gap-24">
         <div className="lg:sticky lg:top-32 lg:self-start">
           <Eyebrow>{paraQuem.eyebrow}</Eyebrow>
@@ -173,6 +177,19 @@ export function ParaQuem() {
           </div>
         </div>
       </div>
+
+      {/* Os pilares, em uma linha: como o trabalho é feito. */}
+      <Rule className="mt-20" />
+      <dl className="stagger grid gap-x-12 gap-y-9 pt-12 sm:grid-cols-2 lg:grid-cols-4">
+        {pilares.map((p) => (
+          <div key={p.titulo}>
+            <dt className="text-sm uppercase tracking-[0.16em]">{p.titulo}</dt>
+            <dd className="mt-3 text-[0.93rem] leading-relaxed text-grafite">
+              {p.texto}
+            </dd>
+          </div>
+        ))}
+      </dl>
     </Section>
   );
 }
@@ -182,7 +199,7 @@ export function ParaQuem() {
    ============================================================ */
 export function Metodo() {
   return (
-    <Section id="metodo" tone="branco">
+    <Section id="metodo">
       <div className="max-w-2xl">
         <Eyebrow>{metodo.eyebrow}</Eyebrow>
         <h2 className="t-title reveal mt-7 text-balance">{metodo.titulo}</h2>
@@ -211,110 +228,107 @@ export function Metodo() {
 }
 
 /* ============================================================
-   PROGRAMA — o que está incluso
+   PROGRAMA — o que está incluso, e o que isso produziu.
+
+   As transformações eram uma seção à parte, depois do programa. A
+   promessa e a prova agora estão no mesmo fundo: quem lê "ajuste
+   quinzenal" vê, duas dobras abaixo, três pessoas que passaram por ele.
+   A âncora #resultados continua a existir, para os links já partilhados.
    ============================================================ */
 export function Programa() {
   return (
-    <Section id="programa">
+    <Section id="programa" tone="grafite">
       <div className="max-w-2xl">
-        <Eyebrow>{programa.eyebrow}</Eyebrow>
-        <h2 className="t-title reveal mt-7 text-balance">{programa.titulo}</h2>
-        <p className="mt-7 text-pretty leading-relaxed text-grafite">
+        <Eyebrow tone="claro">{programa.eyebrow}</Eyebrow>
+        <h2 className="t-title reveal mt-7 text-balance text-porcelana">
+          {programa.titulo}
+        </h2>
+        <p className="mt-7 text-pretty leading-relaxed text-porcelana/70">
           {programa.texto}
         </p>
       </div>
 
-      <div className="stagger mt-18 grid gap-x-14 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="stagger mt-16 grid gap-x-14 gap-y-12 sm:grid-cols-2">
         {programa.itens.map((item, i) => (
           <div key={item.titulo}>
             <div className="flex items-baseline gap-3">
-              <span className="font-display text-sm text-ouro-profundo">
+              <span className="font-display text-sm text-ouro">
                 {String(i + 1).padStart(2, "0")}
               </span>
               <span aria-hidden className="rule-gold draw-in h-px flex-1" />
             </div>
-            <h3 className="mt-5 font-display text-xl">{item.titulo}</h3>
-            <p className="mt-3 text-[0.93rem] leading-relaxed text-grafite">
+            <h3 className="mt-5 font-display text-xl text-porcelana">{item.titulo}</h3>
+            <p className="mt-3 text-[0.93rem] leading-relaxed text-porcelana/70">
               {item.texto}
             </p>
           </div>
         ))}
       </div>
-    </Section>
-  );
-}
 
-/* ============================================================
-   RESULTADOS
-   ============================================================ */
-export function Resultados() {
-  return (
-    <Section id="resultados" tone="grafite">
-      <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-end lg:gap-24">
-        <div>
-          <Eyebrow tone="claro">{resultados.eyebrow}</Eyebrow>
-          <h2 className="t-title reveal mt-7 text-balance text-porcelana">
+      {/* A prova, no mesmo fundo da promessa. */}
+      <div id="resultados" className="mt-24 scroll-mt-24 border-t border-porcelana/12 pt-16">
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+          <h3 className="t-title reveal max-w-md text-balance text-porcelana">
             {resultados.titulo}
-          </h2>
-        </div>
-        <div>
-          <p className="mt-7 max-w-md text-pretty leading-relaxed text-porcelana/65">
-            {resultados.texto}
-          </p>
+          </h3>
           <Link
             href={marca.instagram}
             target="_blank"
             rel="noopener noreferrer"
-            className="group mt-9 inline-flex items-center gap-2.5 border-b border-ouro/40 pb-1.5 text-sm text-ouro transition-colors hover:border-ouro"
+            className="group inline-flex shrink-0 items-center gap-2.5 border-b border-ouro/40 pb-1.5 text-sm text-ouro transition-colors hover:border-ouro"
           >
             {resultados.cta}
             <Arrow />
           </Link>
         </div>
-      </div>
 
-      <div className="stagger mt-16 grid items-start gap-5 sm:grid-cols-3">
-        {resultados.transformacoes.map((pessoa) => (
-          <Link
-            key={pessoa.instagram}
-            href={pessoa.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={`Ver ${pessoa.instagram} no Instagram`}
-            className="group relative isolate overflow-hidden border border-porcelana/12 bg-white/5 transition-all duration-500 hover:-translate-y-2 hover:border-ouro/45 hover:shadow-[0_24px_60px_rgba(0,0,0,0.32)]"
-          >
-            <Image
-              src={pessoa.imagem}
-              alt={pessoa.alt}
-              width={pessoa.largura}
-              height={pessoa.altura}
-              sizes="(max-width: 640px) 100vw, 33vw"
-              className="h-auto w-full opacity-90 transition-all duration-700 group-hover:scale-[1.025] group-hover:opacity-100"
-            />
-            <span
-              aria-hidden
-              className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-grafite via-grafite/55 to-transparent"
-            />
-            <span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5">
-              <span>
-                <span className="block font-display text-xl text-porcelana">
-                  {pessoa.nome}
+        <p className="mt-6 max-w-md text-pretty leading-relaxed text-porcelana/65">
+          {resultados.texto}
+        </p>
+
+        <div className="stagger mt-12 grid items-start gap-5 sm:grid-cols-3">
+          {resultados.transformacoes.map((pessoa) => (
+            <Link
+              key={pessoa.instagram}
+              href={pessoa.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Ver ${pessoa.instagram} no Instagram`}
+              className="group relative isolate overflow-hidden border border-porcelana/12 bg-white/5 transition-all duration-500 hover:-translate-y-2 hover:border-ouro/45 hover:shadow-[0_24px_60px_rgba(0,0,0,0.32)]"
+            >
+              <Image
+                src={pessoa.imagem}
+                alt={pessoa.alt}
+                width={pessoa.largura}
+                height={pessoa.altura}
+                sizes="(max-width: 640px) 100vw, 33vw"
+                className="h-auto w-full opacity-90 transition-all duration-700 group-hover:scale-[1.025] group-hover:opacity-100"
+              />
+              <span
+                aria-hidden
+                className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-grafite via-grafite/55 to-transparent"
+              />
+              <span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5">
+                <span>
+                  <span className="block font-display text-xl text-porcelana">
+                    {pessoa.nome}
+                  </span>
+                  <span className="mt-1 block text-xs tracking-wide text-porcelana/65">
+                    {pessoa.instagram}
+                  </span>
                 </span>
-                <span className="mt-1 block text-xs tracking-wide text-porcelana/65">
-                  {pessoa.instagram}
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-full border border-porcelana/25 bg-white/10 text-ouro backdrop-blur-md transition-transform duration-300 group-hover:-translate-y-1 group-hover:translate-x-1">
+                  <Arrow />
                 </span>
               </span>
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-full border border-porcelana/25 bg-white/10 text-ouro backdrop-blur-md transition-transform duration-300 group-hover:-translate-y-1 group-hover:translate-x-1">
-                <Arrow />
-              </span>
-            </span>
-          </Link>
-        ))}
-      </div>
+            </Link>
+          ))}
+        </div>
 
-      <p className="mt-6 max-w-2xl text-xs leading-relaxed text-porcelana/70">
-        {resultados.aviso}
-      </p>
+        <p className="mt-6 max-w-2xl text-xs leading-relaxed text-porcelana/70">
+          {resultados.aviso}
+        </p>
+      </div>
     </Section>
   );
 }
@@ -377,171 +391,36 @@ export function Sobre() {
           ))}
 
           <div className="flex flex-wrap items-center gap-x-7 gap-y-4 pt-6 text-sm leading-relaxed text-grafite">
-            <div>
-              <Link
-                href={marca.instagram}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group inline-flex items-center gap-2 border-b border-linha-ouro pb-1.5 transition-colors hover:text-ouro-profundo"
-              >
-                {marca.instagramHandle}
-                <Arrow />
-              </Link>
-            </div>
-            <div>
-              <Link
-                href={marca.youtube}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group inline-flex items-center gap-2 border-b border-linha-ouro pb-1.5 transition-colors hover:text-ouro-profundo"
-              >
-                {marca.youtubeNome}
-                <Arrow />
-              </Link>
-            </div>
-            <div>
-              <Link
-                href={marca.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group inline-flex items-center gap-2 border-b border-linha-ouro pb-1.5 transition-colors hover:text-ouro-profundo"
-              >
-                LinkedIn
-                <Arrow />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-    </Section>
-  );
-}
-
-/* ============================================================
-   DÚVIDAS
-   ============================================================ */
-export function Duvidas() {
-  return (
-    <Section id="duvidas">
-      <div className="grid gap-14 lg:grid-cols-[0.72fr_1.28fr] lg:gap-24">
-        <div className="lg:sticky lg:top-32 lg:self-start">
-          <Eyebrow>{duvidas.eyebrow}</Eyebrow>
-          <h2 className="t-title mt-7 text-balance">{duvidas.titulo}</h2>
-        </div>
-
-        <FAQ itens={duvidas.itens} />
-      </div>
-    </Section>
-  );
-}
-
-/* ============================================================
-   FERRAMENTA — ponte da home para a calculadora
-   ============================================================ */
-export function Ferramenta() {
-  return (
-    <Section id="ferramenta" tone="grafite">
-      <div className="grid gap-14 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-20">
-        <div>
-          <Eyebrow tone="claro">{calculadora.eyebrow}</Eyebrow>
-
-          <h2 className="t-title reveal mt-7 text-balance text-porcelana">
-            Comece pelo{" "}
-            <span className="italic text-ouro">seu número</span>, não pelo meu
-            método.
-          </h2>
-
-          <p className="mt-7 max-w-lg text-pretty leading-relaxed text-porcelana/70">
-            Metabolismo basal, gasto do dia, alvo para o peso que você quer, os
-            três macros e a distribuição nas suas refeições. Em trinta segundos,
-            sem cadastro.
-          </p>
-
-          <div className="mt-11 flex flex-wrap items-center gap-4">
             <Link
-              href={calculadora.slug}
-              className="group inline-flex items-center gap-2.5 rounded-full bg-ouro px-8 py-4 text-sm font-medium tracking-wide text-grafite transition-all duration-300 hover:bg-porcelana"
+              href={marca.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center gap-2 border-b border-linha-ouro pb-1.5 transition-colors hover:text-ouro-profundo"
             >
-              {calculadora.cta}
+              {marca.instagramHandle}
               <Arrow />
             </Link>
-            <span className="text-xs text-porcelana/70">
-              Gratuito · sem cadastro
-            </span>
+            <Link
+              href={marca.youtube}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center gap-2 border-b border-linha-ouro pb-1.5 transition-colors hover:text-ouro-profundo"
+            >
+              {marca.youtubeNome}
+              <Arrow />
+            </Link>
+            <Link
+              href={marca.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center gap-2 border-b border-linha-ouro pb-1.5 transition-colors hover:text-ouro-profundo"
+            >
+              LinkedIn
+              <Arrow />
+            </Link>
           </div>
-        </div>
-
-        {/* Prévia do que a ferramenta entrega */}
-        <div className="stagger grid grid-cols-2 gap-px overflow-hidden rounded-sm bg-porcelana/12">
-          {[
-            { n: "1.725", r: "Metabolismo basal", u: "kcal" },
-            { n: "2.674", r: "Gasto no dia", u: "kcal" },
-            { n: "2.030", r: "Alvo para emagrecer", u: "kcal" },
-            { n: "156", r: "Proteína por dia", u: "g" },
-          ].map((c) => (
-            <div key={c.r} className="bg-grafite p-7">
-              <p className="font-display text-3xl text-ouro sm:text-4xl">
-                {c.n}
-                <span className="ml-1.5 font-sans text-xs text-porcelana/70">
-                  {c.u}
-                </span>
-              </p>
-              <p className="mt-2.5 text-xs uppercase tracking-[0.13em] text-porcelana/70">
-                {c.r}
-              </p>
-            </div>
-          ))}
-          <p className="col-span-2 bg-grafite px-7 pb-7 text-xs leading-relaxed text-porcelana/70">
-            Exemplo — homem, 32 anos, 78 kg, 176 cm, treinando 4× por semana.
-          </p>
         </div>
       </div>
     </Section>
-  );
-}
-
-/* ============================================================
-   CINEMA — a ponte da home para o CSFlix
-   Faixa em preto: a marca é de outro território visual, e o
-   contraste com a porcelana é o que a faz existir na página.
-   ============================================================ */
-export function Cinema() {
-  return (
-    <section className="relative overflow-hidden bg-black py-24 sm:py-28">
-      {/* clarão vermelho, discreto */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -left-40 top-1/2 h-[26rem] w-[46rem] -translate-y-1/2 rounded-full bg-[#E00513]/12 blur-[110px]"
-      />
-
-      <Container className="relative">
-        <div className="flex flex-col items-start justify-between gap-10 lg:flex-row lg:items-center lg:gap-20">
-          <div className="max-w-xl">
-            <Image
-              src="/csflix/csflix.png"
-              alt="CSFlix"
-              width={851}
-              height={273}
-              sizes="240px"
-              className="h-auto w-40 sm:w-48"
-            />
-
-            <p className="mt-7 text-pretty leading-relaxed text-white/70">
-              Os vídeos do canal organizados em séries — treino, competição,
-              ciência e bastidores. Sem Shorts, sem garimpo.
-            </p>
-          </div>
-
-          <Link
-            href={rotas.csflix}
-            className="group inline-flex shrink-0 items-center gap-3 rounded-md bg-[#E00513] px-8 py-4 text-sm font-semibold tracking-wide text-white transition-all duration-300 hover:bg-white hover:text-black"
-          >
-            <span aria-hidden className="text-base">▶</span>
-            Entrar no CSFlix
-            <Arrow />
-          </Link>
-        </div>
-      </Container>
-    </section>
   );
 }

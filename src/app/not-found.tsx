@@ -37,8 +37,8 @@ export default function NotFound() {
               Voltar ao início
               <Arrow />
             </Link>
-            <Link href="/#contato" className={buttonClass("outline")}>
-              Solicitar avaliação
+            <Link href="/#contato" className={buttonClass("consultoria")}>
+              Começar consultoria
               <Arrow />
             </Link>
           </div>

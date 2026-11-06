@@ -19,10 +19,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     {
+      /* O funil é a porta do produto: prioridade acima das ferramentas. */
+      url: `${marca.site}${rotas.programa}`,
+      lastModified: agora,
+      changeFrequency: "monthly",
+      priority: 0.95,
+    },
+    {
       url: `${marca.site}${rotas.calculadora}`,
       lastModified: agora,
       changeFrequency: "yearly",
       priority: 0.8,
+    },
+    {
+      url: `${marca.site}${rotas.gordura}`,
+      lastModified: agora,
+      changeFrequency: "yearly",
+      priority: 0.9,
     },
     {
       url: `${marca.site}${rotas.prato}`,
@@ -32,6 +45,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     {
       url: `${marca.site}${rotas.raioX}`,
+      lastModified: agora,
+      changeFrequency: "yearly",
+      priority: 0.8,
+    },
+    {
+      url: `${marca.site}${rotas.postura}`,
       lastModified: agora,
       changeFrequency: "yearly",
       priority: 0.8,

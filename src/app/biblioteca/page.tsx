@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
-import { Arrow, Container, Eyebrow } from "@/components/ui";
+import { Arrow, Container, Eyebrow, buttonClass } from "@/components/ui";
 import { marca, rotas } from "@/lib/content";
 import { jsonLdBiblioteca } from "@/lib/jsonld";
 import { bibliotecaOrdenada } from "@/lib/leituras";
@@ -198,9 +198,9 @@ export default async function Page() {
             <div className="mt-10 flex flex-wrap items-center gap-4">
               <Link
                 href="/#contato"
-                className="group inline-flex items-center gap-2.5 rounded-full bg-ouro px-8 py-4 text-sm font-medium tracking-wide text-grafite transition-all duration-300 hover:bg-porcelana"
+                className={buttonClass("consultoria")}
               >
-                Solicitar avaliação
+                Começar consultoria
                 <Arrow />
               </Link>
               <Link

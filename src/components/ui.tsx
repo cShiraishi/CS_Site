@@ -14,7 +14,9 @@ export function Container({
   className?: string;
 }) {
   return (
-    <div className={`mx-auto w-full max-w-6xl px-6 sm:px-8 lg:px-12 ${className}`}>
+    <div
+      className={`mx-auto w-full max-w-6xl px-6 sm:px-8 lg:px-12 ${className}`}
+    >
       {children}
     </div>
   );
@@ -25,11 +27,14 @@ export function Section({
   children,
   className = "",
   tone = "porcelana",
+  denso = false,
 }: {
   id?: string;
   children: ReactNode;
   className?: string;
   tone?: "porcelana" | "branco" | "grafite";
+  /** respiro curto, para páginas de ferramenta que precisam começar cedo */
+  denso?: boolean;
 }) {
   const tones = {
     porcelana: "bg-porcelana text-grafite",
@@ -37,10 +42,18 @@ export function Section({
     grafite: "bg-grafite text-porcelana",
   } as const;
 
+  /*
+   * O espaçamento é prop, não classe passada por fora. Mandar `py-10` no
+   * `className` não reduz nada: as duas classes ficam na mesma camada e
+   * vence a que o Tailwind emite por último, que é `py-24` — o padding
+   * pedido some sem aviso e a página fica com o dobro do respiro.
+   */
+  const espaco = denso ? "py-10 sm:py-16" : "py-24 sm:py-32 lg:py-40";
+
   return (
     <section
       id={id}
-      className={`${tones[tone]} scroll-mt-24 py-24 sm:py-32 lg:py-40 ${className}`}
+      className={`${tones[tone]} scroll-mt-24 ${espaco} ${className}`}
     >
       <Container>{children}</Container>
     </section>
@@ -61,10 +74,7 @@ export function Eyebrow({
         tone === "ouro" ? "text-ouro-profundo" : "text-ouro"
       }`}
     >
-      <span
-        aria-hidden
-        className="rule-gold inline-block h-px w-8 shrink-0"
-      />
+      <span aria-hidden className="rule-gold inline-block h-px w-8 shrink-0" />
       {children}
     </p>
   );
@@ -102,33 +112,63 @@ export function Rule({ className = "" }: { className?: string }) {
 
 type ButtonProps = {
   children: ReactNode;
-  variant?: "solid" | "outline" | "ghost";
+  variant?: "solid" | "outline" | "ghost" | "consultoria";
   className?: string;
+  /**
+   * Sai por âncora nativa em vez de `Link`.
+   *
+   * `Link` faz prefetch e navegação client-side: pede o payload RSC do
+   * destino. Uma rota que só devolve `Response.redirect` — como
+   * `/consultoria` — não tem payload nenhum, e cada botão passa a gritar
+   * "Failed to fetch RSC payload" na consola antes de cair para a
+   * navegação normal. Para esses, a âncora é o caminho certo.
+   */
+  nativo?: boolean;
 } & Omit<ComponentProps<typeof Link>, "className">;
 
 export function Button({
   children,
   variant = "solid",
   className = "",
+  nativo = false,
   ...props
 }: ButtonProps) {
+  const classe = `${buttonClass(variant)} ${className}`;
+
+  if (nativo) {
+    return (
+      <a className={classe} href={String(props.href)}>
+        {children}
+        <Arrow />
+      </a>
+    );
+  }
+
   return (
-    <Link className={`${buttonClass(variant)} ${className}`} {...props}>
+    <Link className={classe} {...props}>
       {children}
       <Arrow />
     </Link>
   );
 }
 
-export function buttonClass(variant: "solid" | "outline" | "ghost" = "solid") {
+export function buttonClass(
+  variant: "solid" | "outline" | "ghost" | "consultoria" = "solid",
+) {
   const base =
-    "group inline-flex items-center justify-center gap-2.5 rounded-full px-7 py-3.5 text-sm font-medium tracking-wide transition-all duration-300 whitespace-nowrap";
+    "group inline-flex items-center justify-center gap-2.5 rounded-md px-7 py-3.5 text-[0.8rem] font-bold uppercase tracking-[0.14em] transition-all duration-300 whitespace-nowrap";
+  /* Tema escuro: o botão principal é ouro chapado com tinta preta — o
+     único bloco de cor saturada da tela, para o olho ir direto nele. */
   const variants = {
     solid:
-      "bg-grafite text-porcelana hover:bg-ouro-profundo shadow-[0_1px_2px_rgba(29,27,25,0.14)]",
+      "bg-ouro text-[#0b0a09] hover:bg-grafite hover:-translate-y-0.5 shadow-[0_10px_30px_rgba(199,160,106,0.25)]",
     outline:
-      "border border-linha text-grafite hover:border-ouro hover:text-ouro-profundo",
+      "border border-grafite/30 text-grafite hover:border-ouro hover:text-ouro-profundo",
     ghost: "text-grafite hover:text-ouro-profundo",
+    /* Só para "começar a consultoria". O verde é reservado: a pessoa
+       aprende numa tela que verde = começar, e reconhece nas outras. */
+    consultoria:
+      "bg-verde text-[#06140b] hover:bg-verde-claro hover:-translate-y-0.5 shadow-[0_10px_30px_rgba(31,193,91,0.32)]",
   } as const;
   return `${base} ${variants[variant]}`;
 }

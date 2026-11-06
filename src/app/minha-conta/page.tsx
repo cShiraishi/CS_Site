@@ -1,5 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { rotas } from "@/lib/content";
+import { temAcesso } from "@/lib/pedidos";
+import { PROGRAMA } from "@/lib/produto";
 import { criarSupabaseServer } from "@/lib/supabase/server";
 import { atualizarPerfil, sair } from "./actions";
 
@@ -10,9 +13,10 @@ export default async function MinhaContaPage() {
   if (!supabase) redirect("/entrar");
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/entrar?retorno=/minha-conta");
-  const [{ data: perfil }, { data: resultados }] = await Promise.all([
+  const [{ data: perfil }, { data: resultados }, comprou] = await Promise.all([
     supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
     supabase.from("calculator_results").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(5),
+    temAcesso(PROGRAMA.slug),
   ]);
 
   return (
@@ -22,6 +26,24 @@ export default async function MinhaContaPage() {
           <div><p className="t-eyebrow text-ouro-profundo">Área privada</p><h1 className="t-title mt-4">Olá, {perfil?.nome?.split(" ")[0] || "bem-vindo"}.</h1><p className="mt-3 text-grafite">{user.email}</p></div>
           <form action={sair}><button className="text-sm text-grafite underline decoration-ouro/60 underline-offset-4">Sair da conta</button></form>
         </div>
+
+        {/* O que a pessoa comprou vem antes do que ela pode editar: quem
+            entra aqui depois de pagar está à procura do produto, não do
+            formulário de perfil. */}
+        {comprou && (
+          <Link
+            href={`${rotas.programa}/area`}
+            className="mt-10 flex flex-wrap items-center justify-between gap-5 rounded-sm border border-grafite bg-grafite p-7 text-porcelana shadow-(--shadow-floating) transition-colors hover:border-ouro sm:p-9"
+          >
+            <div>
+              <p className="t-eyebrow text-ouro">{PROGRAMA.nome}</p>
+              <p className="mt-3 font-display text-2xl leading-snug sm:text-3xl">
+                Abrir os seus protocolos
+              </p>
+            </div>
+            <span className="text-sm font-medium tracking-wide text-ouro">Entrar →</span>
+          </Link>
+        )}
 
         <div className="mt-12 grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
           <section className="surface-card bg-white p-7 sm:p-9">

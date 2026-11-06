@@ -82,6 +82,13 @@ export default function Page() {
               <p className="mt-9 border-l-2 border-ouro-profundo/50 pl-5 text-[0.86rem] leading-relaxed text-grafite/65">
                 {AVISO}
               </p>
+
+              <Link
+                href={rotas.postura}
+                className="mt-6 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.14em] text-ouro-profundo transition-colors hover:text-grafite"
+              >
+                Antes do teste: a postura do dia a dia ↗
+              </Link>
             </div>
           </Container>
         </section>

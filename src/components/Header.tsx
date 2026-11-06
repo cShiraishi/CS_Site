@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Assinatura } from "./Logo";
 import { Container, buttonClass, Arrow } from "./ui";
 import { LanguageSelector } from "./LanguageSelector";
+import { Dock } from "./Dock";
 import { nav, rotas } from "@/lib/content";
 
 /**
@@ -39,9 +40,9 @@ export function Header({ tone = "claro" }: { tone?: "claro" | "escuro" }) {
   const traco = escuro ? "bg-porcelana" : "bg-grafite";
   const contorno = escuro ? "border-porcelana/25" : "border-linha";
 
-  const superior = nav.filter((item) => item.topo);
-
   return (
+    <>
+    <Dock />
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
         scrolled || aberto ? fundo : "border-b border-transparent"
@@ -58,59 +59,31 @@ export function Header({ tone = "claro" }: { tone?: "claro" | "escuro" }) {
             <Assinatura size={40} priority tone={escuro ? "porcelana" : "grafite"} />
           </Link>
 
-          {/* gap-6 no xl: com seis itens, gap-8 fazia "Raio-X" quebrar em
-              duas linhas. Volta a gap-8 quando há largura para isso. */}
-          <nav className="hidden items-center gap-6 xl:flex 2xl:gap-8" aria-label="Principal">
-            {superior.map((item) => {
-              const destacado = item.href === rotas.calculadora;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`group relative isolate overflow-hidden whitespace-nowrap rounded-full px-3 py-2 text-sm ring-1 ring-transparent transition-all duration-300 before:absolute before:inset-x-2 before:top-0 before:-z-10 before:h-px before:scale-x-0 before:bg-gradient-to-r before:from-transparent before:via-white before:to-transparent before:transition-transform before:duration-300 hover:-translate-y-0.5 hover:before:scale-x-100 ${
-                    escuro
-                      ? "text-porcelana/70 hover:bg-white/10 hover:text-porcelana hover:ring-white/15 hover:shadow-[0_8px_24px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.14)]"
-                      : "text-grafite hover:bg-white/65 hover:text-grafite hover:ring-white/90 hover:shadow-[0_10px_30px_rgba(29,27,25,0.10),inset_0_1px_0_rgba(255,255,255,1)] hover:backdrop-blur-xl"
-                  } ${destacado ? "flex items-center gap-2" : ""}`}
-                >
-                  {destacado && (
-                    <span
-                      aria-hidden
-                      className="h-1.5 w-1.5 rounded-full bg-ouro transition-transform duration-300 group-hover:scale-150"
-                    />
-                  )}
-                  {item.label}
-                  <span className="rule-gold absolute bottom-0 left-3 right-3 h-px origin-left scale-x-0 transition-transform duration-300 group-hover:scale-x-100" />
-                </Link>
-              );
-            })}
-          </nav>
+          {/* A navegação entre ferramentas mora no Dock, preso ao rodapé da
+              tela. No topo fica a marca, a chamada e o menu completo. */}
 
           <div className="flex shrink-0 items-center gap-3">
-            <LanguageSelector escuro={escuro} />
-
-            {/* O display responsivo fica no invólucro: `buttonClass` já traz
-                `inline-flex`, que venceria um `hidden` no mesmo elemento. */}
             <div className="hidden sm:block">
-              <Link
-                href="/#contato"
-                className={
-                  escuro
-                    ? "group inline-flex items-center justify-center gap-2.5 whitespace-nowrap rounded-full bg-ouro px-6 py-3 text-sm font-medium tracking-wide text-grafite transition-all duration-300 hover:bg-porcelana"
-                    : buttonClass("solid")
-                }
-              >
-                Solicitar avaliação
-                <Arrow />
-              </Link>
+              <LanguageSelector escuro={escuro} />
             </div>
+
+            {/* O botão verde fica visível em todas as larguras: o tráfego vem
+                do Instagram, e no celular era justamente onde ele sumia. */}
+            <a
+              href={`${rotas.consultoria}?de=topo`}
+              className={`${buttonClass("consultoria")} !px-4 !py-2.5 sm:!px-6 sm:!py-3`}
+            >
+              <span className="sm:hidden">Começar</span>
+              <span className="hidden sm:inline">Começar consultoria</span>
+              <Arrow />
+            </a>
 
             <button
               type="button"
               onClick={() => setAberto((v) => !v)}
               aria-expanded={aberto}
               aria-label={aberto ? "Fechar menu" : "Abrir menu"}
-              className={`flex h-11 w-11 items-center justify-center rounded-full border transition-colors xl:hidden ${contorno}`}
+              className={`flex h-11 w-11 items-center justify-center rounded-full border transition-colors ${contorno}`}
             >
               <span className="flex w-4 flex-col gap-[5px]">
                 <span
@@ -139,7 +112,7 @@ export function Header({ tone = "claro" }: { tone?: "claro" | "escuro" }) {
 
       {/* Menu — no celular abre com rolagem própria, sem estourar a tela */}
       <div
-        className={`overflow-hidden border-t transition-[max-height] duration-500 xl:hidden ${painel} ${
+        className={`overflow-hidden border-t transition-[max-height] duration-500 ${painel} ${
           aberto ? "max-h-[80svh]" : "max-h-0 border-transparent"
         }`}
       >
@@ -162,17 +135,23 @@ export function Header({ tone = "claro" }: { tone?: "claro" | "escuro" }) {
                 {item.label}
               </Link>
             ))}
-            <Link
-              href="/#contato"
+            <a
+              href={`${rotas.consultoria}?de=menu`}
               onClick={() => setAberto(false)}
-              className={`${buttonClass("solid")} my-6 sm:hidden`}
+              className={`${buttonClass("consultoria")} my-6`}
             >
-              Solicitar avaliação
+              Começar consultoria
               <Arrow />
-            </Link>
+            </a>
+            {/* No celular o seletor de idioma sai do topo para dar lugar ao
+                botão verde; ele mora aqui. */}
+            <div className="mb-6 sm:hidden">
+              <LanguageSelector escuro={escuro} />
+            </div>
           </nav>
         </Container>
       </div>
     </header>
+    </>
   );
 }

@@ -6,37 +6,48 @@
    ============================================================ */
 
 @theme {
-  /* 05 / SISTEMA CROMÁTICO */
-  --color-branco: #ffffff;
-  --color-porcelana: #f7f5f2;
+  /* 05 / SISTEMA CROMÁTICO — versão escura (nov/2026).
+     Os NOMES ficaram e os VALORES inverteram: "porcelana" é o fundo da
+     página e "grafite" é a tinta. Todas as classes do site (bg-porcelana,
+     text-grafite, bg-grafite…) viram o tema escuro sem tocar componente,
+     e as faixas que eram grafite viram faixas claras de contraste. */
+  --color-branco: #161412;
+  --color-porcelana: #0b0a09;
   --color-ouro: #c7a06a;
-  /* Tom funcional: escurecido o suficiente para texto pequeno cumprir WCAG AA. */
-  --color-ouro-profundo: #76512e;
-  --color-grafite: #1d1b19;
+  /* Ouro de texto: no fundo escuro clareia, em vez de escurecer, para AA. */
+  --color-ouro-profundo: #dcb57c;
+  --color-grafite: #f2ede5;
 
-  /* Papel do render 3D — usado para que a placa do logotipo funda no fundo */
-  --color-papel: #e8e3e1;
-  --color-papel-claro: #f1edea;
-  --color-papel-escuro: #ded9d6;
+  /* Verde "Close Friends": cor exclusiva do caminho para a consultoria.
+     Nenhum outro elemento do site usa verde — onde ele aparece, é ali
+     que se começa. */
+  --color-verde: #1fc15b;
+  --color-verde-claro: #4be283;
 
-  /* 06 / TIPOGRAFIA */
-  --font-display: var(--font-garamond), "EB Garamond", Georgia, serif;
+  --color-papel: #1a1815;
+  --color-papel-claro: #201d1a;
+  --color-papel-escuro: #121110;
+
+  /* 06 / TIPOGRAFIA — títulos em Anton (condensada, caixa alta);
+     a Garamond fica como serifa de acento. */
+  --font-display: var(--font-anton), "Anton", Impact, sans-serif;
+  --font-serif: var(--font-garamond), "EB Garamond", Georgia, serif;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
-  /* 07 / LINHAS — 0,5 a 1,5 pt. Sempre delicadas. */
-  --color-linha: color-mix(in srgb, #1d1b19 12%, transparent);
-  --color-linha-ouro: color-mix(in srgb, #c7a06a 38%, transparent);
+  --color-linha: color-mix(in srgb, #f2ede5 13%, transparent);
+  --color-linha-ouro: color-mix(in srgb, #c7a06a 45%, transparent);
 }
 
 /* O Tailwind v4 remove variáveis de tema cujo valor aponta para outra variável
    (o caso das fontes do next/font). Redeclaradas aqui para existirem de fato. */
 :root {
-  color-scheme: light;
-  --font-display: var(--font-garamond), "EB Garamond", Georgia, serif;
+  color-scheme: dark;
+  --font-display: var(--font-anton), "Anton", Impact, sans-serif;
+  --font-serif: var(--font-garamond), "EB Garamond", Georgia, serif;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --shadow-soft: 0 18px 50px rgb(29 27 25 / 0.06);
-  --shadow-floating: 0 28px 80px rgb(29 27 25 / 0.10);
-  --shadow-glass: 0 12px 40px rgb(29 27 25 / 0.08), inset 0 1px 0 rgb(255 255 255 / 0.88);
+  --shadow-soft: 0 18px 50px rgb(0 0 0 / 0.45);
+  --shadow-floating: 0 28px 80px rgb(0 0 0 / 0.6);
+  --shadow-glass: 0 12px 40px rgb(0 0 0 / 0.5), inset 0 1px 0 rgb(255 255 255 / 0.06);
   --ease-editorial: cubic-bezier(0.22, 1, 0.36, 1);
   --motion-fast: 180ms;
   --motion-standard: 320ms;
@@ -71,8 +82,8 @@ body {
 }
 
 .glass-light {
-  border-color: rgb(255 255 255 / 0.7);
-  background: rgb(255 255 255 / 0.58);
+  border-color: rgb(255 255 255 / 0.08);
+  background: rgb(11 10 9 / 0.74);
   box-shadow: var(--shadow-glass);
   backdrop-filter: blur(24px) saturate(1.5);
 }
@@ -84,6 +95,32 @@ body {
   backdrop-filter: blur(24px) saturate(1.45);
 }
 
+/* Ponto de carga da página /postura: o halo respira em volta da junta. */
+@keyframes pulso {
+  0%, 100% { transform: scale(0.7); opacity: 0.9; }
+  50% { transform: scale(1.35); opacity: 0.25; }
+}
+
+.pulso {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pulso 1.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulso { animation: none; }
+}
+
+/* Anton não tem itálico: as frases de assinatura em itálico voltam para a
+   Garamond, que vira a voz de acento por cima da caixa alta. */
+.font-display.italic,
+.t-title.italic,
+.t-display .italic,
+.t-title .italic {
+  font-family: var(--font-serif);
+  text-transform: none;
+}
+
 :where(a, button, input, select, textarea, summary):focus-visible {
   outline: 2px solid var(--color-ouro-profundo);
   outline-offset: 3px;
@@ -92,17 +129,19 @@ body {
 /* 06 / Hierarquia: título 48–72 pt, subtítulo 20–32 pt, texto 10–14 pt */
 @utility t-display {
   font-family: var(--font-display);
-  font-size: clamp(2.75rem, 6.2vw, 4.5rem);
-  line-height: 1.04;
-  letter-spacing: -0.021em;
+  font-size: clamp(3.25rem, 9.5vw, 7.5rem);
+  line-height: 0.9;
+  letter-spacing: 0;
+  text-transform: uppercase;
   font-weight: 400;
 }
 
 @utility t-title {
   font-family: var(--font-display);
-  font-size: clamp(2rem, 3.9vw, 3rem);
-  line-height: 1.12;
-  letter-spacing: -0.016em;
+  font-size: clamp(2.4rem, 5.6vw, 4.25rem);
+  line-height: 0.95;
+  letter-spacing: 0;
+  text-transform: uppercase;
   font-weight: 400;
 }
 
@@ -113,10 +152,10 @@ body {
 }
 
 @utility t-eyebrow {
-  font-size: 0.6875rem;
-  letter-spacing: 0.22em;
+  font-size: 0.72rem;
+  letter-spacing: 0.26em;
   text-transform: uppercase;
-  font-weight: 500;
+  font-weight: 700;
 }
 
 /* 07 / LINGUAGEM GRÁFICA — a seta vira ritmo visual */
@@ -173,6 +212,11 @@ body {
   to { height: 0; opacity: 0; }
 }
 
+/*
+ * A dobra anima só o deslocamento, sem opacity: o herói é o candidato a
+ * LCP, e começar invisível empurraria a métrica 0,9 s para a frente em
+ * troca de um fade que ninguém pediu.
+ */
 /* Entrada da dobra — roda uma vez, no carregamento. */
 .rise {
   animation: rise 0.9s cubic-bezier(0.22, 0.61, 0.36, 1) both;
@@ -180,9 +224,11 @@ body {
 
 @keyframes reveal {
   from {
-    transform: translateY(28px);
+    opacity: 0;
+    transform: translateY(34px);
   }
   to {
+    opacity: 1;
     transform: none;
   }
 }
@@ -239,7 +285,18 @@ body {
   }
 }
 
-/* Escalonamento dentro de uma grade: cada filho entra na sua vez. */
+/*
+ * Escalonamento dentro de uma grade: cada filho entra na sua vez.
+ *
+ * Com timeline de scroll não há `animation-delay` que preste — o relógio
+ * é a posição da página, não o tempo. O atraso faz-se adiando o *range*
+ * de cada filho: o segundo cartão começa a aparecer um pouco mais tarde
+ * que o primeiro, o terceiro mais tarde ainda.
+ *
+ * Sem isto, três cartões lado a lado estão à mesma altura da página,
+ * logo partilham a mesma posição na timeline e entram todos ao mesmo
+ * instante — que é precisamente o que "stagger" existe para evitar.
+ */
 @utility stagger {
   @supports (animation-timeline: view()) {
     @media (prefers-reduced-motion: no-preference) {
@@ -247,6 +304,18 @@ body {
         animation: reveal linear both;
         animation-timeline: view();
         animation-range: entry 4% cover 22%;
+      }
+
+      & > *:nth-child(2) {
+        animation-range: entry 9% cover 27%;
+      }
+
+      & > *:nth-child(3) {
+        animation-range: entry 14% cover 32%;
+      }
+
+      & > *:nth-child(n + 4) {
+        animation-range: entry 19% cover 37%;
       }
     }
   }

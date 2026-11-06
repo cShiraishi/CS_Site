@@ -13,7 +13,7 @@ import {
 } from "@/lib/alimentos";
 import { rotas } from "@/lib/content";
 import { type ItemPrato, lerContraMeta, montarPrato } from "@/lib/prato";
-import { Arrow, Eyebrow } from "./ui";
+import { Arrow, Eyebrow, buttonClass } from "./ui";
 
 /**
  * A meta do dia sobrevive entre visitas — ninguém quer redigitar.
@@ -467,13 +467,13 @@ export function EstimadorDePrato() {
           a olho.
         </p>
         <div className="mt-8 flex flex-wrap items-center gap-4">
-          <Link
-            href="/#contato"
-            className="group inline-flex items-center gap-2.5 rounded-full bg-grafite px-7 py-3.5 text-sm font-medium tracking-wide text-porcelana transition-all duration-300 hover:bg-ouro-profundo"
+          <a
+            href={`${rotas.consultoria}?de=prato`}
+            className={`${buttonClass("consultoria")}`}
           >
-            Solicitar avaliação
+            Começar consultoria
             <Arrow />
-          </Link>
+          </a>
           <Link
             href={rotas.calculadora}
             className="group inline-flex items-center gap-2.5 border-b border-linha-ouro pb-1.5 text-sm text-ouro-profundo"

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { EB_Garamond, Inter } from "next/font/google";
+import { Anton, EB_Garamond, Inter } from "next/font/google";
 import { Analytics } from "@/components/Analytics";
 import { marca } from "@/lib/content";
 import "./globals.css";
@@ -13,12 +13,20 @@ const garamond = EB_Garamond({
   style: ["normal", "italic"],
 });
 
+/* Títulos do tema escuro (nov/2026): condensada, pesada, caixa alta. */
+const anton = Anton({
+  variable: "--font-anton",
+  subsets: ["latin"],
+  display: "swap",
+  weight: "400",
+});
+
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
   display: "swap",
-  // O 700 existe por causa do @carlosseiti da página /links; o browser só
-  // baixa o peso que a página usa de facto.
+  // 700 existe por causa do @carlosseiti da pagina /links; o browser so
+  // baixa o peso que a pagina usa de facto.
   weight: ["400", "500", "700"],
 });
 
@@ -87,7 +95,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f7f5f2",
+  themeColor: "#0b0a09",
 };
 
 export default function RootLayout({
@@ -96,7 +104,7 @@ export default function RootLayout({
   return (
     // As variáveis das fontes precisam existir em :root — é lá que
     // --font-display e --font-sans as consomem (globals.css).
-    <html lang="pt-BR" className={`${garamond.variable} ${inter.variable}`}>
+    <html lang="pt-BR" className={`${anton.variable} ${garamond.variable} ${inter.variable}`}>
       <body>
         {children}
         <Analytics />

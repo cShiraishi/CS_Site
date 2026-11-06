@@ -3,7 +3,7 @@ import Link from "next/link";
 import { CSFlix } from "@/components/CSFlix";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
-import { Arrow, Container } from "@/components/ui";
+import { Arrow, Container, buttonClass } from "@/components/ui";
 import { carregarTrilhas, totalDeVideos } from "@/lib/csflix";
 import { marca, rotas } from "@/lib/content";
 import { jsonLdCSFlix } from "@/lib/jsonld";
@@ -65,9 +65,9 @@ export default async function Page() {
             <div className="mt-9 flex flex-wrap items-center gap-4">
               <Link
                 href="/#contato"
-                className="group inline-flex items-center gap-2.5 rounded-full bg-ouro px-8 py-4 text-sm font-medium tracking-wide text-grafite transition-all duration-300 hover:bg-white"
+                className={buttonClass("consultoria")}
               >
-                Solicitar avaliação <Arrow />
+                Começar consultoria <Arrow />
               </Link>
               <Link
                 href={rotas.biblioteca}

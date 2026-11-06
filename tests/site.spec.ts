@@ -10,15 +10,31 @@ test("home não tem violações automáticas graves de acessibilidade", async ({
   expect(resultado.violations.filter((v) => v.impact === "critical" || v.impact === "serious")).toEqual([]);
 });
 
-test("aplicação avança somente com a etapa preenchida", async ({ page }) => {
+test("a home leva à consultoria e responde a dúvida no mesmo fecho", async ({ page }) => {
   await page.goto("/#contato");
-  await expect(page.locator('#contato [data-interactive="true"]')).toBeVisible();
-  await page.getByLabel("Principal objetivo").selectOption("Emagrecer");
-  await page.getByLabel("Em que momento você está?").selectOption("Já tentei outros planos");
-  await page.getByLabel("Seu contexto").fill("Quero um plano consistente que funcione com minha rotina.");
-  await page.getByRole("button", { name: "Continuar" }).click();
 
-  await expect(page.getByRole("heading", { name: "Sua rotina" })).toBeVisible();
+  // O fecho é um pedido só: um botão, que sai para /consultoria.
+  const pedido = page.locator("#contato").getByRole("link", { name: "Começar minha avaliação" });
+  await expect(pedido).toBeVisible();
+  await expect(pedido).toHaveAttribute("href", /\/consultoria/);
+
+  // E as dúvidas vivem aqui, não numa seção no meio da página.
+  const duvida = page.getByRole("button", { name: "Preciso morar perto para fazer a consultoria?" });
+  await duvida.click();
+  await expect(page.getByText("Todo o acompanhamento é online")).toBeVisible();
+});
+
+test("a home mostra cinco seções, com os resultados dentro do programa", async ({ page }) => {
+  await page.goto("/");
+
+  for (const id of ["topo", "metodo", "programa", "resultados", "sobre", "contato"]) {
+    await expect(page.locator(`#${id}`)).toHaveCount(1);
+  }
+
+  // O que saiu da home continua a ter porta: no menu e no botão do hero.
+  await expect(
+    page.getByRole("link", { name: "Calcular meu % de gordura" }),
+  ).toBeVisible();
 });
 
 test("calculadora gera plano a partir dos dados básicos", async ({ page }) => {

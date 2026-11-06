@@ -5,6 +5,16 @@ const nextConfig: NextConfig = {
   trailingSlash: false,
   poweredByHeader: false,
 
+  /*
+   * Os protocolos em PDF vivem em `protocolos/`, fora de `public/`, e são
+   * lidos do disco pela rota que os serve. Sem esta linha o rastreador de
+   * ficheiros do Next não os vê — nada no código os importa — e a função
+   * é publicada sem eles: em produção, todo o download devolveria 500.
+   */
+  outputFileTracingIncludes: {
+    "/api/protocolos/*": ["./protocolos/*.pdf"],
+  },
+
   images: {
     // AVIF primeiro, WebP como alternativa. O JPEG do render nunca é servido cru.
     formats: ["image/avif", "image/webp"],
@@ -37,9 +47,27 @@ const nextConfig: NextConfig = {
 
   async redirects() {
     return [
-      // Herdeiros do Linktree: as variações que alguém já possa ter guardado
-      // chegam todas à mesma página. Temporário (307) de propósito: 301 fica
-      // gravado no navegador e impede mudar o destino depois.
+      // Um endereço canônico só: www e o *.vercel.app caem no domínio.
+      // 308 permanente — aqui não há campanha a mudar de destino.
+      {
+        source: "/:caminho*",
+        has: [{ type: "host", value: "www.carlosseiti.com" }],
+        destination: "https://carlosseiti.com/:caminho*",
+        permanent: true,
+      },
+      {
+        source: "/:caminho*",
+        has: [{ type: "host", value: "carlosseiti.vercel.app" }],
+        destination: "https://carlosseiti.com/:caminho*",
+        permanent: true,
+      },
+      // Atalho para caber na bio e na legenda do Reels. Temporário (307) de
+      // propósito: 301 fica gravado no navegador e impede mudar o destino da
+      // campanha depois. O Next repassa a query string sozinho, então os
+      // parâmetros do anúncio chegam inteiros à calculadora.
+      { source: "/bf", destination: "/calculadora-de-gordura-corporal", permanent: false },
+      // Herdeiros do Linktree: as variacoes que alguem ja possa ter na bio
+      // chegam todas a mesma pagina.
       { source: "/link", destination: "/links", permanent: false },
       { source: "/linktree", destination: "/links", permanent: false },
       { source: "/bio", destination: "/links", permanent: false },

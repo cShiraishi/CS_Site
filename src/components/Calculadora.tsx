@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import {
@@ -18,10 +17,10 @@ import {
   macros as calcularMacros,
   planejar,
 } from "@/lib/calorias";
-import { calculadora } from "@/lib/content";
+import { calculadora, rotas } from "@/lib/content";
 import { criarSupabaseBrowser } from "@/lib/supabase/client";
 import { CapturaPlano, type Parametros } from "./CapturaPlano";
-import { Arrow, Rotulo, campoBase } from "./ui";
+import { Arrow, Rotulo, buttonClass, campoBase } from "./ui";
 
 const num = (n: number) => n.toLocaleString("pt-BR");
 const dec = (s: string) => Number(s.replace(",", "."));
@@ -568,13 +567,13 @@ function Resultado({ base, plano, macros, pratos, parametros }: DadosCalculados)
       {/* Ponte para a consultoria */}
       <div className="mt-14 border-t border-linha pt-9">
         <p className="max-w-xl leading-relaxed text-grafite">{calculadora.ponte}</p>
-        <Link
-          href="/#contato"
-          className="group mt-7 inline-flex items-center gap-2.5 rounded-full bg-grafite px-7 py-3.5 text-sm font-medium tracking-wide text-porcelana transition-all duration-300 hover:bg-ouro-profundo"
+        <a
+          href={`${rotas.consultoria}?de=calculadora`}
+          className={`mt-7 ${buttonClass("consultoria")}`}
         >
-          Solicitar avaliação
+          Começar consultoria
           <Arrow />
-        </Link>
+        </a>
       </div>
       </motion.div>
       )}

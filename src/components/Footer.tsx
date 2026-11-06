@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { Logo } from "./Logo";
 import { Container, Arrow } from "./ui";
-import { marca, nav, rodape } from "@/lib/content";
+import { marca, nav, rodape, rotas } from "@/lib/content";
 
 export function Footer() {
   const ano = new Date().getFullYear();
 
   return (
-    <footer className="bg-grafite text-porcelana">
+    <footer className="border-t border-linha-ouro bg-porcelana pb-28 text-grafite">
       <Container className="py-20">
         <div className="grid gap-14 lg:grid-cols-[1.2fr_1fr] lg:gap-24">
           {/* Assinatura com respiro amplo (04 / brand book) */}
@@ -23,20 +23,20 @@ export function Footer() {
                 </p>
               </div>
             </div>
-            <p className="mt-8 font-display text-2xl italic text-porcelana/80">
+            <p className="mt-8 font-display text-2xl italic text-grafite/80">
               {marca.assinatura}.
             </p>
           </div>
 
           <div className="grid gap-10 sm:grid-cols-2">
             <nav aria-label="Rodapé">
-              <p className="t-eyebrow text-porcelana/70">Navegação</p>
+              <p className="t-eyebrow text-grafite/70">Navegação</p>
               <ul className="mt-5 space-y-3 text-sm">
                 {nav.map((item) => (
                   <li key={item.href}>
                     <Link
                       href={item.href}
-                      className="text-porcelana/70 transition-colors hover:text-ouro"
+                      className="text-grafite/70 transition-colors hover:text-ouro"
                     >
                       {item.label}
                     </Link>
@@ -46,14 +46,14 @@ export function Footer() {
             </nav>
 
             <div>
-              <p className="t-eyebrow text-porcelana/70">Contato</p>
+              <p className="t-eyebrow text-grafite/70">Contato</p>
               <ul className="mt-5 space-y-3 text-sm">
                 <li>
                   <Link
                     href={marca.instagram}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group inline-flex items-center gap-2 text-porcelana/70 transition-colors hover:text-ouro"
+                    className="group inline-flex items-center gap-2 text-grafite/70 transition-colors hover:text-ouro"
                   >
                     Instagram
                     <Arrow />
@@ -64,7 +64,7 @@ export function Footer() {
                     href={marca.whatsapp}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group inline-flex items-center gap-2 text-porcelana/70 transition-colors hover:text-ouro"
+                    className="group inline-flex items-center gap-2 text-grafite/70 transition-colors hover:text-ouro"
                   >
                     WhatsApp
                     <Arrow />
@@ -75,7 +75,7 @@ export function Footer() {
                     href={marca.youtube}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group inline-flex items-center gap-2 text-porcelana/70 transition-colors hover:text-ouro"
+                    className="group inline-flex items-center gap-2 text-grafite/70 transition-colors hover:text-ouro"
                   >
                     {marca.youtubeNome}
                     <Arrow />
@@ -86,28 +86,28 @@ export function Footer() {
                     href={marca.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group inline-flex items-center gap-2 text-porcelana/70 transition-colors hover:text-ouro"
+                    className="group inline-flex items-center gap-2 text-grafite/70 transition-colors hover:text-ouro"
                   >
                     LinkedIn
                     <Arrow />
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    href="#contato"
-                    className="text-porcelana/70 transition-colors hover:text-ouro"
+                  <a
+                    href={`${rotas.consultoria}?de=rodape`}
+                    className="font-semibold text-verde transition-colors hover:text-verde-claro"
                   >
-                    Solicitar avaliação
-                  </Link>
+                    Começar consultoria
+                  </a>
                 </li>
               </ul>
             </div>
           </div>
         </div>
 
-        <hr className="my-14 h-px border-0 bg-porcelana/12" />
+        <hr className="my-14 h-px border-0 bg-grafite/12" />
 
-        <div className="flex flex-col gap-6 text-xs text-porcelana/70 lg:flex-row lg:items-start lg:justify-between">
+        <div className="flex flex-col gap-6 text-xs text-grafite/70 lg:flex-row lg:items-start lg:justify-between">
           <p className="max-w-2xl leading-relaxed">{rodape.disclaimer}</p>
           <p className="shrink-0">
             © {ano} {marca.nome}

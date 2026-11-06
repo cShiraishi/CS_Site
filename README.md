@@ -35,6 +35,9 @@ npm run dev
 | Ordem das seções | `src/app/page.tsx` |
 | Equações e regras da calculadora | `src/lib/calorias.ts` |
 | **Livros da biblioteca** | `src/lib/biblioteca.ts` |
+| Escala visual de gordura corporal | `src/lib/gordura.ts` |
+| Endereço do formulário da consultoria | `marca.formulario` em `src/lib/content.ts` |
+| Recortar a tira de níveis de abdômen | `scripts/fatiar-abs.py` |
 | **Adicionar um PDF para ler online** | `scripts/preparar-livro.py` |
 | Campos do formulário | `src/components/Contato.tsx` + `src/app/actions.ts` |
 | Logotipo | `public/brand/` e `src/app/icon.png` |
@@ -42,6 +45,20 @@ npm run dev
 
 **Toda a copy está em `src/lib/content.ts`.** Nenhum componente precisa ser
 aberto para trocar texto.
+
+## Testes
+
+```bash
+npx playwright test --config=playwright.local.config.ts
+```
+
+A config principal usa a porta 3210 com `reuseExistingServer`. Quando outro
+projeto já ocupa essa porta, o Playwright testa o site errado sem reclamar —
+a config local sobe um servidor exclusivo na 3417 e fecha essa porta de erro.
+
+> O teste `calculadora gera plano a partir dos dados básicos` falha desde antes
+> da calculadora de gordura: o campo WhatsApp da captura de plano não chega a
+> aparecer para o Playwright. Está fora do escopo daquela ferramenta.
 
 ## Movimento
 
@@ -85,6 +102,73 @@ Toda a lógica está em `src/lib/calorias.ts`, sem nenhuma dependência de
 interface. Conferido à mão: homem, 32 anos, 78 kg, 176 cm, moderadamente ativo
 → TMB 1 725, GET 2 674, alvo 2 030 kcal, e a soma das refeições bate exatamente
 com o total em kcal e nos três macros.
+
+## Calculadora de gordura corporal
+
+`/calculadora-de-gordura-corporal` — e `/bf`, o atalho para caber na bio e na
+legenda do Reels (redirect 307 em `next.config.ts`, que repassa a query string).
+
+É a porta de entrada do tráfego pago. O caminho é: percentual estimado →
+escolher o abdômen desejado na escala → calorias, macros e prazo → formulário
+da consultoria.
+
+| Etapa | Base |
+|---|---|
+| Estimativa com fita | Hodgdon & Beckett (Marinha dos EUA), erro padrão de 3,5 pp |
+| Estimativa sem fita | Deurenberg, pelo IMC, erro padrão de 5 pp |
+| Classificação | Faixas do American Council on Exercise, por sexo |
+| Peso alvo | Massa magra mantida: `MM / (1 − %GC alvo)` |
+| Calorias e prazo | `planejar()` de `src/lib/calorias.ts`, com os mesmos limites de segurança |
+
+O resultado sai **em faixa**, nunca como número seco — o método não tem
+precisão para a segunda casa, e fingir que tem é o que as calculadoras da
+internet fazem. O metabolismo usa Mifflin, não Katch-McArdle, mesmo havendo
+um %GC em mãos: esse percentual é estimado, e a Katch levaria o erro dele
+para dentro do gasto energético.
+
+### A escala visual
+
+`NIVEIS` em `src/lib/gordura.ts`. Os seis degraus masculinos com foto são os
+seis painéis da tira de referência, recortados por
+`scripts/fatiar-abs.py`, com o percentual que cada um de fato representa
+(de ~7 % a ~17 %). Os dois degraus acima (`Médio`, `Acima`) existem porque é
+onde está boa parte de quem chega pelo anúncio — e ainda não têm foto:
+aparecem como cartão tipográfico.
+
+Para acrescentar as fotos que faltam, ou a tira feminina, corte os painéis em
+`public/gordura/` seguindo o padrão `h-<pct>.png` / `m-<pct>.png` e aponte o
+campo `figura` do nível. A página lê a pasta no servidor
+(`src/lib/gordura-figuras.ts`) e só usa o arquivo se ele existir — sem 404 e
+sem imagem quebrada enquanto a coleção não está completa.
+
+```bash
+python scripts/fatiar-abs.py tira-masculina.png public/gordura h "17,15,13,11,09,07" 0.08
+python scripts/fatiar-abs.py tira-feminina.png  public/gordura m "25,23,21,19,16,13" 0.16
+```
+
+Os percentuais vão da esquerda para a direita, na ordem dos painéis. O último
+argumento é a folga descartada de cada lado: quanto maior, mais fechado no
+abdômen. A montagem feminina é mais apertada que a masculina e precisa de
+mais folga para não trazer o braço do painel vizinho.
+
+> **Trocou uma imagem e o site continua mostrando a antiga?** O cache do
+> otimizador no Next 16 fica em **`.next/dev/cache/images`** — não em
+> `.next/cache/images`. Ele não revalida quando o arquivo em `public/` muda
+> com o mesmo nome, e chega a servir a versão velha só em alguns tamanhos do
+> `srcset`, o que aparece como foto borrada em certas telas e nítida em
+> outras. Pare o dev server, apague essa pasta e suba de novo.
+
+### Atribuição de campanha
+
+`src/lib/campanha.ts` repassa ao formulário os `utm_*` e o `fbclid` que a
+visita trouxe, e acrescenta `cs_bf`, `cs_meta`, `cs_sexo` e `cs_kcal` para o
+lead não chegar sem contexto no CRM. Sem origem nenhuma na URL, entra
+`utm_source=site&utm_medium=calculadora-bf`. Parâmetro de clique não se
+inventa: cravar um `fbclid` no código atribuiria todo lead a um clique que
+nunca houve.
+
+O endereço do formulário está em `marca.formulario` (`src/lib/content.ts`) e
+pode ser trocado por `NEXT_PUBLIC_FORMULARIO_CONSULTORIA` sem mexer no código.
 
 ## Biblioteca
 
