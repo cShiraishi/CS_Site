@@ -48,7 +48,9 @@ export function Aplicar() {
         </div>
 
         {/* Os três passos: o que acontece depois do clique, em ordem. */}
-        <ol className="space-y-px border-t border-linha">
+        {/* Os passos já aparecem no hero; no celular, repetir aqui era só
+            mais uma tela antes das dúvidas. */}
+        <ol className="hidden space-y-px border-t border-linha lg:block">
           {contato.passos.map((passo) => (
             <li
               key={passo.numero}

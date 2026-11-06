@@ -67,16 +67,19 @@ export function Header({ tone = "claro" }: { tone?: "claro" | "escuro" }) {
               <LanguageSelector escuro={escuro} />
             </div>
 
-            {/* O botão verde fica visível em todas as larguras: o tráfego vem
-                do Instagram, e no celular era justamente onde ele sumia. */}
-            <a
-              href={`${rotas.consultoria}?de=topo`}
-              className={`${buttonClass("consultoria")} !px-4 !py-2.5 sm:!px-6 sm:!py-3`}
-            >
-              <span className="sm:hidden">Começar</span>
-              <span className="hidden sm:inline">Começar consultoria</span>
-              <Arrow />
-            </a>
+            {/* No celular o botão verde vive no dock, preso ao rodapé e ao
+                alcance do polegar; dois botões iguais na mesma tela só
+                dividiam a atenção. O invólucro carrega o `hidden` porque
+                `buttonClass` traz `inline-flex`, que o venceria. */}
+            <div className="hidden sm:block">
+              <a
+                href={`${rotas.consultoria}?de=topo`}
+                className={`${buttonClass("consultoria")} !px-6 !py-3`}
+              >
+                Começar consultoria
+                <Arrow />
+              </a>
+            </div>
 
             <button
               type="button"

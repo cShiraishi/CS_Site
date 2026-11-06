@@ -34,7 +34,7 @@ import {
    ============================================================ */
 export function Hero() {
   return (
-    <section id="topo" className="relative overflow-hidden bg-porcelana pt-32 sm:pt-40">
+    <section id="topo" className="relative overflow-hidden bg-porcelana pt-24 sm:pt-40">
       {/* 08 / diagonais: ângulos consistentes e direcionais, sempre discretas */}
       <div
         aria-hidden
@@ -42,7 +42,7 @@ export function Hero() {
       />
 
       <Container className="relative">
-        <div className="grid items-center gap-16 pb-24 lg:grid-cols-[1.05fr_0.95fr] lg:gap-20 lg:pb-32">
+        <div className="grid items-center gap-16 pb-12 sm:pb-24 lg:grid-cols-[1.05fr_0.95fr] lg:gap-20 lg:pb-32">
           <div className="rise">
             <Eyebrow>{hero.eyebrow}</Eyebrow>
 
@@ -91,7 +91,7 @@ export function Hero() {
           </div>
 
           {/* 03 / o símbolo como expressão principal, sobre fundo de baixa interferência */}
-          <div className="rise relative mx-auto w-full max-w-md lg:max-w-none" style={{ animationDelay: "160ms" }}>
+          <div className="rise relative mx-auto hidden w-full max-w-md lg:block lg:max-w-none" style={{ animationDelay: "160ms" }}>
             <div className="paper drift relative aspect-square overflow-hidden rounded-[2rem] ring-1 ring-linha shadow-[0_28px_70px_-40px_rgba(29,27,25,0.5)]">
               <Image
                 src="/brand/cs-mark.jpg"
@@ -449,7 +449,9 @@ export function Resultados() {
         </Link>
       </div>
 
-      <div className="stagger mt-10 grid items-start gap-4 sm:grid-cols-3">
+      {/* No celular, carrossel com deslize (o gesto dos stories); do sm para
+          cima, as três lado a lado. Empilhadas, eram 1.900 px de rolagem. */}
+      <div className="stagger -mx-6 mt-8 flex snap-x snap-mandatory items-start gap-3 overflow-x-auto px-6 pb-2 [scrollbar-width:none] sm:mx-0 sm:mt-10 sm:grid sm:grid-cols-3 sm:gap-4 sm:overflow-visible sm:px-0">
         {resultados.transformacoes.map((pessoa) => (
           <Link
             key={pessoa.instagram}
@@ -457,7 +459,7 @@ export function Resultados() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label={`Ver ${pessoa.instagram} no Instagram`}
-            className="group relative isolate overflow-hidden rounded-xl border border-linha bg-branco transition-all duration-500 hover:-translate-y-1.5 hover:border-ouro/45"
+            className="group relative isolate w-[72%] shrink-0 snap-center overflow-hidden rounded-xl border border-linha bg-branco transition-all duration-500 hover:-translate-y-1.5 hover:border-ouro/45 sm:w-auto"
           >
             <Image
               src={pessoa.imagem}
@@ -496,12 +498,12 @@ export function ComoFunciona() {
       <Eyebrow tone="claro">Como funciona</Eyebrow>
       <h2 className="t-title reveal mt-6 text-balance text-porcelana">{metodo.titulo}</h2>
 
-      <ol className="stagger mt-10 grid gap-px overflow-hidden rounded-xl bg-porcelana/15 sm:grid-cols-2 lg:grid-cols-4">
+      <ol className="stagger mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-xl bg-porcelana/15 sm:mt-10 lg:grid-cols-4">
         {metodo.etapas.map((e) => (
-          <li key={e.n} className="bg-grafite p-6">
+          <li key={e.n} className="bg-grafite p-4 sm:p-6">
             <span className="font-display text-4xl leading-none text-[#8a6438]">{e.n}</span>
-            <h3 className="mt-4 font-display text-2xl uppercase text-porcelana">{e.titulo}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-porcelana/70">{e.texto}</p>
+            <h3 className="mt-3 font-display text-xl uppercase text-porcelana sm:mt-4 sm:text-2xl">{e.titulo}</h3>
+            <p className="mt-2 text-xs leading-relaxed text-porcelana/70 sm:text-sm">{e.texto}</p>
           </li>
         ))}
       </ol>
