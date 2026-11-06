@@ -165,10 +165,24 @@ const BASE = 46;
 const ESCALA_MAX = 1.5;
 const RAIO = 160;
 
+/* No celular não existe hover para revelar o tooltip, e ícone sozinho não
+   diz nada a quem chega de um Reel: lá cada botão leva o nome escrito por
+   baixo, como uma tab bar. Do sm para cima volta a ser só o ícone. */
 const botaoIcone =
-  "flex size-11 items-center justify-center rounded-[0.85rem] transition-[transform,margin,background-color] duration-150 ease-out sm:size-[46px] [&>svg]:size-[21px] sm:[&>svg]:size-[22px]";
+  "flex h-[54px] w-[4.1rem] flex-col items-center justify-center gap-1 rounded-[0.95rem] transition-[transform,margin,background-color] duration-150 ease-out sm:size-[46px] sm:gap-0 [&>svg]:size-[22px]";
+
+function Nome({ texto }: { texto: string }) {
+  return (
+    <span className="text-[0.6rem] font-bold uppercase leading-none tracking-[0.04em] sm:hidden">
+      {texto}
+    </span>
+  );
+}
 const inativo =
-  "bg-white/[0.06] text-[#f2ede5]/85 ring-1 ring-inset ring-white/10 hover:bg-white/[0.12] hover:text-[#f2ede5]";
+  "bg-white/[0.08] text-[#f2ede5] ring-1 ring-inset ring-white/15 hover:bg-white/[0.14]";
+/* Ferramentas é a porta dos Reels: dourado para se separar dos outros. */
+const dourado =
+  "bg-ouro/15 text-ouro ring-1 ring-inset ring-ouro/60 hover:bg-ouro/25";
 const ativoCls = "bg-[#f2ede5] text-[#0b0a09]";
 
 function Rotulo({ texto }: { texto: string }) {
@@ -186,6 +200,24 @@ export function Dock() {
   const ref = useRef<HTMLUListElement>(null);
   const caminho = usePathname();
   const [aberto, setAberto] = useState(false);
+  // O anel dourado pulsa até a pessoa abrir as ferramentas uma vez.
+  const [chamar, setChamar] = useState(false);
+
+  useEffect(() => {
+    try {
+      setChamar(localStorage.getItem("cs_dock_visto") !== "1");
+    } catch {
+      setChamar(true);
+    }
+  }, []);
+
+  const alternar = () => {
+    setAberto((v) => !v);
+    setChamar(false);
+    try {
+      localStorage.setItem("cs_dock_visto", "1");
+    } catch {}
+  };
 
   // Fecha a lista com Esc.
   useEffect(() => {
@@ -279,7 +311,7 @@ export function Dock() {
 
       <ul
         ref={ref}
-        className="pointer-events-auto flex items-end gap-1.5 rounded-[1.4rem] sm:gap-2 border border-white/10 bg-[#0b0a09]/80 px-2.5 py-2 shadow-[0_20px_50px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl backdrop-saturate-150 sm:px-3"
+        className="dock-entra pointer-events-auto flex items-center gap-1.5 rounded-[1.4rem] sm:items-end sm:gap-2 border border-white/10 bg-[#0b0a09]/80 px-2.5 py-2 shadow-[0_20px_50px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl backdrop-saturate-150 sm:px-3"
       >
         {[INICIO, RESULTADOS].map((item) => (
           <li
@@ -296,6 +328,7 @@ export function Dock() {
               className={`${botaoIcone} ${ehAtual(item.href) ? ativoCls : inativo}`}
             >
               {item.icone}
+              <Nome texto={item.label} />
             </Link>
             <Rotulo texto={item.label} />
           </li>
@@ -307,24 +340,38 @@ export function Dock() {
             aria-label="Ferramentas gratuitas"
             aria-expanded={aberto}
             aria-controls="dock-ferramentas"
-            onClick={() => setAberto((v) => !v)}
+            onClick={alternar}
             data-dock
             style={{ transformOrigin: "bottom center" }}
-            className={`${botaoIcone} ${aberto || ferramentaAtual ? ativoCls : inativo}`}
+            className={`${botaoIcone} ${aberto || ferramentaAtual ? ativoCls : dourado} ${chamar && !aberto ? "dock-chama" : ""}`}
           >
             {ICONE_FERRAMENTAS}
+            <Nome texto="Grátis" />
           </button>
+          {chamar && !aberto && (
+            <span
+              aria-hidden
+              className="pointer-events-none absolute -top-2.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-ouro px-1.5 py-0.5 text-[0.55rem] font-bold uppercase leading-none tracking-[0.06em] text-[#0b0a09] sm:hidden"
+            >
+              Novo
+            </span>
+          )}
           <Rotulo texto="Ferramentas" />
         </li>
 
         {/* O botão verde não magnifica: é largo, tem texto e é o único
             elemento do dock que se entende sem tooltip. */}
-        <li className="ml-1 border-l border-white/10 pl-2.5">
+        <li className="ml-0.5 border-l border-white/10 pl-2 sm:ml-1 sm:pl-2.5">
           <a
             href={CTA.href}
-            className="flex h-11 items-center gap-2 whitespace-nowrap rounded-[0.85rem] bg-verde px-3.5 text-[0.74rem] font-bold uppercase tracking-[0.08em] sm:text-[0.78rem] sm:tracking-[0.12em] text-[#06140b] shadow-[0_8px_22px_rgba(31,193,91,0.4)] transition-colors hover:bg-verde-claro sm:h-[46px] sm:px-5 [&>svg]:size-4"
+            className="flex h-[54px] items-center gap-2 whitespace-nowrap rounded-[0.95rem] bg-verde px-4 font-bold uppercase text-[#06140b] shadow-[0_8px_22px_rgba(31,193,91,0.4)] transition-colors hover:bg-verde-claro sm:h-[46px] sm:px-5 [&>svg]:size-4"
           >
-            Começar consultoria
+            {/* No celular quebra em duas linhas: cabe ao lado dos botões com
+                nome e lê maior do que numa linha espremida. */}
+            <span className="flex flex-col leading-[1.05] sm:flex-row sm:gap-[0.4em]">
+              <span className="text-[0.66rem] tracking-[0.1em] sm:text-[0.78rem] sm:tracking-[0.12em]">Começar</span>
+              <span className="text-[0.86rem] tracking-[0.06em] sm:text-[0.78rem] sm:tracking-[0.12em]">consultoria</span>
+            </span>
             {CTA.icone}
           </a>
         </li>
