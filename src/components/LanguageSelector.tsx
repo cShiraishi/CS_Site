@@ -43,7 +43,7 @@ export function LanguageSelector({ escuro = false }: { escuro?: boolean }) {
         aria-label="Escolher idioma"
       >
         <span aria-hidden className="text-base leading-none">🇧🇷</span>
-        <span className="hidden sm:inline">PT</span>
+        <span>PT</span>
         <svg
           aria-hidden
           viewBox="0 0 10 6"

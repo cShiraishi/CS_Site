@@ -63,9 +63,9 @@ export function Header({ tone = "claro" }: { tone?: "claro" | "escuro" }) {
               tela. No topo fica a marca, a chamada e o menu completo. */}
 
           <div className="flex shrink-0 items-center gap-3">
-            <div className="hidden sm:block">
-              <LanguageSelector escuro={escuro} />
-            </div>
+            {/* Visível também no celular: escondido no menu ☰, quem vinha
+                de fora não achava a troca de idioma. */}
+            <LanguageSelector escuro={escuro} />
 
             {/* No celular o botão verde vive no dock, preso ao rodapé e ao
                 alcance do polegar; dois botões iguais na mesma tela só
@@ -146,11 +146,6 @@ export function Header({ tone = "claro" }: { tone?: "claro" | "escuro" }) {
               Começar consultoria
               <Arrow />
             </a>
-            {/* No celular o seletor de idioma sai do topo para dar lugar ao
-                botão verde; ele mora aqui. */}
-            <div className="mb-6 sm:hidden">
-              <LanguageSelector escuro={escuro} />
-            </div>
           </nav>
         </Container>
       </div>
