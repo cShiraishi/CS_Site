@@ -5,8 +5,6 @@ import { Arrow, Button, Container, Eyebrow, Rule, Section, buttonClass } from ".
 import {
   rotas,
   contato,
-  credenciais,
-  gordura,
   hero,
   marca,
   metodo,
@@ -58,10 +56,12 @@ export function Hero() {
 
             <div className="mt-11 flex flex-wrap items-center gap-4">
               <Button nativo variant="consultoria" href={`${rotas.consultoria}?de=hero`}>{hero.cta}</Button>
-              <Link href={gordura.slug} className={buttonClass("outline")}>
+              {/* O segundo botão era a calculadora de gordura — uma porta
+                  para fora do funil. Agora só desce até a prova. */}
+              <a href="#resultados" className={buttonClass("outline")}>
                 {hero.ctaSecundario}
-                <Arrow />
-              </Link>
+                <span aria-hidden>↓</span>
+              </a>
             </div>
 
             {/* Como começar, colado ao botão: quem sabe o que vem depois do
@@ -109,20 +109,6 @@ export function Hero() {
           </div>
         </div>
 
-        {/* Faixa de credenciais */}
-        <Rule />
-        <dl className="stagger grid grid-cols-2 gap-y-10 py-12 sm:py-14 lg:grid-cols-4">
-          {credenciais.map((c) => (
-            <div key={c.rotulo} className="px-2 text-center lg:border-l lg:border-linha lg:first:border-l-0">
-              <dt className="font-display text-4xl text-ouro-profundo sm:text-5xl">
-                {c.valor}
-              </dt>
-              <dd className="mt-2.5 text-xs uppercase tracking-[0.14em] text-grafite">
-                {c.rotulo}
-              </dd>
-            </div>
-          ))}
-        </dl>
       </Container>
     </section>
   );
@@ -419,6 +405,150 @@ export function Sobre() {
               <Arrow />
             </Link>
           </div>
+        </div>
+      </div>
+    </Section>
+  );
+}
+
+/* ============================================================
+   HOME ENXUTA (nov/2026) — uma página, um pedido.
+
+   A home anterior explicava tudo antes de pedir o clique: para quem é,
+   pilares, método, programa, sobre. Agora a ordem é a de quem chega do
+   Instagram: promessa → prova → como funciona → quem é → começar. Cada
+   bloco termina no mesmo botão verde.
+   ============================================================ */
+
+function BotaoComecar({ de }: { de: string }) {
+  return (
+    <a href={`${rotas.consultoria}?de=${de}`} className={buttonClass("consultoria")}>
+      Começar consultoria
+      <Arrow />
+    </a>
+  );
+}
+
+/** A prova logo depois da promessa. */
+export function Resultados() {
+  return (
+    <Section id="resultados" denso className="border-t border-linha">
+      <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <Eyebrow>{resultados.eyebrow}</Eyebrow>
+          <h2 className="t-title reveal mt-6 text-balance">{resultados.titulo}</h2>
+        </div>
+        <Link
+          href={marca.instagram}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group inline-flex shrink-0 items-center gap-2.5 border-b border-ouro/40 pb-1.5 text-sm text-ouro transition-colors hover:border-ouro"
+        >
+          {resultados.cta}
+          <Arrow />
+        </Link>
+      </div>
+
+      <div className="stagger mt-10 grid items-start gap-4 sm:grid-cols-3">
+        {resultados.transformacoes.map((pessoa) => (
+          <Link
+            key={pessoa.instagram}
+            href={pessoa.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Ver ${pessoa.instagram} no Instagram`}
+            className="group relative isolate overflow-hidden rounded-xl border border-linha bg-branco transition-all duration-500 hover:-translate-y-1.5 hover:border-ouro/45"
+          >
+            <Image
+              src={pessoa.imagem}
+              alt={pessoa.alt}
+              width={pessoa.largura}
+              height={pessoa.altura}
+              sizes="(max-width: 640px) 100vw, 33vw"
+              className="h-auto w-full"
+            />
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/85 to-transparent"
+            />
+            <span className="absolute inset-x-0 bottom-0 p-4">
+              <span className="block font-display text-xl uppercase text-[#f2ede5]">
+                {pessoa.nome}
+              </span>
+              <span className="block text-xs text-[#f2ede5]/70">{pessoa.instagram}</span>
+            </span>
+          </Link>
+        ))}
+      </div>
+
+      <div className="mt-10 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-xs text-grafite/55">{resultados.aviso}</p>
+        <BotaoComecar de="resultados" />
+      </div>
+    </Section>
+  );
+}
+
+/** Método e o que está incluso, num bloco só. */
+export function ComoFunciona() {
+  return (
+    <Section id="metodo" tone="grafite" denso>
+      <Eyebrow tone="claro">Como funciona</Eyebrow>
+      <h2 className="t-title reveal mt-6 text-balance text-porcelana">{metodo.titulo}</h2>
+
+      <ol className="stagger mt-10 grid gap-px overflow-hidden rounded-xl bg-porcelana/15 sm:grid-cols-2 lg:grid-cols-4">
+        {metodo.etapas.map((e) => (
+          <li key={e.n} className="bg-grafite p-6">
+            <span className="font-display text-4xl leading-none text-[#8a6438]">{e.n}</span>
+            <h3 className="mt-4 font-display text-2xl uppercase text-porcelana">{e.titulo}</h3>
+            <p className="mt-2 text-sm leading-relaxed text-porcelana/70">{e.texto}</p>
+          </li>
+        ))}
+      </ol>
+
+      <div className="mt-8 flex flex-wrap items-center gap-2">
+        <span className="mr-2 text-xs font-bold uppercase tracking-[0.16em] text-porcelana/60">
+          Incluso
+        </span>
+        {programa.itens.map((i) => (
+          <span
+            key={i.titulo}
+            className="rounded-full border border-porcelana/20 px-3.5 py-1.5 text-sm text-porcelana"
+          >
+            ✓ {i.titulo}
+          </span>
+        ))}
+      </div>
+
+      <div className="mt-10">
+        <BotaoComecar de="como-funciona" />
+      </div>
+    </Section>
+  );
+}
+
+/** Quem está do outro lado — foto e duas linhas. */
+export function SobreCurto() {
+  return (
+    <Section id="sobre" denso>
+      <div className="grid items-center gap-10 sm:grid-cols-[minmax(0,14rem)_1fr] sm:gap-12">
+        <div className="relative mx-auto w-48 overflow-hidden rounded-2xl border border-linha sm:mx-0 sm:w-full">
+          <Image
+            src="/sobre/carlos-seiti.png"
+            alt="Carlos Seiti em ambiente de treino"
+            width={1087}
+            height={1448}
+            sizes="14rem"
+            className="h-auto w-full"
+          />
+        </div>
+        <div>
+          <Eyebrow>Quem vai te acompanhar</Eyebrow>
+          <p className="t-title mt-5">{marca.nome}</p>
+          <p className="mt-4 max-w-xl text-pretty leading-relaxed text-grafite/75">
+            {sobre.curto}
+          </p>
+          <p className="mt-5 font-serif text-xl italic text-ouro">{sobre.citacao}</p>
         </div>
       </div>
     </Section>

@@ -1,14 +1,15 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Aplicar } from "@/components/Aplicar";
-import { Hero, Metodo, ParaQuem, Programa, Sobre } from "@/components/sections";
+import { ComoFunciona, Hero, Resultados, SobreCurto } from "@/components/sections";
 import { jsonLd } from "@/lib/jsonld";
 
 /**
- * Cinco seções e o fecho, nesta ordem: quem sou eu para você, como o
- * trabalho é feito, o que você recebe (com a prova ao lado), quem está do
- * outro lado, e o pedido. Tudo o que foi tirado daqui continua no site —
- * calculadoras, CSFlix e biblioteca têm página própria e lugar no menu.
+ * Home enxuta (nov/2026): um objetivo só, começar a consultoria.
+ *
+ * Promessa → prova → como funciona → quem é → começar. "Para quem é", os
+ * pilares e a faixa de credenciais saíram; as ferramentas gratuitas
+ * continuam no dock, em "Ferramentas", fora do caminho principal.
  */
 export default function Home() {
   return (
@@ -16,10 +17,9 @@ export default function Home() {
       <Header />
       <main>
         <Hero />
-        <ParaQuem />
-        <Metodo />
-        <Programa />
-        <Sobre />
+        <Resultados />
+        <ComoFunciona />
+        <SobreCurto />
         <Aplicar />
       </main>
       <Footer />

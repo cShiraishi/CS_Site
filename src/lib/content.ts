@@ -49,12 +49,11 @@ export const marca = {
 
 /** Hrefs absolutos: os mesmos links funcionam na home e nas outras páginas. */
 export const nav = [
-  { label: "Método", href: "/#metodo", topo: true },
+  { label: "Como funciona", href: "/#metodo", topo: true },
   /* Rótulo "90 Dias" e não "Programa": a âncora da home abaixo já se chama
      assim, e dois itens com o mesmo nome no mesmo menu não se distinguem —
      nem a olho, nem em leitor de tela. */
   { label: "90 Dias", href: "/programa-90-dias", topo: true },
-  { label: "Programa", href: "/#programa", topo: false },
   { label: "Calculadora", href: "/calculadora-de-calorias", topo: true },
   { label: "Gordura", href: "/calculadora-de-gordura-corporal", topo: true },
   { label: "Prato", href: "/calculadora-do-prato", topo: true },
@@ -87,7 +86,7 @@ export const hero = {
   texto:
     "Nutrição e treino com base em evidência, ajustados ao seu corpo e à sua rotina. Sem restrição desnecessária. Sem promessa vazia.",
   cta: "Começar consultoria online",
-  ctaSecundario: "Calcular meu % de gordura",
+  ctaSecundario: "Ver resultados",
   nota: "Vagas limitadas por turma — acompanhamento individual.",
 } as const;
 
@@ -243,16 +242,16 @@ export const sobre = {
     "Também treino e compito. Sei o que é sustentar um protocolo com trabalho, prazo e cansaço — por isso nenhum plano meu depende de você ser perfeito.",
   ],
   citacao: "Evolução não é pressa. É direção.",
+  /* A versão da home enxuta (nov/2026): duas linhas, o resto fica para
+     quem procurar. */
+  curto:
+    "Dois mestrados em Ciência de Alimentos, doutorado em andamento e atleta de classic bodybuilding. Nenhum plano meu depende de você ser perfeito.",
 } as const;
 
 export const duvidas = {
   eyebrow: "Dúvidas",
   titulo: "Antes de começar.",
   itens: [
-    {
-      p: "Preciso morar perto para fazer a consultoria?",
-      r: "Não. Todo o acompanhamento é online: diagnóstico, entrega do protocolo, ajustes e suporte.",
-    },
     {
       p: "Vou precisar cortar carboidrato, glúten ou lactose?",
       r: "Só se houver um motivo clínico ou uma preferência sua. Restrição sem justificativa é o principal motivo pelo qual as pessoas abandonam a dieta.",

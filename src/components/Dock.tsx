@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { rotas } from "@/lib/content";
 
 /**
@@ -135,13 +135,67 @@ const ITENS: Item[] = [
   },
 ];
 
+/* Home enxuta (nov/2026): o dock deixou de ser um cardápio de dez portas.
+   Ficam três ícones e o botão verde; as ferramentas gratuitas moram atrás
+   de "Ferramentas", que abre a lista por cima do dock. */
+const INICIO = ITENS.find((i) => i.href === "/")!;
+const CTA = ITENS.find((i) => i.cta)!;
+const FERRAMENTAS = ITENS.filter((i) => i.href !== "/" && !i.cta);
+
+const RESULTADOS: Item = {
+  href: "/#resultados",
+  label: "Resultados",
+  icone: (
+    <svg viewBox="0 0 24 24" {...s}>
+      <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />
+    </svg>
+  ),
+};
+
+const ICONE_FERRAMENTAS = (
+  <svg viewBox="0 0 24 24" {...s}>
+    <rect x="4" y="4" width="6.5" height="6.5" rx="1.5" />
+    <rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5" />
+    <rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5" />
+    <rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5" />
+  </svg>
+);
+
 const BASE = 46;
-const ESCALA_MAX = 1.6;
-const RAIO = 200;
+const ESCALA_MAX = 1.5;
+const RAIO = 160;
+
+const botaoIcone =
+  "flex size-11 items-center justify-center rounded-[0.85rem] transition-[transform,margin,background-color] duration-150 ease-out sm:size-[46px] [&>svg]:size-[21px] sm:[&>svg]:size-[22px]";
+const inativo =
+  "bg-white/[0.06] text-[#f2ede5]/85 ring-1 ring-inset ring-white/10 hover:bg-white/[0.12] hover:text-[#f2ede5]";
+const ativoCls = "bg-[#f2ede5] text-[#0b0a09]";
+
+function Rotulo({ texto }: { texto: string }) {
+  return (
+    <span
+      aria-hidden
+      className="pointer-events-none absolute -top-11 left-1/2 hidden -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-lg border border-white/10 bg-[#161412]/95 px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-[#f2ede5] opacity-0 shadow-lg transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100 sm:block"
+    >
+      {texto}
+    </span>
+  );
+}
 
 export function Dock() {
   const ref = useRef<HTMLUListElement>(null);
   const caminho = usePathname();
+  const [aberto, setAberto] = useState(false);
+
+  // Fecha a lista com Esc.
+  useEffect(() => {
+    if (!aberto) return;
+    const esc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setAberto(false);
+    };
+    window.addEventListener("keydown", esc);
+    return () => window.removeEventListener("keydown", esc);
+  }, [aberto]);
 
   useEffect(() => {
     const dock = ref.current;
@@ -156,9 +210,7 @@ export function Dock() {
         let escala = 1;
         if (x !== null) {
           const r = el.getBoundingClientRect();
-          // centro sem a escala atual: a largura renderizada já vem escalada
-          const centro = r.left + r.width / 2;
-          const d = Math.abs(x - centro);
+          const d = Math.abs(x - (r.left + r.width / 2));
           if (d < RAIO) escala = ESCALA_MAX - (d / RAIO) * (ESCALA_MAX - 1);
         }
         el.style.transform = `scale(${escala})`;
@@ -184,64 +236,98 @@ export function Dock() {
     };
   }, []);
 
-  const ativo = (href: string) =>
-    href === "/" ? caminho === "/" : caminho.startsWith(href.split("?")[0]);
+  const ehAtual = (href: string) =>
+    href === "/"
+      ? caminho === "/"
+      : !href.includes("#") && caminho.startsWith(href.split("?")[0]);
+  const ferramentaAtual = FERRAMENTAS.some((f) => ehAtual(f.href));
 
   return (
     <nav
-      aria-label="Ferramentas"
-      className="pointer-events-none fixed inset-x-0 bottom-3 z-50 flex justify-center px-3 sm:bottom-5"
+      aria-label="Navegação principal"
+      className="pointer-events-none fixed inset-x-0 bottom-3 z-50 flex flex-col items-center px-3 sm:bottom-5"
     >
+      {/* Lista das ferramentas gratuitas, por cima do dock. */}
+      <div
+        id="dock-ferramentas"
+        hidden={!aberto}
+        className="pointer-events-auto mb-2 w-full max-w-sm rounded-2xl border border-white/10 bg-[#0b0a09]/90 p-2 shadow-[0_20px_50px_rgba(0,0,0,0.6)] backdrop-blur-xl"
+      >
+        <p className="px-3 pb-1 pt-2 text-[0.65rem] font-bold uppercase tracking-[0.18em] text-[#f2ede5]/50">
+          Ferramentas gratuitas
+        </p>
+        <ul className="grid grid-cols-2 gap-1">
+          {FERRAMENTAS.map((f) => (
+            <li key={f.href}>
+              <Link
+                href={f.href}
+                onClick={() => setAberto(false)}
+                aria-current={ehAtual(f.href) ? "page" : undefined}
+                className={`flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm transition-colors [&>svg]:size-[18px] [&>svg]:shrink-0 ${
+                  ehAtual(f.href)
+                    ? "bg-[#f2ede5] text-[#0b0a09]"
+                    : "text-[#f2ede5]/85 hover:bg-white/[0.08] hover:text-[#f2ede5]"
+                }`}
+              >
+                {f.icone}
+                {f.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+
       <ul
         ref={ref}
-        className="pointer-events-auto flex max-w-full items-end gap-1.5 overflow-x-auto rounded-[1.4rem] border border-white/10 bg-[#0b0a09]/75 px-2.5 py-2 shadow-[0_20px_50px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl backdrop-saturate-150 [scrollbar-width:none] sm:gap-2 sm:overflow-visible sm:px-3"
+        className="pointer-events-auto flex items-end gap-1.5 rounded-[1.4rem] sm:gap-2 border border-white/10 bg-[#0b0a09]/80 px-2.5 py-2 shadow-[0_20px_50px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl backdrop-saturate-150 sm:px-3"
       >
-        {ITENS.map((item, i) => {
-          const atual = ativo(item.href);
-          return (
-            <li
-              key={item.href}
-              className={`group relative flex shrink-0 flex-col items-center ${
-                item.cta ? "ml-1 border-l border-white/10 pl-2.5 sm:ml-1.5 sm:pl-3" : ""
-              }`}
+        {[INICIO, RESULTADOS].map((item) => (
+          <li
+            key={item.href}
+            className={`group relative ${item.href === "/" ? "hidden sm:block" : ""}`}
+          >
+            <Link
+              href={item.href}
+              onClick={() => setAberto(false)}
+              aria-label={item.label}
+              aria-current={ehAtual(item.href) ? "page" : undefined}
+              data-dock
+              style={{ transformOrigin: "bottom center" }}
+              className={`${botaoIcone} ${ehAtual(item.href) ? ativoCls : inativo}`}
             >
-              <Link
-                href={item.href}
-                aria-label={item.label}
-                aria-current={atual ? "page" : undefined}
-                data-dock
-                style={{ transformOrigin: "bottom center" }}
-                className={`flex size-10 items-center justify-center rounded-[0.8rem] sm:size-[46px] transition-[transform,margin] duration-150 ease-out [&>svg]:size-5 sm:[&>svg]:size-[22px] ${
-                  item.cta
-                    ? "bg-verde text-[#06140b] shadow-[0_8px_22px_rgba(31,193,91,0.4)]"
-                    : atual
-                      ? "bg-[#f2ede5] text-[#0b0a09]"
-                      : "bg-white/[0.06] text-[#f2ede5]/85 ring-1 ring-inset ring-white/10 hover:bg-white/[0.12] hover:text-[#f2ede5]"
-                }`}
-              >
-                {item.icone}
-              </Link>
+              {item.icone}
+            </Link>
+            <Rotulo texto={item.label} />
+          </li>
+        ))}
 
-              {/* Indicador da página atual — o pontinho do dock do macOS. */}
-              <span
-                aria-hidden
-                className={`mt-1 size-1 rounded-full bg-ouro transition-opacity ${
-                  atual ? "opacity-100" : "opacity-0"
-                }`}
-              />
+        <li className="group relative">
+          <button
+            type="button"
+            aria-label="Ferramentas gratuitas"
+            aria-expanded={aberto}
+            aria-controls="dock-ferramentas"
+            onClick={() => setAberto((v) => !v)}
+            data-dock
+            style={{ transformOrigin: "bottom center" }}
+            className={`${botaoIcone} ${aberto || ferramentaAtual ? ativoCls : inativo}`}
+          >
+            {ICONE_FERRAMENTAS}
+          </button>
+          <Rotulo texto="Ferramentas" />
+        </li>
 
-              {/* Rótulo: tooltip no desktop; no toque, a lista de 10 itens
-                  já rola na horizontal e o aria-label carrega o nome. */}
-              <span
-                aria-hidden
-                className="pointer-events-none absolute -top-11 left-1/2 hidden -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-lg border border-white/10 bg-[#161412]/95 px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-[#f2ede5] opacity-0 shadow-lg transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100 sm:block"
-                style={{ zIndex: 60 - i }}
-              >
-                {item.label}
-              </span>
-            </li>
-          );
-        })}
+        {/* O botão verde não magnifica: é largo, tem texto e é o único
+            elemento do dock que se entende sem tooltip. */}
+        <li className="ml-1 border-l border-white/10 pl-2.5">
+          <a
+            href={CTA.href}
+            className="flex h-11 items-center gap-2 whitespace-nowrap rounded-[0.85rem] bg-verde px-3.5 text-[0.74rem] font-bold uppercase tracking-[0.08em] sm:text-[0.78rem] sm:tracking-[0.12em] text-[#06140b] shadow-[0_8px_22px_rgba(31,193,91,0.4)] transition-colors hover:bg-verde-claro sm:h-[46px] sm:px-5 [&>svg]:size-4"
+          >
+            Começar consultoria
+            {CTA.icone}
+          </a>
+        </li>
       </ul>
     </nav>
   );
