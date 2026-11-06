@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { rotas } from "@/lib/content";
 
 /**
@@ -185,6 +185,8 @@ const dourado =
   "bg-ouro/15 text-ouro ring-1 ring-inset ring-ouro/60 hover:bg-ouro/25";
 const ativoCls = "bg-[#f2ede5] text-[#0b0a09]";
 
+const nadaAssinar = () => () => {};
+
 function Rotulo({ texto }: { texto: string }) {
   return (
     <span
@@ -201,19 +203,24 @@ export function Dock() {
   const caminho = usePathname();
   const [aberto, setAberto] = useState(false);
   // O anel dourado pulsa até a pessoa abrir as ferramentas uma vez.
-  const [chamar, setChamar] = useState(false);
-
-  useEffect(() => {
-    try {
-      setChamar(localStorage.getItem("cs_dock_visto") !== "1");
-    } catch {
-      setChamar(true);
-    }
-  }, []);
+  // No servidor conta como "visto": sem selo no HTML, sem descompasso na hidratação.
+  const visto = useSyncExternalStore(
+    nadaAssinar,
+    () => {
+      try {
+        return localStorage.getItem("cs_dock_visto") === "1";
+      } catch {
+        return false;
+      }
+    },
+    () => true,
+  );
+  const [abriu, setAbriu] = useState(false);
+  const chamar = !visto && !abriu;
 
   const alternar = () => {
     setAberto((v) => !v);
-    setChamar(false);
+    setAbriu(true);
     try {
       localStorage.setItem("cs_dock_visto", "1");
     } catch {}
