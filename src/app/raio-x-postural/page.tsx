@@ -21,6 +21,16 @@ export const metadata: Metadata = {
     title: `${titulo} | ${marca.nome}`,
     description:
       "Quatro padrões, doze exercícios e um protocolo de oito semanas que entra no treino que você já faz.",
+    // Declarar openGraph aqui substitui o do layout, images incluído:
+    // sem esta linha o link mandado por DM sai sem imagem.
+    images: [
+      {
+        url: "/brand/cs-mark.jpg",
+        width: 1024,
+        height: 1024,
+        alt: `Raio-X Postural — ${marca.nome}`,
+      },
+    ],
   },
 };
 

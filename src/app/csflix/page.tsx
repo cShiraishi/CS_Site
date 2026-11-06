@@ -22,6 +22,16 @@ export const metadata: Metadata = {
     title: `CSFlix | ${marca.nome}`,
     description:
       "Os vídeos do canal organizados por área: treino, competição, nutrição e método.",
+    // Declarar openGraph aqui substitui o do layout, images incluído:
+    // sem esta linha o link mandado por DM sai sem imagem.
+    images: [
+      {
+        url: "/brand/cs-mark.jpg",
+        width: 1024,
+        height: 1024,
+        alt: `CSFlix — ${marca.nome}`,
+      },
+    ],
   },
 };
 

@@ -86,7 +86,15 @@ export function linkDoFormulario(
    * `utm_source` — exatamente o "parece tráfego direto" que este arquivo
    * existe para evitar.
    */
-  const padrao = padraoDe(contexto.medium ?? "site");
+  /*
+   * Mas quando a visita trouxe `utm_source`, a origem é dela: completar o
+   * resto com "link-direto/organico" fazia um link `?utm_source=instagram`
+   * chegar ao CRM como orgânico do site. Nesse caso o que faltar fica
+   * explícito como "nao-informado".
+   */
+  const padrao: Record<string, string> = veio.get("utm_source")
+    ? { utm_medium: "nao-informado", utm_campaign: "nao-informado" }
+    : padraoDe(contexto.medium ?? "site");
   for (const [chave, valor] of Object.entries(padrao)) {
     url.searchParams.set(chave, valor);
   }

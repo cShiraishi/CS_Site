@@ -452,7 +452,8 @@ export const gordura = {
       cta: "Quero esse plano comigo",
       urgencia: "Vagas limitadas por turma — o acompanhamento é individual.",
       nota: "Formulário de 2 minutos. Eu leio e respondo pessoalmente.",
-      privacidade: "Nada do que você digitou sai do seu navegador.",
+      privacidade:
+        "O cálculo é feito no seu navegador. Só se você clicar no botão o resultado (% de gordura, meta e calorias) vai junto para o formulário — para eu não te perguntar tudo de novo.",
       /**
        * A prova ao lado do pedido. A calculadora entrega um número; a foto
        * mostra que o número vira corpo em alguém real.

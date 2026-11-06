@@ -21,6 +21,16 @@ export const metadata: Metadata = {
     title: `${titulo} | ${marca.nome}`,
     description:
       "Seis situações do cotidiano, o ajuste de cada uma e os exercícios para os desconfortos mais comuns.",
+    // Declarar openGraph aqui substitui o do layout, images incluído:
+    // sem esta linha o link mandado por DM sai sem imagem.
+    images: [
+      {
+        url: "/brand/cs-mark.jpg",
+        width: 1024,
+        height: 1024,
+        alt: `Postura do dia a dia — ${marca.nome}`,
+      },
+    ],
   },
 };
 

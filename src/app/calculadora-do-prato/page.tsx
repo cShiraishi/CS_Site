@@ -20,6 +20,16 @@ export const metadata: Metadata = {
     title: `Calculadora do Prato | ${marca.nome}`,
     description:
       "Calorias e macros do prato de restaurante, medidos em conchas e palmas — não em gramas.",
+    // Declarar openGraph aqui substitui o do layout, images incluído:
+    // sem esta linha o link mandado por DM sai sem imagem.
+    images: [
+      {
+        url: "/brand/cs-mark.jpg",
+        width: 1024,
+        height: 1024,
+        alt: `Calculadora do Prato — ${marca.nome}`,
+      },
+    ],
   },
 };
 

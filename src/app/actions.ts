@@ -294,6 +294,9 @@ export async function enviarPlano(
   const copia = process.env.CONTATO_EMAIL ?? marca.email;
   const remetente = process.env.CONTATO_REMETENTE ?? "Carlos Seiti <onboarding@resend.dev>";
 
+  const SEM_COPIA =
+    "Recebi seus dados e liberei o plano completo aqui embaixo. A cópia por e-mail não saiu agora — se quiser recebê-la, me chame no WhatsApp.";
+
   if (!apiKey) {
     // O lead está guardado e o plano aparece na tela; o que falta é a cópia
     // por e-mail. Dizer "confira a caixa de entrada" aqui seria mentira, e o
@@ -389,11 +392,12 @@ export async function enviarPlano(
 
     if (!resposta.ok) {
       console.error("[plano] Resend respondeu", resposta.status, await resposta.text());
-      return { status: "erro", mensagem: "Não consegui enviar agora. Tente pelo WhatsApp." };
+      // O lead já está gravado: falha do e-mail não pode trancar o resultado.
+      return { status: "ok", mensagem: SEM_COPIA };
     }
   } catch (e) {
     console.error("[plano] falha no envio", e);
-    return { status: "erro", mensagem: "Não consegui enviar agora. Tente pelo WhatsApp." };
+    return { status: "ok", mensagem: SEM_COPIA };
   }
 
   return { status: "ok" };

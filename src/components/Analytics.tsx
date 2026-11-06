@@ -1,9 +1,13 @@
 import Script from "next/script";
+import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
 
 /**
- * Analytics sem cookies (Plausible ou Umami) — não exige banner de consentimento
- * e não coleta dado pessoal. Só é renderizado se a variável existir;
- * sem configuração, nenhum script vai para a página.
+ * Analytics sem cookies — não exige banner de consentimento e não coleta
+ * dado pessoal.
+ *
+ * Vercel Web Analytics vai sempre (é o que mede Reel → página → clique
+ * desde já; os `utm_*` da visita aparecem no painel do projeto). Plausible
+ * ou Umami entram só se a variável existir:
  *
  * Plausible: NEXT_PUBLIC_PLAUSIBLE_DOMAIN=carlosseiti.com
  * Umami:     NEXT_PUBLIC_UMAMI_ID + NEXT_PUBLIC_UMAMI_SRC
@@ -16,6 +20,7 @@ export function Analytics() {
 
   return (
     <>
+      <VercelAnalytics />
       {plausible && (
         <Script
           defer

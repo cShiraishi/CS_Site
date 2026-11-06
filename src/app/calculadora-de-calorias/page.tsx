@@ -20,6 +20,16 @@ export const metadata: Metadata = {
     title: `${titulo} | ${marca.nome}`,
     description:
       "Taxa metabólica basal, gasto total e alvos de emagrecimento, manutenção e ganho. Três equações validadas, sem cadastro.",
+    // Declarar openGraph aqui substitui o do layout, images incluído:
+    // sem esta linha o link mandado por DM sai sem imagem.
+    images: [
+      {
+        url: "/brand/cs-mark.jpg",
+        width: 1024,
+        height: 1024,
+        alt: `Calculadora de calorias — ${marca.nome}`,
+      },
+    ],
   },
 };
 

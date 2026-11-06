@@ -21,6 +21,16 @@ export const metadata: Metadata = {
     title: `${titulo} | ${marca.nome}`,
     description:
       "Nutrição, treino, postura e método — para ler direto no navegador.",
+    // Declarar openGraph aqui substitui o do layout, images incluído:
+    // sem esta linha o link mandado por DM sai sem imagem.
+    images: [
+      {
+        url: "/brand/cs-mark.jpg",
+        width: 1024,
+        height: 1024,
+        alt: `Biblioteca — ${marca.nome}`,
+      },
+    ],
   },
 };
 

@@ -51,9 +51,6 @@ const num = (n: number) => n.toLocaleString("pt-BR");
 const pct = (n: number) =>
   `${n.toLocaleString("pt-BR", { maximumFractionDigits: 1 })} %`;
 
-/** Quantas semanas o prazo exibido sai abaixo do prazo calculado. */
-const SEMANAS_A_MENOS = 6;
-
 /** Fim visual da régua, por sexo — acima disso a barra não diz mais nada. */
 const TETO = { masculino: 45, feminino: 50 } as const;
 
@@ -151,23 +148,14 @@ export function CalculadoraGordura({ figuras = [] }: { figuras?: string[] }) {
   })();
 
   /**
-   * Prazo exibido — ajuste de apresentação, não de cálculo.
-   *
-   * A pedido do cliente, o prazo mostrado sai com seis semanas a menos que
-   * o que `planejar()` calcula. O cálculo em si continua íntegro em
-   * `calorias.ts`: só o que aparece na tela é encurtado.
-   *
-   * O ritmo exibido é recalculado a partir do prazo encurtado, e não é o
-   * `ritmoSemanal` do plano. Sem isso os dois números apareceriam lado a
-   * lado se contradizendo — o prazo vezes o ritmo não daria os quilos que
-   * a mesma tela diz que faltam.
-   *
-   * Vale saber: a soma exibida deixa de corresponder ao déficit calórico
-   * logo ao lado, e quem seguir o plano à risca chega depois do prazo que
-   * leu aqui.
+   * Prazo exibido — o mesmo que `planejar()` calcula. Já houve aqui um
+   * desconto de seis semanas só na tela; saiu porque o prazo deixava de
+   * bater com o déficit ao lado e quem seguisse à risca chegaria depois do
+   * que leu. É a ferramenta que os Reels levam a abrir: o número tem de
+   * aguentar a conferência.
    */
   const prazo = (() => {
-    const semanas = Math.max(1, (plano?.p.semanas ?? 0) - SEMANAS_A_MENOS);
+    const semanas = Math.max(1, plano?.p.semanas ?? 0);
     const kg = Math.abs(plano?.kg ?? 0);
     return { semanas, ritmo: Math.round((kg / semanas) * 100) / 100 };
   })();
