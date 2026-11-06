@@ -302,10 +302,10 @@ export function Dock() {
                 href={f.href}
                 onClick={() => setAberto(false)}
                 aria-current={ehAtual(f.href) ? "page" : undefined}
-                className={`flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm transition-colors [&>svg]:size-[18px] [&>svg]:shrink-0 ${
+                className={`flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm ring-1 ring-inset transition-all duration-150 [&>svg]:size-[18px] [&>svg]:shrink-0 [&>svg]:transition-transform [&>svg]:duration-150 ${
                   ehAtual(f.href)
-                    ? "bg-[#f2ede5] text-[#0b0a09]"
-                    : "text-[#f2ede5]/85 hover:bg-white/[0.08] hover:text-[#f2ede5]"
+                    ? "bg-[#f2ede5] text-[#0b0a09] ring-transparent"
+                    : "text-[#f2ede5]/85 ring-transparent hover:translate-x-0.5 hover:bg-ouro/15 hover:text-ouro hover:ring-ouro/50 hover:[&>svg]:scale-115 focus-visible:bg-ouro/15 focus-visible:text-ouro focus-visible:ring-ouro/50"
                 }`}
               >
                 {f.icone}
