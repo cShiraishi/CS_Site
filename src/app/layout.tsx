@@ -46,6 +46,12 @@ export const metadata: Metadata = {
   description: descricao,
   alternates: {
     canonical: "/",
+    languages: {
+      "pt-BR": "/",
+      es: "/es",
+      en: "/en",
+      "x-default": "/",
+    },
   },
   // Preenchidas por variável de ambiente; ausentes, as tags não são emitidas.
   verification: {

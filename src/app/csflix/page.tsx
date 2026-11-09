@@ -12,16 +12,16 @@ import { jsonLdCSFlix } from "@/lib/jsonld";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "CSFlix — os vídeos do canal, por área",
+  title: "CSFlix — As Séries e Temporadas do Canal Carlos Seiti TV",
   description:
-    "Treino, culturismo de competição, nutrição e método. Os vídeos do canal Carlos Seiti TV organizados por área, para ver direto aqui.",
+    "29 episódios em 5 temporadas sequenciais: Projeto True Shape, Sessões Brutas, Nutrição no Mundo Real, Laboratório PhD e Mentes Fora da Curva. Assista como uma série.",
   alternates: { canonical: rotas.csflix },
   openGraph: {
     type: "website",
     url: `${marca.site}${rotas.csflix}`,
-    title: `CSFlix | ${marca.nome}`,
+    title: `CSFlix — Séries & Temporadas | ${marca.nome}`,
     description:
-      "Os vídeos do canal organizados por área: treino, competição, nutrição e método.",
+      "5 temporadas sequenciais de treino, preparação de palco, ciência de alimentos e inteligência artificial para maratonar.",
     // Declarar openGraph aqui substitui o do layout, images incluído:
     // sem esta linha o link mandado por DM sai sem imagem.
     images: [

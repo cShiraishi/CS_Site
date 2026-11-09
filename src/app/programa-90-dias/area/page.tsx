@@ -4,23 +4,18 @@ import { redirect } from "next/navigation";
 
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { PlataformaReset21D } from "@/components/PlataformaReset21D";
 import { Container, Eyebrow } from "@/components/ui";
 import { rotas } from "@/lib/content";
 import { temAcesso } from "@/lib/pedidos";
 import { PROGRAMA, precoEmReais } from "@/lib/produto";
-import {
-  FAMILIAS,
-  PROTOCOLOS,
-  paraOPrograma,
-  type Familia,
-  type Protocolo,
-} from "@/lib/protocolos";
-import type { Modo } from "@/lib/programa";
+import { PROTOCOLOS, paraOPrograma } from "@/lib/protocolos";
+import type { Modo, Perfil } from "@/lib/programa";
 import type { Experiencia, Local } from "@/lib/treino";
 import { criarSupabaseServer } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
-  title: "Seus protocolos | Programa 90 Dias",
+  title: "CS Performance · Área de Membros | Reset Metabólico 21D",
   /* Área paga: não entra em busca, e os PDFs também não (a rota que os
      serve devolve X-Robots-Tag). */
   robots: { index: false, follow: false },
@@ -34,16 +29,6 @@ export const dynamic = "force-dynamic";
 
 type Situacao = { modo: Modo; local: Local; experiencia: Experiencia };
 
-/**
- * Lê a situação de dentro do plano gravado no pedido.
- *
- * O plano é `jsonb`: veio do navegador no momento da compra e pode ter
- * sido gerado por uma versão anterior do motor. Por isso nada aqui
- * confia na forma — se algum campo não for o que se espera, a função
- * devolve `null` e a área mostra os protocolos todos com a explicação de
- * quando cada um se aplica. Um plano antigo nunca deve impedir alguém de
- * abrir o que pagou.
- */
 function situacao(plano: unknown): Situacao | null {
   if (!plano || typeof plano !== "object") return null;
 
@@ -63,13 +48,45 @@ function situacao(plano: unknown): Situacao | null {
   return { modo, local, experiencia };
 }
 
+function extrairPerfil(plano: unknown): Partial<Perfil> | null {
+  if (!plano || typeof plano !== "object") return null;
+  const p = plano as Record<string, unknown>;
+  if (!p.perfil || typeof p.perfil !== "object") return null;
+  return p.perfil as Partial<Perfil>;
+}
+
 /* ============================================================
-   A PÁGINA
+   A PÁGINA (PLATAFORMA CS PERFORMANCE — RESET METABÓLICO 21D)
    ============================================================ */
 
-export default async function Page() {
+export default async function Page({
+  searchParams,
+}: {
+  searchParams?: Promise<{ demo?: string }>;
+}) {
+  const params = searchParams ? await searchParams : undefined;
+  const isDemo = params?.demo === "1" || params?.demo === "true";
+
+  if (isDemo) {
+    return (
+      <PlataformaReset21D
+        emailUsuario="Participante@carlosseiti.com"
+        protocolos={PROTOCOLOS}
+        modoDemo
+      />
+    );
+  }
+
   const supabase = await criarSupabaseServer();
-  if (!supabase) redirect("/entrar");
+  if (!supabase) {
+    return (
+      <PlataformaReset21D
+        emailUsuario="Participante@carlosseiti.com"
+        protocolos={PROTOCOLOS}
+        modoDemo
+      />
+    );
+  }
 
   const {
     data: { user },
@@ -78,11 +95,6 @@ export default async function Page() {
 
   if (!(await temAcesso(PROGRAMA.slug))) return <SemAcesso />;
 
-  /*
-   * O plano do pedido mais recente que foi pago. A RLS da tabela já
-   * limita o que este cliente consegue ler aos próprios pedidos, então
-   * não há `where` de utilizador a escrever — nem a esquecer.
-   */
   const { data: pedido } = await supabase
     .from("pedidos")
     .select("plano")
@@ -94,96 +106,15 @@ export default async function Page() {
 
   const minha = situacao(pedido?.plano);
   const meus = minha ? paraOPrograma(minha) : PROTOCOLOS;
-
-  const familias: Familia[] = ["nutricao", "treino", "nucleo"];
-
-  return (
-    <>
-      <Header />
-
-      <main>
-        <section className="bg-porcelana pb-24 pt-32 sm:pb-32 sm:pt-40">
-          <Container>
-            <div className="max-w-2xl">
-              <Eyebrow>{PROGRAMA.nome}</Eyebrow>
-              <h1 className="t-display mt-6 text-balance">Seus protocolos.</h1>
-              <p className="mt-7 leading-relaxed text-grafite sm:text-lg">
-                {minha
-                  ? "Estes são os protocolos da sua situação — não a biblioteca inteira. Quem corta não precisa de ler o protocolo de ganho, e um PDF que não se aplica é um PDF que ensina a não abrir os outros."
-                  : "Abaixo estão todos os protocolos, com a indicação de quando cada um se aplica. Abra o de nutrição que corresponde ao seu objetivo e o de treino do seu local e experiência."}
-              </p>
-            </div>
-
-            <div className="mt-16 grid gap-14">
-              {familias.map((familia) => {
-                const daFamilia = meus.filter((p) => p.familia === familia);
-                if (daFamilia.length === 0) return null;
-
-                return (
-                  <section key={familia}>
-                    <div className="flex flex-wrap items-baseline justify-between gap-3 border-b border-linha pb-5">
-                      <h2 className="t-title">{FAMILIAS[familia].nome}</h2>
-                      <p className="text-sm text-grafite/70">{FAMILIAS[familia].nota}</p>
-                    </div>
-
-                    <ul className="mt-8 grid gap-5 sm:grid-cols-2">
-                      {daFamilia.map((protocolo) => (
-                        <li key={protocolo.codigo}>
-                          <Cartao protocolo={protocolo} />
-                        </li>
-                      ))}
-                    </ul>
-                  </section>
-                );
-              })}
-            </div>
-
-            <p className="mt-16 max-w-2xl border-t border-linha pt-7 text-sm leading-relaxed text-grafite/80">
-              Os protocolos são seus, sem prazo. Entre com este mesmo e-mail sempre que
-              quiser abri-los de novo. Se algum ainda estiver a ser escrito, ele aparece
-              aqui assim que sair — não é preciso comprar nada outra vez.
-            </p>
-          </Container>
-        </section>
-      </main>
-
-      <Footer />
-    </>
-  );
-}
-
-function Cartao({ protocolo }: { protocolo: Protocolo }) {
-  const comum =
-    "flex h-full flex-col rounded-sm border border-linha bg-white p-7 transition-colors";
-
-  if (!protocolo.pronto) {
-    return (
-      <div className={`${comum} opacity-70`}>
-        <p className="t-eyebrow text-grafite/50">{protocolo.codigo}</p>
-        <h3 className="mt-4 font-display text-2xl leading-snug">{protocolo.titulo}</h3>
-        <p className="mt-3 text-sm leading-relaxed text-grafite/80">{protocolo.resumo}</p>
-        <p className="mt-auto pt-6 text-xs uppercase tracking-[0.18em] text-grafite/50">
-          Em preparação
-        </p>
-      </div>
-    );
-  }
+  const perfilSalvo = extrairPerfil(pedido?.plano);
 
   return (
-    <a
-      href={`/api/protocolos/${protocolo.arquivo}`}
-      className={`${comum} group hover:border-ouro`}
-      target="_blank"
-      rel="noopener"
-    >
-      <p className="t-eyebrow text-ouro-profundo">{protocolo.codigo}</p>
-      <h3 className="mt-4 font-display text-2xl leading-snug">{protocolo.titulo}</h3>
-      <p className="mt-3 text-sm leading-relaxed text-grafite/80">{protocolo.resumo}</p>
-      <p className="mt-2 text-xs leading-relaxed text-grafite/60">{protocolo.quando}</p>
-      <p className="mt-auto pt-6 text-sm font-medium tracking-wide text-grafite transition-colors group-hover:text-ouro-profundo">
-        Abrir o PDF →
-      </p>
-    </a>
+    <PlataformaReset21D
+      emailUsuario={user.email ?? "Participante"}
+      perfilSalvo={perfilSalvo}
+      protocolos={meus}
+      modoDemo={false}
+    />
   );
 }
 
@@ -198,18 +129,24 @@ function SemAcesso() {
             <div className="max-w-2xl">
               <Eyebrow>{PROGRAMA.nome}</Eyebrow>
               <h1 className="t-display mt-6 text-balance">
-                Esta área é de quem tem o programa.
+                Esta área é exclusiva de quem tem o Reset Metabólico 21D.
               </h1>
               <p className="mt-7 leading-relaxed text-grafite sm:text-lg">
                 Não encontrei uma compra deste produto na sua conta. Se você comprou com
                 outro e-mail, entre com esse — o acesso segue o e-mail do pagamento.
               </p>
-              <div className="mt-9">
+              <div className="mt-9 flex flex-wrap items-center gap-4">
                 <Link
                   href={rotas.programa}
-                  className="inline-flex min-h-12 items-center rounded-full bg-grafite px-8 py-3.5 text-sm font-medium tracking-wide text-porcelana transition-colors hover:bg-ouro-profundo"
+                  className="inline-flex min-h-12 items-center rounded-lg bg-[#00ff66] px-8 py-3.5 text-sm font-extrabold uppercase tracking-wider text-[#041208] shadow-[0_0_25px_rgba(0,255,102,0.4)] transition-all hover:bg-[#4be283]"
                 >
-                  Ver o programa — {precoEmReais()}
+                  Garantir acesso ao Reset 21D — {precoEmReais()}
+                </Link>
+                <Link
+                  href={`${rotas.programa}/area?demo=1`}
+                  className="inline-flex min-h-12 items-center rounded-lg border border-[#00ff66]/50 bg-[#00ff66]/10 px-6 py-3.5 text-sm font-bold uppercase tracking-wider text-[#00ff66] transition-all hover:bg-[#00ff66]/20"
+                >
+                  Explorar preview da plataforma →
                 </Link>
               </div>
             </div>

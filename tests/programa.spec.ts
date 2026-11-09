@@ -90,7 +90,9 @@ test("a apresentação sai de cena assim que o funil começa", async ({ page }) 
    * mesma coisa a cada passo no telemóvel.
    */
   await expect(h1).toHaveCount(0);
-  await expect(page.getByText("Por que 90 dias, e não 21.")).toHaveCount(0);
+  await expect(
+    page.getByText("Por que 21 dias é a janela exata para destravar o metabolismo."),
+  ).toHaveCount(0);
 });
 
 test("as oito silhuetas aparecem juntas, sem carrossel", async ({ page }) => {
@@ -109,21 +111,21 @@ test("as oito silhuetas aparecem juntas, sem carrossel", async ({ page }) => {
 test("o funil leva do sexo ao programa montado", async ({ page }) => {
   await percorrerHomem(page);
 
-  await expect(page.getByText("Seu programa de 90 dias")).toBeVisible();
+  await expect(page.getByText("Seu programa de 21 dias")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Fundação" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Carga" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Definição" })).toBeVisible();
 
   await expect(page.getByText("95 kg", { exact: true })).toBeVisible();
-  await expect(page.getByText("86,6 kg", { exact: true })).toBeVisible();
+  await expect(page.getByText("93 kg", { exact: true })).toBeVisible();
 });
 
-test("a meta que não cabe em 90 dias é recusada com número", async ({ page }) => {
+test("a meta que não cabe em 21 dias é recusada com número", async ({ page }) => {
   await percorrerHomem(page);
 
   const avisos = page.getByText("O que você precisa saber").locator("..");
-  await expect(avisos).toContainText("não cabem em 90 dias");
-  await expect(avisos).toContainText("8,4 kg");
+  await expect(avisos).toContainText("não cabem em 21 dias");
+  await expect(avisos).toContainText("2 kg");
 
   // No corte, o preço de acelerar é massa magra — e não gordura.
   await expect(avisos).toContainText("massa magra");
@@ -133,7 +135,7 @@ test("as duas silhuetas aparecem lado a lado no resultado", async ({ page }) => 
   await percorrerHomem(page);
 
   await expect(page.getByText("Hoje").first()).toBeVisible();
-  await expect(page.getByText("Dia 90").first()).toBeVisible();
+  await expect(page.getByText("Dia 21").first()).toBeVisible();
   await expect(page.getByText("Abdômen saliente").first()).toBeVisible();
   await expect(page.getByText("Em forma").first()).toBeVisible();
 });
@@ -191,7 +193,7 @@ test("quem nunca treinou não recebe mais dias do que sustenta", async ({ page }
 
 test("o resultado não tem violação de acessibilidade séria", async ({ page }) => {
   await percorrerHomem(page);
-  await expect(page.getByText("Seu programa de 90 dias")).toBeVisible();
+  await expect(page.getByText("Seu programa de 21 dias")).toBeVisible();
 
   const { violations } = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa"])
@@ -200,5 +202,9 @@ test("o resultado não tem violação de acessibilidade séria", async ({ page }
   const graves = violations.filter(
     (v) => v.impact === "serious" || v.impact === "critical",
   );
-  expect(graves.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
+  expect(
+    graves.map(
+      (v) => `${v.id}: ${v.help} -> ${v.nodes.map((n) => n.target.join(" ")).join(" | ")}`,
+    ),
+  ).toEqual([]);
 });

@@ -8,7 +8,8 @@ import { ESCALA, figura as caminhoDaFigura, type Nivel } from "@/lib/shapes";
 import { precoEmReais } from "@/lib/produto";
 import { DIAS_POSSIVEIS, type Experiencia, type Local } from "@/lib/treino";
 import { Comprar } from "./Comprar";
-import { Arrow, Container, Rotulo, buttonClass, campoBase } from "./ui";
+import { PrecoDinamico, SeletorMoeda } from "./SeletorMoeda";
+import { Arrow, Container, Rotulo, campoBase } from "./ui";
 
 /**
  * O funil do Programa 90 Dias.
@@ -208,6 +209,7 @@ export function Programa({
       {passo === 0 && abertura}
 
       <div
+        id="simulador"
         ref={topo}
         /*
          * Sem a apresentação acima, o funil encosta no topo do documento e
@@ -220,6 +222,20 @@ export function Programa({
         }`}
       >
         <Container>
+        {passo === 0 && !noResultado && (
+          <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="t-eyebrow text-[#00ff66]">Diagnóstico Interativo Gratuito</p>
+              <p className="mt-2 font-display text-2xl text-grafite sm:text-3xl">
+                Simule seu Reset de 21 Dias em 60 segundos
+              </p>
+            </div>
+            <span className="inline-flex items-center gap-2 rounded-full border border-[#00ff66]/45 bg-[#00ff66]/10 px-4 py-1.5 text-xs font-bold text-[#00ff66] shadow-[0_0_20px_rgba(0,255,102,0.18)]">
+              <span aria-hidden className="pulso size-2 rounded-full bg-[#00ff66]" />
+              7 toques · Sem cadastro para ver o cálculo
+            </span>
+          </div>
+        )}
         {noResultado ? (
           <Resultado
             plano={plano}
@@ -228,7 +244,7 @@ export function Programa({
             onVoltar={() => setPasso(TOTAL_PASSOS - 1)}
           />
         ) : (
-          <div className="surface-elevated bg-branco">
+          <div className="surface-elevated overflow-hidden rounded-xl border border-[#00ff66]/30 bg-branco shadow-[0_0_50px_rgba(0,255,102,0.08)]">
             <Progresso passo={passo} />
 
             <div
@@ -416,7 +432,7 @@ export function Programa({
                 <Tela
                   indice={7}
                   titulo="Quanto você consegue treinar"
-                  nota="Última pergunta. O número que você sustenta por 90 dias vale mais que o número que você gostaria de fazer."
+                  nota="Última pergunta. O número que você sustenta por 21 dias vale mais que o número que você gostaria de fazer."
                 >
                   <fieldset>
                     <legend className="t-eyebrow text-grafite">Sua experiência</legend>
@@ -513,7 +529,7 @@ export function Programa({
                 type="button"
                 onClick={avancar}
                 disabled={!podeAvancar}
-                className="group inline-flex min-h-12 items-center gap-2.5 rounded-full bg-grafite px-7 py-3.5 text-sm font-medium tracking-wide text-porcelana transition-all duration-300 hover:bg-ouro-profundo disabled:opacity-40 sm:px-8"
+                className="group inline-flex min-h-12 cursor-pointer items-center gap-2.5 rounded-full bg-[#00ff66] px-7 py-3.5 text-sm font-extrabold uppercase tracking-wider text-[#041208] shadow-[0_0_25px_rgba(0,255,102,0.4)] transition-all duration-300 hover:bg-[#4be283] hover:shadow-[0_0_38px_rgba(0,255,102,0.6)] disabled:opacity-40 disabled:shadow-none sm:px-8"
               >
                 {passo === TOTAL_PASSOS - 1 ? "Ver meu programa" : "Continuar"}
                 <Arrow />
@@ -543,10 +559,10 @@ function Progresso({ passo }: { passo: number }) {
       aria-valuemin={1}
       aria-valuemax={TOTAL_PASSOS}
       aria-label={`Passo ${passo + 1} de ${TOTAL_PASSOS}`}
-      className="h-1 w-full bg-porcelana"
+      className="h-1.5 w-full bg-porcelana"
     >
       <div
-        className="h-full bg-linear-to-r from-ouro-profundo to-ouro transition-[width] duration-500"
+        className="h-full bg-linear-to-r from-[#00ff66] via-[#4be283] to-ouro shadow-[0_0_16px_rgba(0,255,102,0.6)] transition-[width] duration-500"
         style={{ width: `${pct}%` }}
       />
     </div>
@@ -574,7 +590,7 @@ function Tela({
 }) {
   return (
     <div>
-      <p className="t-eyebrow text-ouro-profundo">
+      <p className="t-eyebrow text-[#00ff66]">
         Passo {indice} de {TOTAL_PASSOS}
       </p>
       <h2 className="mt-3 font-display text-2xl leading-tight text-balance text-grafite sm:mt-4 sm:text-4xl">
@@ -602,10 +618,10 @@ function Opcao({
       type="button"
       aria-pressed={ativo}
       onClick={onClick}
-      className={`min-h-14 rounded-sm border p-4 text-left transition-all duration-300 active:scale-[0.99] sm:p-5 ${
+      className={`min-h-14 cursor-pointer rounded-lg border p-4 text-left transition-all duration-300 active:scale-[0.99] sm:p-5 ${
         ativo
-          ? "border-ouro-profundo bg-ouro/10"
-          : "border-linha bg-branco hover:border-ouro/60 hover:bg-ouro/[0.04]"
+          ? "border-[#00ff66] bg-[#00ff66]/12 shadow-[0_0_24px_rgba(0,255,102,0.18)]"
+          : "border-linha bg-branco hover:border-[#00ff66]/55 hover:bg-[#00ff66]/[0.05]"
       }`}
     >
       {children}
@@ -631,10 +647,10 @@ function Pastilha({
       aria-pressed={ativo}
       aria-label={rotulo}
       onClick={onClick}
-      className={`size-14 rounded-full border font-display text-lg transition-all duration-300 ${
+      className={`size-14 cursor-pointer rounded-full border font-display text-lg transition-all duration-300 ${
         ativo
-          ? "border-ouro-profundo bg-ouro/10 text-ouro-profundo"
-          : "border-linha text-grafite hover:border-ouro/60"
+          ? "border-[#00ff66] bg-[#00ff66]/15 text-[#00ff66] shadow-[0_0_20px_rgba(0,255,102,0.25)]"
+          : "border-linha text-grafite hover:border-[#00ff66]/60"
       }`}
     >
       {children}
@@ -731,10 +747,10 @@ function Silhuetas({
             role="radio"
             aria-checked={ativo}
             onClick={() => onEscolher(n.id)}
-            className={`group flex cursor-pointer flex-col overflow-hidden rounded-sm border text-left transition-all duration-300 active:scale-[0.99] ${
+            className={`group flex cursor-pointer flex-col overflow-hidden rounded-lg border text-left transition-all duration-300 active:scale-[0.99] ${
               ativo
-                ? "border-ouro-profundo bg-ouro/10"
-                : "border-linha bg-branco hover:border-ouro/60 hover:bg-ouro/[0.04]"
+                ? "border-[#00ff66] bg-[#00ff66]/12 shadow-[0_0_24px_rgba(0,255,102,0.2)]"
+                : "border-linha bg-branco hover:border-[#00ff66]/55 hover:bg-[#00ff66]/[0.04]"
             }`}
           >
             {/*
@@ -840,8 +856,8 @@ function Resultado({
             {v.modo === "recomposicao"
               ? "O seu caso não é perder peso — é trocar composição."
               : v.cabe
-                ? "O que você pediu cabe nos 90 dias."
-                : "Vamos ser exatos sobre o que cabe em 90 dias."}
+                ? `O que você pediu cabe nos ${plano.duracao} dias.`
+                : `Vamos ser exatos sobre o que cabe em ${plano.duracao} dias.`}
           </h2>
 
           <Comparacao plano={plano} disponivel={disponivel} />
@@ -1080,30 +1096,72 @@ function Metrica({
  * plano genérico que ela teria de reconstruir respondendo tudo outra vez.
  */
 function Oferta({ plano, vendaAberta }: { plano: Plano; vendaAberta: boolean }) {
+  const diasAfericao = plano.blocos
+    .map((b) => b.etapa.bloco * Math.round(plano.duracao / plano.blocos.length))
+    .join(", ");
+
   return (
-    <div className="overflow-hidden rounded-sm border border-grafite bg-grafite text-porcelana shadow-(--shadow-floating)">
-      <div className="h-1 bg-linear-to-r from-ouro-profundo via-ouro to-transparent" />
+    <div className="relative overflow-hidden rounded-2xl border-2 border-[#00ff66]/65 bg-[#0c140f] text-grafite shadow-[0_0_60px_rgba(0,255,102,0.18)]">
+      <div className="h-1.5 bg-linear-to-r from-[#00ff66] via-[#4be283] to-ouro" />
       <div className="p-6 sm:p-10 lg:p-12">
-        <p className="t-eyebrow text-ouro">O programa completo</p>
-        <h3 className="mt-3 font-display text-2xl leading-tight text-balance sm:mt-4 sm:text-4xl">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <p className="t-eyebrow text-[#00ff66]">Liberação Imediata · Reset Metabólico {plano.duracao} Dias</p>
+          <div className="flex flex-wrap items-center gap-2.5">
+            <SeletorMoeda />
+            <span className="rounded-full border border-[#00ff66]/50 bg-[#00ff66]/15 px-3.5 py-1 text-xs font-extrabold tracking-wider uppercase text-[#00ff66]">
+              Oferta de Entrada · <PrecoDinamico />
+            </span>
+          </div>
+        </div>
+
+        <div className="mt-5 max-w-sm overflow-hidden rounded-xl border border-[#39ff14]/35 bg-[#030b05] p-1.5 shadow-[0_0_30px_rgba(57,255,20,0.18)]">
+          <Image
+            src="/brand/reset-metabolico-21d.jpg"
+            alt="Reset Metabólico 21D — Emagrecimento com Método"
+            width={1024}
+            height={512}
+            sizes="(max-width: 640px) 85vw, 380px"
+            className="h-auto w-full rounded-lg object-cover"
+          />
+        </div>
+
+        <h3 className="mt-5 font-display text-2xl leading-tight text-balance text-grafite sm:mt-6 sm:text-4xl">
           Você acabou de ver o plano. O programa é cumpri-lo.
         </h3>
-        <p className="mt-4 max-w-xl text-sm leading-relaxed text-porcelana/80 sm:mt-5 sm:text-base">
-          Os {plano.duracao} dias divididos em {plano.blocos.length} blocos, com as sessões
-          numeradas, a lista de compras de cada fase, o registro de cargas e a aferição nos
-          dias {plano.blocos.map((b) => b.etapa.bloco * 30).join(", ")}. O plano acima, por
-          escrito e com data.
+        <p className="mt-4 max-w-2xl text-sm leading-relaxed text-grafite/85 sm:mt-5 sm:text-base">
+          Os {plano.duracao} dias divididos em {plano.blocos.length} blocos semanais, com as sessões
+          numeradas, o guia alimentar de substituições sem balança, o registro de cargas e a aferição nos
+          dias {diasAfericao}. O plano acima, por escrito, em PDF e com data.
         </p>
 
-        <div className="mt-8 border-t border-porcelana/15 pt-7">
+        <ul className="mt-6 grid gap-2.5 text-sm text-grafite/90 sm:grid-cols-2">
+          <li className="flex items-center gap-2.5">
+            <span className="font-bold text-[#00ff66]">✓</span>
+            Prescrição dos {plano.duracao} dias salva na sua conta
+          </li>
+          <li className="flex items-center gap-2.5">
+            <span className="font-bold text-[#00ff66]">✓</span>
+            Protocolo de Nutrição em Comida Real (PDF)
+          </li>
+          <li className="flex items-center gap-2.5">
+            <span className="font-bold text-[#00ff66]">✓</span>
+            Protocolo de Treino ({plano.perfil.local === "casa" ? "Em Casa" : "Academia"}) (PDF)
+          </li>
+          <li className="flex items-center gap-2.5">
+            <span className="font-bold text-[#00ff66]">✓</span>
+            Guia dos Primeiros 7 Dias + Aferição (PDF)
+          </li>
+        </ul>
+
+        <div className="mt-8 border-t border-white/12 pt-7">
           {vendaAberta ? (
-            <Comprar plano={{ perfil: plano.perfil, duracao: plano.duracao }} preco={precoEmReais()} />
+            <Comprar plano={{ perfil: plano.perfil, duracao: plano.duracao, modo: plano.modo }} preco={precoEmReais()} />
           ) : (
             /* Sem checkout configurado, o botão de compra só daria erro.
                Quem chegou até aqui é lead quente: vai para a consultoria. */
             <a
               href="/consultoria?de=programa-90-dias"
-              className={buttonClass("consultoria")}
+              className="group inline-flex items-center justify-center gap-2.5 rounded-lg bg-[#00ff66] px-8 py-4 text-xs font-extrabold uppercase tracking-[0.14em] text-[#041208] shadow-[0_0_30px_rgba(0,255,102,0.45)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#4be283] hover:shadow-[0_0_45px_rgba(0,255,102,0.65)]"
             >
               Começar consultoria
               <Arrow />
@@ -1111,10 +1169,15 @@ function Oferta({ plano, vendaAberta }: { plano: Plano; vendaAberta: boolean }) 
           )}
         </div>
 
-        <p className="mt-6 max-w-md text-xs leading-relaxed text-porcelana/70">
-          Assinado por Carlos Seiti. O plano que você viu nesta tela é o mesmo que entra no
-          programa — não existe versão melhor atrás do pagamento.
-        </p>
+        <div className="mt-6 flex flex-wrap items-center gap-4 border-t border-white/12 pt-5 text-xs leading-relaxed text-grafite/75">
+          <span className="inline-flex items-center gap-1.5 font-semibold text-[#00ff66]">
+            🛡️ Garantia incondicional de 7 dias
+          </span>
+          <span>·</span>
+          <span>
+            Assinado por Carlos Seiti (MSc, PhD Cand.). O plano que você viu nesta tela é salvo automaticamente com o seu pedido.
+          </span>
+        </div>
       </div>
     </div>
   );

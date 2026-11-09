@@ -13,22 +13,25 @@
  * delas é o último argumento antes do clique — e continua a alimentar o
  * FAQPage dos dados estruturados, com as perguntas visíveis na página.
  */
-import { contato, duvidas, rotas } from "@/lib/content";
+import { rotas } from "@/lib/content";
+import { obterConteudo, type Idioma } from "@/lib/i18n";
 
 import { FAQ } from "./FAQ";
 import { Arrow, Eyebrow, Section, buttonClass } from "./ui";
 
-export function Aplicar() {
+export function Aplicar({ idioma = "pt" }: { idioma?: Idioma } = {}) {
+  const t = obterConteudo(idioma);
+
   return (
     <Section id="contato" tone="branco">
       <div className="grid gap-16 lg:grid-cols-[0.9fr_1.1fr] lg:gap-24">
         <div>
-          <Eyebrow>{contato.eyebrow}</Eyebrow>
+          <Eyebrow>{t.contato.eyebrow}</Eyebrow>
           <h2 className="t-title mt-7 whitespace-pre-line text-balance">
-            {contato.titulo}
+            {t.contato.titulo}
           </h2>
           <p className="mt-7 max-w-md text-pretty leading-relaxed text-grafite">
-            {contato.texto}
+            {t.contato.texto}
           </p>
 
           <div className="mt-11">
@@ -36,14 +39,14 @@ export function Aplicar() {
               href={`${rotas.consultoria}?de=fecho`}
               className={buttonClass("consultoria")}
             >
-              {contato.cta}
+              {t.contato.cta}
               <Arrow />
             </a>
           </div>
 
           <p className="mt-8 flex items-center gap-2.5 text-xs text-grafite">
             <span aria-hidden className="rule-gold h-px w-6" />
-            {contato.nota}
+            {t.contato.nota}
           </p>
         </div>
 
@@ -51,7 +54,7 @@ export function Aplicar() {
         {/* Os passos já aparecem no hero; no celular, repetir aqui era só
             mais uma tela antes das dúvidas. */}
         <ol className="hidden space-y-px border-t border-linha lg:block">
-          {contato.passos.map((passo) => (
+          {t.contato.passos.map((passo) => (
             <li
               key={passo.numero}
               className="flex items-start gap-6 border-b border-linha py-7"
@@ -77,8 +80,8 @@ export function Aplicar() {
         id="duvidas"
         className="mt-24 grid scroll-mt-24 gap-10 lg:grid-cols-[0.5fr_1.5fr] lg:gap-24"
       >
-        <p className="t-eyebrow text-grafite">{duvidas.titulo}</p>
-        <FAQ itens={duvidas.itens} />
+        <p className="t-eyebrow text-grafite">{t.duvidas.titulo}</p>
+        <FAQ itens={t.duvidas.itens} />
       </div>
     </Section>
   );

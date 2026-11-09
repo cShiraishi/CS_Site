@@ -50,19 +50,20 @@ export const marca = {
 /** Hrefs absolutos: os mesmos links funcionam na home e nas outras páginas. */
 export const nav = [
   { label: "Como funciona", href: "/#metodo", topo: true },
-  /* Rótulo "90 Dias" e não "Programa": a âncora da home abaixo já se chama
-     assim, e dois itens com o mesmo nome no mesmo menu não se distinguem —
-     nem a olho, nem em leitor de tela. */
-  { label: "90 Dias", href: "/programa-90-dias", topo: true },
-  { label: "Calculadora", href: "/calculadora-de-calorias", topo: true },
-  { label: "Gordura", href: "/calculadora-de-gordura-corporal", topo: true },
-  { label: "Prato", href: "/calculadora-do-prato", topo: true },
-  { label: "Raio-X", href: "/raio-x-postural", topo: true },
-  { label: "Postura", href: "/postura", topo: true },
+  { label: "Reset Metabólico", href: "/programa-90-dias", topo: true },
   { label: "Biblioteca", href: "/biblioteca", topo: true },
   { label: "CSFlix", href: "/csflix", topo: true },
+  { label: "Receitas Fit", href: "/receitas", topo: true },
   { label: "Resultados", href: "/#resultados", topo: false },
   { label: "Sobre", href: "/#sobre", topo: false },
+] as const;
+
+export const appsNav = [
+  { label: "% Gordura", href: "/calculadora-de-gordura-corporal" },
+  { label: "Postura", href: "/postura" },
+  { label: "Raio-X", href: "/raio-x-postural" },
+  { label: "Calorias", href: "/calculadora-de-calorias" },
+  { label: "Prato", href: "/calculadora-do-prato" },
 ] as const;
 
 export const rotas = {
@@ -74,6 +75,7 @@ export const rotas = {
   programa: "/programa-90-dias",
   prato: "/calculadora-do-prato",
   biblioteca: "/biblioteca",
+  receitas: "/receitas",
   raioX: "/raio-x-postural",
   postura: "/postura",
   csflix: "/csflix",
@@ -203,6 +205,15 @@ export const resultados = {
   cta: "Ver transformações no Instagram",
   transformacoes: [
     {
+      nome: "Carlos Abra",
+      instagram: "@carlosabraoficial",
+      link: "https://www.instagram.com/carlosabraoficial/",
+      imagem: "/resultados/carlos-abra-v2.png",
+      largura: 600,
+      altura: 1160,
+      alt: "Evolução corporal de Carlos Abra, com registros de antes e depois",
+    },
+    {
       nome: "Laís",
       instagram: "@laisdas",
       link: "https://www.instagram.com/laisdas/",
@@ -224,9 +235,9 @@ export const resultados = {
       nome: "Isaías Santos",
       instagram: "@isaiassantos_2021",
       link: "https://www.instagram.com/isaiassantos_2021/",
-      imagem: "/resultados/isaias-santos.png",
-      largura: 336,
-      altura: 342,
+      imagem: "/resultados/isaias-santos-v3.png",
+      largura: 360,
+      altura: 660,
       alt: "Evolução corporal de Isaías Santos, com registros de antes e depois",
     },
   ],

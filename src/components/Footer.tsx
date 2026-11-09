@@ -1,10 +1,16 @@
+"use client";
+
 import Link from "next/link";
 import { Logo } from "./Logo";
 import { Container, Arrow } from "./ui";
-import { marca, nav, rodape, rotas } from "@/lib/content";
+import { marca, rotas } from "@/lib/content";
+import { obterConteudo, type Idioma } from "@/lib/i18n";
+import { useIdioma } from "@/lib/useIdioma";
 
-export function Footer() {
+export function Footer({ idioma: idiomaForcado }: { idioma?: Idioma } = {}) {
   const ano = new Date().getFullYear();
+  const idioma = useIdioma(idiomaForcado);
+  const t = obterConteudo(idioma);
 
   return (
     <footer className="border-t border-linha-ouro bg-porcelana pb-28 text-grafite">
@@ -19,20 +25,20 @@ export function Footer() {
                   {marca.nome.toUpperCase()}
                 </p>
                 <p className="mt-1 text-[0.65rem] uppercase tracking-[0.2em] text-ouro">
-                  {marca.descritor}
+                  {t.marca.descritor}
                 </p>
               </div>
             </div>
             <p className="mt-8 font-display text-2xl italic text-grafite/80">
-              {marca.assinatura}.
+              {t.marca.assinatura}.
             </p>
           </div>
 
           <div className="grid gap-10 sm:grid-cols-2">
             <nav aria-label="Rodapé">
-              <p className="t-eyebrow text-grafite/70">Navegação</p>
+              <p className="t-eyebrow text-grafite/70">{t.ui.navegacaoRodape}</p>
               <ul className="mt-5 space-y-3 text-sm">
-                {nav.map((item) => (
+                {t.nav.map((item) => (
                   <li key={item.href}>
                     <Link
                       href={item.href}
@@ -46,7 +52,7 @@ export function Footer() {
             </nav>
 
             <div>
-              <p className="t-eyebrow text-grafite/70">Contato</p>
+              <p className="t-eyebrow text-grafite/70">{t.ui.contatoRodape}</p>
               <ul className="mt-5 space-y-3 text-sm">
                 <li>
                   <Link
@@ -97,7 +103,7 @@ export function Footer() {
                     href={`${rotas.consultoria}?de=rodape`}
                     className="font-semibold text-verde transition-colors hover:text-verde-claro"
                   >
-                    Começar consultoria
+                    {t.ui.comecarConsultoria}
                   </a>
                 </li>
               </ul>
@@ -108,7 +114,7 @@ export function Footer() {
         <hr className="my-14 h-px border-0 bg-grafite/12" />
 
         <div className="flex flex-col gap-6 text-xs text-grafite/70 lg:flex-row lg:items-start lg:justify-between">
-          <p className="max-w-2xl leading-relaxed">{rodape.disclaimer}</p>
+          <p className="max-w-2xl leading-relaxed">{t.rodape.disclaimer}</p>
           <p className="shrink-0">
             © {ano} {marca.nome}
           </p>

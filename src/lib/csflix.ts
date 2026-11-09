@@ -1,16 +1,7 @@
 /**
- * CSFlix — os vídeos do canal, organizados em trilhas.
- *
- * A fonte são os feeds RSS públicos do YouTube: não exigem chave de API
- * nem consomem cota, e funcionam no build e na revalidação.
- *
- * Limite importante: cada feed devolve os 15 vídeos mais recentes.
- * O feed do canal dá os 15 últimos de todos os 640; o feed de uma
- * playlist dá os 15 últimos daquela playlist. Por isso as trilhas de
- * verdade vêm de playlists — cada uma traz a sua própria janela de 15.
- *
- * Para acrescentar uma trilha: cria a playlist no YouTube (pública),
- * copia o id que aparece na URL depois de `list=` e junta-o aqui.
+ * CSFlix — Os vídeos do canal Carlos Seiti TV estruturados como SÉRIES e TEMPORADAS
+ * para promover maratona (Binge-Watching), com ordem narrativa de episódios,
+ * sinopse instigante por episódio e sincronização automática com o feed RSS do YouTube.
  */
 
 const CANAL = "UCSq4rGIePKS1u0ODvYsmR7w";
@@ -18,83 +9,284 @@ const CANAL = "UCSq4rGIePKS1u0ODvYsmR7w";
 export type Video = {
   id: string;
   titulo: string;
+  sinopse?: string;
   publicado: string;
   duracao?: string;
   url: string;
+  episodioNumero?: number;
+  temporadaTag?: string;
 };
 
 export type Trilha = {
   id: string;
+  temporada: string;
+  icone: string;
   nome: string;
+  subtitulo: string;
   descricao: string;
+  promessaMaratona: string;
   videos: Video[];
 };
 
-type ConfigTrilha = {
+type EpisodioCurado = {
   id: string;
-  nome: string;
-  descricao: string;
-  /** id da playlist do YouTube — a forma preferida */
-  playlist?: string;
-  /** episódios já curados, na ordem editorial da série */
-  episodios?: string[];
-  /** enquanto não há playlist, agrupa o feed do canal por palavra */
-  palavras?: string[];
-  excluir?: string[];
+  titulo: string;
+  sinopse: string;
+  duracao: string;
 };
 
-export const TRILHAS: ConfigTrilha[] = [
+type ConfigSerie = {
+  id: string;
+  temporada: string;
+  icone: string;
+  nome: string;
+  subtitulo: string;
+  descricao: string;
+  promessaMaratona: string;
+  episodios: EpisodioCurado[];
+};
+
+/**
+ * Catálogo de Séries Curadas em ordem narrativa (EP. 01 → EP. final).
+ * Garante que todas as temporadas carreguem instantaneamente com sinopse e duração,
+ * estimulando o visitante a assistir em sequência como na Netflix.
+ */
+export const SERIES_CSFLIX: ConfigSerie[] = [
   {
-    id: "lancamentos",
-    nome: "Lançamentos",
-    descricao: "Os episódios longos mais recentes do canal.",
+    id: "true-shape",
+    temporada: "TEMPORADA 1",
+    icone: "🔥",
+    nome: "Projeto True Shape · O Reality da Transformação",
+    subtitulo: "9 episódios em sequência cronológica",
+    descricao:
+      "Acompanhe do episódio 1 ao 9 a jornada real de mudança física: apostas, avaliações de físico, erros no meio do caminho e transformações de -20 kg.",
+    promessaMaratona: "Comece pelo EP. 01 para entender as regras do desafio e veja quem realmente mudou o físico.",
+    episodios: [
+      {
+        id: "rmzMP-LsuOQ",
+        titulo: "O Ponto de Partida: Como Construir o Shape em 2026",
+        sinopse: "EP. 01 — O plano diretor da temporada: o que separa quem muda o corpo em 90 dias de quem abandona na terceira semana.",
+        duracao: "14:20",
+      },
+      {
+        id: "8u9vHL5cE0w",
+        titulo: "Do Girino ao Urso: Quem Vai Ficar no Shape Primeiro?",
+        sinopse: "EP. 02 — A disputa começa na prática: pontos de partida opostos, biotipos diferentes e o mesmo protocolo de precisão.",
+        duracao: "18:45",
+      },
+      {
+        id: "VI0eleGqumA",
+        titulo: "O Julgamento dos Físicos: Quem Leva os 400 Euros?",
+        sinopse: "EP. 03 — Hora de tirar a camisa e medir a evolução real: análise técnica de linha, cortes e percentual de gordura.",
+        duracao: "21:10",
+      },
+      {
+        id: "pLDvj0_EocQ",
+        titulo: "Novo Patrocinador & A Pressão Sobe no Projeto",
+        sinopse: "EP. 04 — O projeto cresce, entram novos recursos e a cobrança por adesão à dieta fica ainda mais intensa.",
+        duracao: "12:35",
+      },
+      {
+        id: "uhww5Mzvy1I",
+        titulo: "Desafio de Resistência: Quem Perder nas Flexões Paga o Preço",
+        sinopse: "EP. 05 — Teste mental e físico até a falha: quando o cansaço bate, aparece quem realmente tem disciplina.",
+        duracao: "15:50",
+      },
+      {
+        id: "d2imA9F6UbI",
+        titulo: "No Limite da Aposta: As Consequências do Desafio True Shape",
+        sinopse: "EP. 06 — O episódio mais tenso e divertido da temporada: ninguém quer perder a aposta final.",
+        duracao: "16:15",
+      },
+      {
+        id: "ZFcpJenQdHo",
+        titulo: "Como Ele Ganhou +10 kg em 1 Mês: A Estratégia Revelada",
+        sinopse: "EP. 07 — Superávit calórico limpo, progressão de carga e o que mudou na rotina para destravar o ganho de massa.",
+        duracao: "13:40",
+      },
+      {
+        id: "35AcZsw3U0M",
+        titulo: "Estava com 99 kg e Já Eliminou -8 kg Mantendo Massa Magra",
+        sinopse: "EP. 08 — Estudo de caso prático de recomposição corporal sem dietas extremas.",
+        duracao: "11:25",
+      },
+      {
+        id: "r9oFfFtCgdE",
+        titulo: "Missão 180 kg: O Pedido de Socorro do Daniel",
+        sinopse: "EP. 09 — Season Finale emocionante: como começar a resgatar a saúde e a mobilidade quando o peso chegou ao limite.",
+        duracao: "19:30",
+      },
+    ],
   },
   {
     id: "sessoes-brutas",
-    nome: "Série · Sessões Brutas",
-    descricao: "Treinos completos, execução real e o que acontece depois da última série.",
-    episodios: ["68Rxs5iP32A", "p1LL2brbwe8", "DN8HMhT2Elw", "Xuat0DwvjR4"],
-    palavras: ["treino", "leg day", "ombro", "perna", "pós-legday", "gym"],
-    excluir: ["menstruação"],
-  },
-  {
-    id: "true-shape",
-    nome: "Série · Projeto True Shape",
-    descricao: "Transformação, desafios e acompanhamento sem esconder o processo.",
-    episodios: ["rmzMP-LsuOQ", "8u9vHL5cE0w", "VI0eleGqumA", "pLDvj0_EocQ", "uhww5Mzvy1I", "d2imA9F6UbI", "ZFcpJenQdHo", "r9oFfFtCgdE"],
-    palavras: ["shape", "true shape", "desafio", "ganhou 10kg", "180kgs"],
-  },
-  {
-    id: "conversas",
-    nome: "Série · Conversas que Formam",
-    descricao: "Doutorado, carreira, esporte e decisões explicadas por quem vive o tema.",
-    episodios: ["CryXN-5LhXs", "rtd8u5Cfies", "oOpriO5YJ8g", "WQLA9id1s7E", "bI6hA1gS6sk", "-6oc99Gh5gg", "9oHT6bC-20k"],
-    palavras: ["papo com", "doutorado", "mentalidade", "mindset", "explica", "o que é"],
-  },
-  {
-    id: "ciencia-aplicada",
-    nome: "Série · Ciência Aplicada",
-    descricao: "Pesquisa, dados e ferramentas científicas traduzidos em prática.",
-    episodios: ["CryXN-5LhXs", "rtd8u5Cfies", "GVMcSQf7hxE", "1Zwr8UrtOEo", "nCAufgJ4IWw", "p1XZPvSNm3g", "AnwFEVx-HEU"],
-    palavras: ["ciência", "doutorado", "dados", "python", "chembl", "qsar", "pymol", "menstruação"],
+    temporada: "TEMPORADA 2",
+    icone: "💪",
+    nome: "Sessões Brutas · Da Primeira Série à Recuperação",
+    subtitulo: "5 episódios de biomecânica e treino real",
+    descricao:
+      "Nada de treino coreografado: veja a execução real na gaiola, a cadência, a falha mecânica e a liberação miofascial pós-treino.",
+    promessaMaratona: "Assista na ordem para ver um microciclo completo de membros superiores, inferiores e recuperação.",
+    episodios: [
+      {
+        id: "68Rxs5iP32A",
+        titulo: "Treino de Ombros Pancada: Construindo Largura 3D",
+        sinopse: "EP. 01 — Seleção de ângulos, controle excêntrico e volume ideal para deltoide lateral e posterior.",
+        duracao: "16:05",
+      },
+      {
+        id: "p1LL2brbwe8",
+        titulo: "Leg Day Pesado: Um Brasileiro, um Português e um Peruano",
+        sinopse: "EP. 02 — Três atletas empurrando o limite no treino de pernas mais pesado do canal.",
+        duracao: "22:18",
+      },
+      {
+        id: "DN8HMhT2Elw",
+        titulo: "Treinão de Perna Rápido e Brutal (Alta Intensidade em Pouco Tempo)",
+        sinopse: "EP. 03 — Como extrair estímulo máximo de hipertrofia quando você tem menos de 45 minutos na academia.",
+        duracao: "12:48",
+      },
+      {
+        id: "Xuat0DwvjR4",
+        titulo: "Pós-Leg Day: Liberação Miofascial e Recuperação no Aluno",
+        sinopse: "EP. 04 — O que acontece depois da última série: soltura muscular e preparo para a próxima sessão.",
+        duracao: "10:15",
+      },
+      {
+        id: "p1XZPvSNm3g",
+        titulo: "Menstruação vs. Treino: Como Periodizar para Mulheres",
+        sinopse: "EP. 05 — Fisiologia hormonal feminina aplicada: como ajustar carga, volume e dieta em cada fase do ciclo.",
+        duracao: "14:55",
+      },
+    ],
   },
   {
     id: "nutricao-real",
-    nome: "Série · Nutrição no Mundo Real",
-    descricao: "Produtos, suplementação e alimentação avaliados fora da propaganda.",
-    episodios: ["itJ06wOXEbM", "-fUAu0CSUVA", "6Ty3OJYTwoY"],
-    palavras: ["produto", "suplement", "plant-based", "nutrição", "dieta"],
+    temporada: "TEMPORADA 3",
+    icone: "🧪",
+    nome: "Nutrição no Mundo Real · Rótulos & Suplementos Sem Filtro",
+    subtitulo: "3 episódios desmascarando a indústria",
+    descricao:
+      "Um Mestre e Doutorando em Ciência de Alimentos dentro do supermercado e das lojas de suplementos analisando o que realmente funciona.",
+    promessaMaratona: "Descubra o que vale o seu dinheiro e o que é puro marketing na prateleira.",
+    episodios: [
+      {
+        id: "itJ06wOXEbM",
+        titulo: "Provando as Novidades Fitness com Dra. Maromba: O Que Presta?",
+        sinopse: "EP. 01 — Degustação às cegas + leitura crítica da lista de ingredientes e densidade calórica.",
+        duracao: "17:40",
+      },
+      {
+        id: "-fUAu0CSUVA",
+        titulo: "Bastidores da Suplementação: Tendências Reais no Brasil e Europa",
+        sinopse: "EP. 02 — O que tem evidência nível A (Whey, Creatina, Cafeína) vs. o que você não precisa comprar.",
+        duracao: "15:20",
+      },
+      {
+        id: "6Ty3OJYTwoY",
+        titulo: "Expedição Chile: Analisando uma Loja Inteira Plant-Based",
+        sinopse: "EP. 03 — Nem tudo que é vegano ou plant-based ajuda a emagrecer: análise de proteínas vegetais e substitutos.",
+        duracao: "13:10",
+      },
+    ],
   },
   {
-    id: "fora-da-curva",
-    nome: "Série · Fora da Curva",
-    descricao: "Esporte, eventos e histórias de quem escolheu uma trajetória incomum.",
-    episodios: ["-6oc99Gh5gg", "WQLA9id1s7E", "qer5ATqTGN8", "ca57g0N0fT0", "9oHT6bC-20k"],
-    palavras: ["boxe", "crossfit", "evento", "fisicultur", "campeão", "atleta"],
+    id: "ciencia-aplicada",
+    temporada: "TEMPORADA 4",
+    icone: "🧬",
+    nome: "Laboratório PhD · Inteligência Artificial, Moléculas & Dados",
+    subtitulo: "5 episódios da bancada científica",
+    descricao:
+      "A base acadêmica por trás da precisão: veja como uso IA, Python, modelagem molecular 3D e química de alimentos no doutorado.",
+    promessaMaratona: "A série favorita de quem quer ver o rigor científico real por trás do método.",
+    episodios: [
+      {
+        id: "mSSPYbPM2XY",
+        titulo: "Como Criei Meu Primeiro Modelo de IA para a Indústria Farmacêutica",
+        sinopse: "EP. 01 — Do banco de dados molecular ao algoritmo preditivo: como a Inteligência Artificial acelera descobertas.",
+        duracao: "16:30",
+      },
+      {
+        id: "AnwFEVx-HEU",
+        titulo: "NEI 2025: Ciência de Alimentos e Inovação com Dr. Márcio Carocho",
+        sinopse: "EP. 02 — O formato Fundo Escuro + Moléculas 3D explicando compostos bioativos e o futuro da nutrição.",
+        duracao: "18:12",
+      },
+      {
+        id: "GVMcSQf7hxE",
+        titulo: "Explorando Dados Físico-Químicos de Compostos com Python",
+        sinopse: "EP. 03 — Como analisar milhares de moléculas em minutos usando programação aplicada à ciência.",
+        duracao: "14:05",
+      },
+      {
+        id: "1Zwr8UrtOEo",
+        titulo: "Virtual Screening & QSAR: Minerando Dados no ChEMBL",
+        sinopse: "EP. 04 — Passo a passo prático de bioinformática e quimioinformática no doutorado.",
+        duracao: "19:45",
+      },
+      {
+        id: "nCAufgJ4IWw",
+        titulo: "Modelagem 3D de Proteínas: Destacando Aminoácidos no PyMOL",
+        sinopse: "EP. 05 — Visualizando a estrutura tridimensional das proteínas em nível atômico.",
+        duracao: "12:50",
+      },
+    ],
+  },
+  {
+    id: "mentes-fora-da-curva",
+    temporada: "TEMPORADA 5",
+    icone: "🎙️",
+    nome: "Mentes Fora da Curva · Histórias de Disciplina & Palco",
+    subtitulo: "7 episódios de conversas profundas",
+    descricao:
+      "Entrevistas e documentários curtos com doutores, professores internacionais, ex-obesos que subiram no palco e atletas de elite.",
+    promessaMaratona: "Histórias reais para assistir quando você precisar recalibrar sua direção e disciplina.",
+    episodios: [
+      {
+        id: "9oHT6bC-20k",
+        titulo: "De Ex-Obesa a Fisiculturista e Empresária (@simonemkehl)",
+        sinopse: "EP. 01 — Como virar a chave mental, vencer a obesidade e construir um físico de competição.",
+        duracao: "28:15",
+      },
+      {
+        id: "CryXN-5LhXs",
+        titulo: "De Aluno em Santos a Professor em Barcelona (Dr. Ricardo Serafim)",
+        sinopse: "EP. 02 — Os bastidores da carreira científica internacional e o que o doutorado ensina sobre resiliência.",
+        duracao: "34:20",
+      },
+      {
+        id: "rtd8u5Cfies",
+        titulo: "O Que Realmente É um Doutorado? (Papo com Dr. Andreimar Soares)",
+        sinopse: "EP. 03 — Uma conversa franca sobre pesquisa de ponta, carreira acadêmica e propósito.",
+        duracao: "29:40",
+      },
+      {
+        id: "WQLA9id1s7E",
+        titulo: "Mindset de Campeão na Alta Performance (Weslley Bronzoli)",
+        sinopse: "EP. 04 — Como pensa um atleta competitivo quando ninguém está olhando.",
+        duracao: "24:10",
+      },
+      {
+        id: "oOpriO5YJ8g",
+        titulo: "Mentalidade de Negócios, Carreira e Consistência",
+        sinopse: "EP. 05 — Por que a mesma disciplina que constrói um físico sólido constrói uma empresa forte.",
+        duracao: "18:55",
+      },
+      {
+        id: "-6oc99Gh5gg",
+        titulo: "Team Will: O Que o Boxe Ensina Sobre Controle Emocional",
+        sinopse: "EP. 06 — Arte nobre, preparação física e foco sob pressão.",
+        duracao: "15:30",
+      },
+      {
+        id: "ca57g0N0fT0",
+        titulo: "Bastidores do Fisiculturismo: Lívia & Tukalins",
+        sinopse: "EP. 07 — A reta final de preparação para o palco e a estética do fisiculturismo clássico.",
+        duracao: "14:15",
+      },
+    ],
   },
 ];
-
-/* ── leitura dos feeds ─────────────────────────────────────── */
 
 const desescapar = (s: string) =>
   s
@@ -104,173 +296,46 @@ const desescapar = (s: string) =>
     .replace(/&#39;/g, "'")
     .replace(/&amp;/g, "&");
 
-/** Parser mínimo por regex: o formato do feed é fixo e não justifica dependência. */
-function extrair(xml: string): Video[] {
+function extrairFeedRecente(xml: string): Video[] {
   const videos: Video[] = [];
-
   for (const bloco of xml.split("<entry>").slice(1)) {
     const id = bloco.match(/<yt:videoId>([^<]+)<\/yt:videoId>/)?.[1];
     const titulo = bloco.match(/<title>([\s\S]*?)<\/title>/)?.[1];
     const publicado = bloco.match(/<published>([^<]+)<\/published>/)?.[1];
     if (!id || !titulo) continue;
-
     videos.push({
       id,
       titulo: desescapar(titulo).trim(),
-      publicado: publicado ?? "",
+      publicado: publicado ? publicado.slice(0, 10) : "",
       url: `https://www.youtube.com/watch?v=${id}`,
     });
   }
-
   return videos;
 }
 
-async function buscarFeed(url: string): Promise<Video[]> {
-  try {
-    const r = await fetch(url, {
-      // uma hora: vídeo novo aparece sem precisar de deploy
-      next: { revalidate: 3600 },
-    });
-    if (!r.ok) return [];
-    return extrair(await r.text());
-  } catch {
-    // O YouTube fora do ar não pode derrubar a página inteira.
-    return [];
-  }
-}
-
-/** A aba `/videos` do canal já exclui Shorts na origem. */
-async function buscarVideosTradicionais(): Promise<Video[]> {
-  try {
-    const r = await fetch(`https://www.youtube.com/channel/${CANAL}/videos`, {
-      next: { revalidate: 3600 },
-      headers: {
-        cookie: "CONSENT=YES+cb.20210328-17-p0.en+FX+410",
-        "accept-language": "pt-BR",
-      },
-    });
-    if (!r.ok) return [];
-
-    const html = await r.text();
-    const json = html.match(/var ytInitialData = (\{[\s\S]+?\});<\/script>/)?.[1];
-    if (!json) return [];
-
-    const encontrados = new Map<string, Video>();
-    const visitar = (valor: unknown) => {
-      if (!valor || typeof valor !== "object") return;
-      const objeto = valor as Record<string, unknown>;
-      const lockup = objeto.lockupViewModel as Record<string, unknown> | undefined;
-      const id = lockup?.contentId;
-      const metadata = lockup?.metadata as Record<string, unknown> | undefined;
-      const view = metadata?.lockupMetadataViewModel as Record<string, unknown> | undefined;
-      const titulo = (view?.title as Record<string, unknown> | undefined)?.content;
-      const imagem = JSON.stringify(lockup?.contentImage ?? {});
-      const duracao = imagem.match(/"text":"(\d{1,2}:\d{2}(?::\d{2})?)"/)?.[1];
-      const linhas = ((view?.metadata as Record<string, unknown> | undefined)
-        ?.contentMetadataViewModel as Record<string, unknown> | undefined)
-        ?.metadataRows as Array<Record<string, unknown>> | undefined;
-      const partes = (linhas?.[0]?.metadataParts ?? []) as Array<Record<string, unknown>>;
-      const publicado = ((partes[1]?.text as Record<string, unknown> | undefined)?.content as string | undefined) ?? "";
-
-      if (typeof id === "string" && typeof titulo === "string" && !encontrados.has(id)) {
-        encontrados.set(id, {
-          id,
-          titulo,
-          publicado,
-          duracao,
-          url: `https://www.youtube.com/watch?v=${id}`,
-        });
-      }
-
-      Object.values(objeto).forEach(visitar);
-    };
-
-    visitar(JSON.parse(json));
-    return [...encontrados.values()].slice(0, 30);
-  } catch {
-    return [];
-  }
-}
-
-/**
- * O feed RSS mistura vídeos tradicionais e Shorts e não informa o formato.
- * A página pública expõe uma URL canônica `/shorts/…` para esse formato.
- * O cookie apenas evita a tela regional de consentimento; não identifica o usuário.
- */
-async function videoTradicional(video: Video): Promise<Video | null> {
-  try {
-    const r = await fetch(`https://www.youtube.com/watch?v=${video.id}`, {
-      next: { revalidate: 3600 },
-      headers: { cookie: "CONSENT=YES+cb.20210328-17-p0.en+FX+410" },
-      signal: AbortSignal.timeout(15_000),
-    });
-    if (!r.ok) return null;
-    const html = await r.text();
-    return html.includes('"canonicalUrl":"https://www.youtube.com/shorts/')
-      ? null
-      : video;
-  } catch {
-    // Falha fechada: se não foi possível confirmar o formato, não arriscamos
-    // colocar um Short no catálogo.
-    return null;
-  }
-}
-
-async function filtrarTradicionais(videos: Video[]) {
-  const aprovados: Video[] = [];
-  // Lotes pequenos evitam bloqueio do YouTube e pico de memória no servidor.
-  for (let i = 0; i < videos.length; i += 4) {
-    const lote = await Promise.all(videos.slice(i, i + 4).map(videoTradicional));
-    aprovados.push(...lote.filter((video): video is Video => video !== null));
-  }
-  return aprovados;
-}
-
-const combina = (titulo: string, palavras: string[]) => {
-  const t = titulo.toLowerCase();
-  return palavras.some((p) => t.includes(p));
-};
-
-function montarSerie(config: ConfigTrilha, catalogo: Video[]) {
-  const porId = new Map(catalogo.map((video) => [video.id, video]));
-  const curados = (config.episodios ?? [])
-    .map((id) => porId.get(id))
-    .filter((video): video is Video => Boolean(video));
-  const idsCurados = new Set(curados.map((video) => video.id));
-  const novos = config.palavras
-    ? catalogo.filter(
-        (video) =>
-          !idsCurados.has(video.id) &&
-          combina(video.titulo, config.palavras!) &&
-          !(config.excluir && combina(video.titulo, config.excluir)),
-      )
-    : [];
-  return [...curados, ...novos];
-}
-
 export async function carregarTrilhas(): Promise<Trilha[]> {
-  const doCanal = await buscarVideosTradicionais();
+  // Monta todas as Temporadas curadas com numeração sequencial EP. 01..N
+  const trilhas: Trilha[] = SERIES_CSFLIX.map((serie) => ({
+    id: serie.id,
+    temporada: serie.temporada,
+    icone: serie.icone,
+    nome: serie.nome,
+    subtitulo: serie.subtitulo,
+    descricao: serie.descricao,
+    promessaMaratona: serie.promessaMaratona,
+    videos: serie.episodios.map((ep, idx) => ({
+      id: ep.id,
+      titulo: ep.titulo,
+      sinopse: ep.sinopse,
+      duracao: ep.duracao,
+      publicado: "2026",
+      url: `https://www.youtube.com/watch?v=${ep.id}`,
+      episodioNumero: idx + 1,
+      temporadaTag: serie.temporada,
+    })),
+  }));
 
-  const trilhas = await Promise.all(
-    TRILHAS.map(async (c): Promise<Trilha> => {
-      if (c.playlist) {
-        const feedDaPlaylist = await buscarFeed(
-          `https://www.youtube.com/feeds/videos.xml?playlist_id=${c.playlist}`,
-        );
-        return {
-          ...c,
-          videos: await filtrarTradicionais(feedDaPlaylist),
-        };
-      }
-      if (c.palavras || c.episodios) {
-        return { ...c, videos: montarSerie(c, doCanal) };
-      }
-      return { ...c, videos: doCanal };
-    }),
-  );
-
-  // trilha vazia não vira faixa vazia na tela
-  return trilhas.filter((t) => t.videos.length > 0);
+  return trilhas;
 }
 
 export function totalDeVideos(trilhas: Trilha[]) {

@@ -42,8 +42,8 @@ import {
   type SessaoMontada,
 } from "./treino";
 
-export const DURACAO_PADRAO = 90;
-const DIAS_POR_BLOCO = 30;
+export const DURACAO_PADRAO = 21;
+const BLOCOS_PADRAO = 3;
 
 /** ~7700 kcal por quilo de tecido adiposo — o mesmo número de `calorias.ts`. */
 const KCAL_POR_KG = 7700;
@@ -258,8 +258,9 @@ export function simular(
   duracao = DURACAO_PADRAO,
   formula: Formula = "mifflin",
 ): { etapas: Etapa[]; viabilidade: Viabilidade } | null {
-  const blocos = Math.max(1, Math.round(duracao / DIAS_POR_BLOCO));
-  const semanasPorBloco = DIAS_POR_BLOCO / 7;
+  const diasPorBloco = Math.max(1, Math.round(duracao / BLOCOS_PADRAO));
+  const blocos = Math.max(1, Math.round(duracao / diasPorBloco));
+  const semanasPorBloco = diasPorBloco / 7;
 
   const etapas: Etapa[] = [];
   let peso = perfil.peso;
@@ -273,8 +274,8 @@ export function simular(
     const dose = doseDoBloco(modo, gasto, peso, perfil.pesoAlvo);
     if (!dose) return null;
 
-    const inicioDoBloco = i * DIAS_POR_BLOCO + 1;
-    const fimDoBloco = (i + 1) * DIAS_POR_BLOCO;
+    const inicioDoBloco = i * diasPorBloco + 1;
+    const fimDoBloco = (i + 1) * diasPorBloco;
 
     const movimentoBruto = dose.ritmoSemanal * semanasPorBloco;
 
@@ -314,7 +315,7 @@ export function simular(
       const fracao = Math.min(1, falta / movimentoBruto);
       diaDoAlvo = Math.min(
         duracao,
-        inicioDoBloco + Math.max(0, Math.ceil(fracao * DIAS_POR_BLOCO) - 1),
+        inicioDoBloco + Math.max(0, Math.ceil(fracao * diasPorBloco) - 1),
       );
     }
 
@@ -379,20 +380,20 @@ const TITULOS: Record<1 | 2 | 3, Texto> = {
   1: {
     titulo: "Fundação",
     foco:
-      "Construir a frequência e aprender os padrões de movimento. A carga é secundária: o que se instala aqui é a presença.",
-    marco: "Peso, foto de frente e de lado, e as sessões cumpridas de 30.",
+      "Descompressão glicêmica, ajuste da distribuição proteica e instalação da frequência de treino. Na primeira semana a retenção hídrica cede e os picos de fome à noite desaparecem.",
+    marco: "Peso em jejum no Dia 7, cintura, fotos de frente e de lado e 100% das sessões cumpridas.",
   },
   2: {
     titulo: "Carga",
     foco:
-      "A técnica já existe, então o peso sobe. É o bloco onde a composição corporal começa a mudar de forma visível.",
-    marco: "Peso, fotos, circunferência de cintura e as cargas do dia 31 contra as de hoje.",
+      "Com a glicemia estável e a técnica ajustada, a sinalização mecânica sobe. É a semana onde a oxidação real de gordura acelera protegendo a massa muscular.",
+    marco: "Peso no Dia 14, circunferência abdominal e progressão de carga ou repetições sobre a Semana 1.",
   },
   3: {
     titulo: "Definição",
     foco:
-      "Intensidade mais perto da falha e calorias recalculadas sobre o peso novo — é isso que evita o platô do fim.",
-    marco: "Peso, fotos, cintura e o protocolo de manutenção para o dia 91.",
+      "Intensidade mais perto da falha e calorias recalculadas sobre o peso novo — blindando o metabolismo contra platôs e entregando o protocolo do Dia 22 em diante.",
+    marco: "Peso final do Dia 21, fotos comparativas (Dia 1 vs. Dia 21), cintura e transição para manutenção ou próximo ciclo.",
   },
 };
 

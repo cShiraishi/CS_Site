@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import type { Moeda } from "@/lib/produto";
+import { useMoeda } from "@/lib/useMoeda";
 import { Arrow } from "./ui";
 
 /**
@@ -17,14 +19,18 @@ import { Arrow } from "./ui";
  */
 export function Comprar({
   plano,
-  preco,
+  preco = "R$ 47",
+  moedaServidor,
   rotulo = "Quero o programa",
 }: {
   /** o perfil que gerou o plano, guardado com o pedido */
   plano?: unknown;
-  preco: string;
+  preco?: string;
+  moedaServidor?: Moeda | null;
   rotulo?: string;
 }) {
+  const { info } = useMoeda(moedaServidor);
+  const precoExibido = info.precoFormatado || preco;
   const [email, setEmail] = useState("");
   const [empresa, setEmpresa] = useState("");
   const [estado, setEstado] = useState<"parado" | "indo" | "erro">("parado");
@@ -79,8 +85,8 @@ export function Comprar({
         />
       </div>
 
-      <label htmlFor="compra-email" className="t-eyebrow block text-ouro">
-        Seu e-mail
+      <label htmlFor="compra-email" className="t-eyebrow block text-[#00ff66]">
+        Seu e-mail para liberar o acesso imediato
       </label>
       <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center">
         <input
@@ -94,28 +100,27 @@ export function Comprar({
           onChange={(e) => setEmail(e.target.value)}
           aria-invalid={estado === "erro"}
           /* 16 px: abaixo disso o Safari do iPhone dá zoom ao focar. */
-          className="min-h-12 w-full border-b border-porcelana/30 bg-transparent py-3 text-base text-porcelana transition-colors placeholder:text-porcelana/40 focus:border-ouro focus:outline-none sm:max-w-xs"
+          className="min-h-12 w-full rounded-lg border border-[#00ff66]/35 bg-[#0b0a09]/90 px-4 py-3 text-base text-grafite transition-all placeholder:text-grafite/50 focus:border-[#00ff66] focus:shadow-[0_0_20px_rgba(0,255,102,0.25)] focus:outline-none sm:max-w-xs"
         />
 
         <button
           type="submit"
           disabled={estado === "indo"}
-          className="group inline-flex min-h-12 shrink-0 items-center justify-center gap-2.5 rounded-full bg-ouro-profundo px-8 py-3.5 text-sm font-medium tracking-wide text-porcelana transition-all duration-300 hover:bg-ouro disabled:opacity-60"
+          className="group inline-flex min-h-12 shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-lg bg-[#00ff66] px-8 py-3.5 text-sm font-extrabold uppercase tracking-wider text-[#041208] shadow-[0_0_30px_rgba(0,255,102,0.45)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#4be283] hover:shadow-[0_0_45px_rgba(0,255,102,0.65)] disabled:opacity-60"
         >
-          {estado === "indo" ? "Abrindo o pagamento…" : `${rotulo} — ${preco}`}
+          {estado === "indo" ? "Abrindo o pagamento…" : `${rotulo} — ${precoExibido}`}
           <Arrow />
         </button>
       </div>
 
       {mensagem && (
-        <p role="alert" className="mt-4 text-sm text-ouro">
+        <p role="alert" className="mt-4 text-sm font-medium text-[#ff8c42]">
           {mensagem}
         </p>
       )}
 
-      <p className="mt-5 text-xs leading-relaxed text-porcelana/70">
-        Pagamento por Pix, cartão ou boleto, no ambiente do Mercado Pago. Seus dados de
-        cartão não passam por este site.
+      <p className="mt-5 text-xs leading-relaxed text-grafite/75">
+        Pagamento seguro ({info.meiosPagamento}). Liberação imediata na sua conta CS Performance.
       </p>
     </form>
   );

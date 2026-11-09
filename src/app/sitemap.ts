@@ -19,6 +19,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     {
+      url: `${marca.site}/es`,
+      lastModified: agora,
+      changeFrequency: "monthly",
+      priority: 0.95,
+    },
+    {
+      url: `${marca.site}/en`,
+      lastModified: agora,
+      changeFrequency: "monthly",
+      priority: 0.95,
+    },
+    {
       /* O funil é a porta do produto: prioridade acima das ferramentas. */
       url: `${marca.site}${rotas.programa}`,
       lastModified: agora,
@@ -60,6 +72,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: agora,
       changeFrequency: "weekly",
       priority: 0.7,
+    },
+    {
+      url: `${marca.site}${rotas.receitas}`,
+      lastModified: agora,
+      changeFrequency: "weekly",
+      priority: 0.75,
     },
     {
       url: `${marca.site}${rotas.biblioteca}`,

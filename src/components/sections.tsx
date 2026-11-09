@@ -4,16 +4,13 @@ import { Logo } from "./Logo";
 import { Arrow, Button, Container, Eyebrow, Rule, Section, buttonClass } from "./ui";
 import {
   rotas,
-  contato,
-  hero,
   marca,
-  metodo,
   paraQuem,
   pilares,
-  programa,
-  resultados,
-  sobre,
+  resultados as resultadosBase,
+  sobre as sobreBase,
 } from "@/lib/content";
+import { obterConteudo, type Idioma } from "@/lib/i18n";
 
 /*
  * A home tem cinco seções, mais o fecho em `Aplicar`:
@@ -32,7 +29,9 @@ import {
 /* ============================================================
    HERO — um único foco visual, muita área de silêncio.
    ============================================================ */
-export function Hero() {
+export function Hero({ idioma = "pt" }: { idioma?: Idioma } = {}) {
+  const t = obterConteudo(idioma);
+
   return (
     <section id="topo" className="relative overflow-hidden bg-porcelana pt-24 sm:pt-40">
       {/* 08 / diagonais: ângulos consistentes e direcionais, sempre discretas */}
@@ -44,22 +43,24 @@ export function Hero() {
       <Container className="relative">
         <div className="grid items-center gap-16 pb-12 sm:pb-24 lg:grid-cols-[1.05fr_0.95fr] lg:gap-20 lg:pb-32">
           <div className="rise">
-            <Eyebrow>{hero.eyebrow}</Eyebrow>
+            <Eyebrow>{t.hero.eyebrow}</Eyebrow>
 
             <h1 className="t-display mt-8 whitespace-pre-line text-balance">
-              {hero.titulo}
+              {t.hero.titulo}
             </h1>
 
             <p className="t-sub mt-8 max-w-xl text-pretty text-grafite">
-              {hero.texto}
+              {t.hero.texto}
             </p>
 
             <div className="mt-11 flex flex-wrap items-center gap-4">
-              <Button nativo variant="consultoria" href={`${rotas.consultoria}?de=hero`}>{hero.cta}</Button>
+              <Button nativo variant="consultoria" href={`${rotas.consultoria}?de=hero`}>
+                {t.hero.cta}
+              </Button>
               {/* O segundo botão era a calculadora de gordura — uma porta
                   para fora do funil. Agora só desce até a prova. */}
               <a href="#resultados" className={buttonClass("outline")}>
-                {hero.ctaSecundario}
+                {t.hero.ctaSecundario}
                 <span aria-hidden>↓</span>
               </a>
             </div>
@@ -67,7 +68,7 @@ export function Hero() {
             {/* Como começar, colado ao botão: quem sabe o que vem depois do
                 clique não trava nele. Os mesmos três passos do fecho. */}
             <ol className="mt-9 grid max-w-xl gap-px overflow-hidden rounded-xl border border-verde/25 bg-verde/20 sm:grid-cols-3">
-              {contato.passos.map((p, i) => (
+              {t.contato.passos.map((p, i) => (
                 <li key={p.numero} className="flex items-start gap-3 bg-porcelana/95 p-4">
                   <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-verde text-[0.7rem] font-bold text-[#06140b]">
                     {i + 1}
@@ -86,7 +87,7 @@ export function Hero() {
 
             <p className="mt-6 flex items-center gap-2.5 text-xs text-grafite/70">
               <span aria-hidden className="size-1.5 rounded-full bg-verde" />
-              {hero.nota}
+              {t.hero.nota}
             </p>
           </div>
 
@@ -95,7 +96,7 @@ export function Hero() {
             <div className="paper drift relative aspect-square overflow-hidden rounded-[2rem] ring-1 ring-linha shadow-[0_28px_70px_-40px_rgba(29,27,25,0.5)]">
               <Image
                 src="/brand/cs-mark.jpg"
-                alt="Monograma CS — branco e ouro, com seta ascendente"
+                alt={t.hero.altMonograma}
                 width={1024}
                 height={1024}
                 priority
@@ -104,11 +105,10 @@ export function Hero() {
               />
             </div>
             <p className="mt-6 text-center font-display text-lg italic text-grafite">
-              {marca.assinatura}
+              {t.marca.assinatura}
             </p>
           </div>
         </div>
-
       </Container>
     </section>
   );
@@ -183,17 +183,18 @@ export function ParaQuem() {
 /* ============================================================
    MÉTODO — 4 etapas
    ============================================================ */
-export function Metodo() {
+export function Metodo({ idioma = "pt" }: { idioma?: Idioma } = {}) {
+  const t = obterConteudo(idioma);
   return (
     <Section id="metodo">
       <div className="max-w-2xl">
-        <Eyebrow>{metodo.eyebrow}</Eyebrow>
-        <h2 className="t-title reveal mt-7 text-balance">{metodo.titulo}</h2>
-        <p className="mt-7 text-pretty leading-relaxed text-grafite">{metodo.texto}</p>
+        <Eyebrow>{t.metodo.eyebrow}</Eyebrow>
+        <h2 className="t-title reveal mt-7 text-balance">{t.metodo.titulo}</h2>
+        <p className="mt-7 text-pretty leading-relaxed text-grafite">{t.metodo.texto}</p>
       </div>
 
       <ol className="stagger mt-20 grid gap-px overflow-hidden rounded-sm bg-linha sm:grid-cols-2">
-        {metodo.etapas.map((e) => (
+        {t.metodo.etapas.map((e) => (
           <li key={e.n} className="group relative bg-branco p-9 sm:p-11">
             <span
               aria-hidden
@@ -221,21 +222,22 @@ export function Metodo() {
    quinzenal" vê, duas dobras abaixo, três pessoas que passaram por ele.
    A âncora #resultados continua a existir, para os links já partilhados.
    ============================================================ */
-export function Programa() {
+export function Programa({ idioma = "pt" }: { idioma?: Idioma } = {}) {
+  const t = obterConteudo(idioma);
   return (
     <Section id="programa" tone="grafite">
       <div className="max-w-2xl">
-        <Eyebrow tone="claro">{programa.eyebrow}</Eyebrow>
+        <Eyebrow tone="claro">{t.programa.eyebrow}</Eyebrow>
         <h2 className="t-title reveal mt-7 text-balance text-porcelana">
-          {programa.titulo}
+          {t.programa.titulo}
         </h2>
         <p className="mt-7 text-pretty leading-relaxed text-porcelana/70">
-          {programa.texto}
+          {t.programa.texto}
         </p>
       </div>
 
       <div className="stagger mt-16 grid gap-x-14 gap-y-12 sm:grid-cols-2">
-        {programa.itens.map((item, i) => (
+        {t.programa.itens.map((item, i) => (
           <div key={item.titulo}>
             <div className="flex items-baseline gap-3">
               <span className="font-display text-sm text-ouro">
@@ -255,7 +257,7 @@ export function Programa() {
       <div id="resultados" className="mt-24 scroll-mt-24 border-t border-porcelana/12 pt-16">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <h3 className="t-title reveal max-w-md text-balance text-porcelana">
-            {resultados.titulo}
+            {t.resultados.titulo}
           </h3>
           <Link
             href={marca.instagram}
@@ -263,47 +265,44 @@ export function Programa() {
             rel="noopener noreferrer"
             className="group inline-flex shrink-0 items-center gap-2.5 border-b border-ouro/40 pb-1.5 text-sm text-ouro transition-colors hover:border-ouro"
           >
-            {resultados.cta}
+            {t.resultados.cta}
             <Arrow />
           </Link>
         </div>
 
         <p className="mt-6 max-w-md text-pretty leading-relaxed text-porcelana/65">
-          {resultados.texto}
+          {t.resultados.texto}
         </p>
 
-        <div className="stagger mt-12 grid items-start gap-5 sm:grid-cols-3">
-          {resultados.transformacoes.map((pessoa) => (
+        <div className="stagger mt-12 grid items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {resultadosBase.transformacoes.map((pessoa) => (
             <Link
               key={pessoa.instagram}
               href={pessoa.link}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={`Ver ${pessoa.instagram} no Instagram`}
-              className="group relative isolate overflow-hidden border border-porcelana/12 bg-white/5 transition-all duration-500 hover:-translate-y-2 hover:border-ouro/45 hover:shadow-[0_24px_60px_rgba(0,0,0,0.32)]"
+              aria-label={t.resultados.verNoInstagram(pessoa.instagram)}
+              className="group flex flex-col justify-between overflow-hidden rounded-xl border border-porcelana/15 bg-white/5 transition-all duration-500 hover:-translate-y-2 hover:border-ouro/55 hover:shadow-[0_24px_60px_rgba(0,0,0,0.32)]"
             >
-              <Image
-                src={pessoa.imagem}
-                alt={pessoa.alt}
-                width={pessoa.largura}
-                height={pessoa.altura}
-                sizes="(max-width: 640px) 100vw, 33vw"
-                className="h-auto w-full opacity-90 transition-all duration-700 group-hover:scale-[1.025] group-hover:opacity-100"
-              />
-              <span
-                aria-hidden
-                className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-grafite via-grafite/55 to-transparent"
-              />
-              <span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5">
+              <div className="relative aspect-[10/18] w-full overflow-hidden bg-black">
+                <Image
+                  src={pessoa.imagem}
+                  alt={pessoa.alt}
+                  fill
+                  sizes="(max-width: 640px) 95vw, 25vw"
+                  className="object-cover object-center opacity-95 transition-all duration-700 group-hover:scale-[1.03] group-hover:opacity-100"
+                />
+              </div>
+              <span className="flex items-center justify-between gap-3 border-t border-porcelana/12 bg-black/55 px-4 py-3.5">
                 <span>
-                  <span className="block font-display text-xl text-porcelana">
+                  <span className="block font-display text-xl uppercase text-porcelana">
                     {pessoa.nome}
                   </span>
-                  <span className="mt-1 block text-xs tracking-wide text-porcelana/65">
+                  <span className="mt-0.5 block text-xs tracking-wide text-porcelana/70">
                     {pessoa.instagram}
                   </span>
                 </span>
-                <span className="flex size-9 shrink-0 items-center justify-center rounded-full border border-porcelana/25 bg-white/10 text-ouro backdrop-blur-md transition-transform duration-300 group-hover:-translate-y-1 group-hover:translate-x-1">
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-full border border-porcelana/25 bg-white/10 text-ouro backdrop-blur-md transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5">
                   <Arrow />
                 </span>
               </span>
@@ -312,7 +311,7 @@ export function Programa() {
         </div>
 
         <p className="mt-6 max-w-2xl text-xs leading-relaxed text-porcelana/70">
-          {resultados.aviso}
+          {t.resultados.aviso}
         </p>
       </div>
     </Section>
@@ -322,13 +321,14 @@ export function Programa() {
 /* ============================================================
    SOBRE
    ============================================================ */
-export function Sobre() {
+export function Sobre({ idioma = "pt" }: { idioma?: Idioma } = {}) {
+  const t = obterConteudo(idioma);
   return (
     <Section id="sobre" tone="branco">
       <div className="max-w-2xl">
-        <Eyebrow>{sobre.eyebrow}</Eyebrow>
+        <Eyebrow>{t.sobre.eyebrow}</Eyebrow>
         <h2 className="t-title reveal mt-7 whitespace-pre-line text-balance">
-          {sobre.titulo}
+          {t.sobre.titulo}
         </h2>
       </div>
 
@@ -341,7 +341,7 @@ export function Sobre() {
           <div className="relative overflow-hidden bg-grafite shadow-[0_24px_70px_rgba(29,27,25,0.16)]">
             <Image
               src="/sobre/carlos-seiti.png"
-              alt="Carlos Seiti em ambiente de treino"
+              alt={t.sobre.altFoto}
               width={1087}
               height={1448}
               sizes="(max-width: 1024px) 100vw, 40vw"
@@ -355,7 +355,7 @@ export function Sobre() {
               <span>
                 <span className="block font-display text-2xl">{marca.nome}</span>
                 <span className="mt-1 block text-xs uppercase tracking-[0.14em] text-porcelana/70">
-                  Ciência aplicada à vida real
+                  {t.marca.descritor}
                 </span>
               </span>
               <Logo size={44} className="ring-porcelana/25" />
@@ -366,11 +366,11 @@ export function Sobre() {
         <div className="stagger space-y-6">
           <figure className="mb-10 border-l border-linha-ouro pl-7">
             <blockquote className="font-display text-2xl italic leading-snug text-grafite/85 sm:text-3xl">
-              {sobre.citacao}
+              {t.sobre.citacao}
             </blockquote>
           </figure>
 
-          {sobre.paragrafos.map((p) => (
+          {sobreBase.paragrafos.map((p) => (
             <p key={p.slice(0, 24)} className="text-pretty leading-[1.75] text-grafite">
               {p}
             </p>
@@ -420,23 +420,25 @@ export function Sobre() {
    bloco termina no mesmo botão verde.
    ============================================================ */
 
-function BotaoComecar({ de }: { de: string }) {
+function BotaoComecar({ de, texto }: { de: string; texto: string }) {
   return (
     <a href={`${rotas.consultoria}?de=${de}`} className={buttonClass("consultoria")}>
-      Começar consultoria
+      {texto}
       <Arrow />
     </a>
   );
 }
 
 /** A prova logo depois da promessa. */
-export function Resultados() {
+export function Resultados({ idioma = "pt" }: { idioma?: Idioma } = {}) {
+  const t = obterConteudo(idioma);
+
   return (
     <Section id="resultados" denso className="border-t border-linha">
       <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <Eyebrow>{resultados.eyebrow}</Eyebrow>
-          <h2 className="t-title reveal mt-6 text-balance">{resultados.titulo}</h2>
+          <Eyebrow>{t.resultados.eyebrow}</Eyebrow>
+          <h2 className="t-title reveal mt-6 text-balance">{t.resultados.titulo}</h2>
         </div>
         <Link
           href={marca.instagram}
@@ -444,21 +446,21 @@ export function Resultados() {
           rel="noopener noreferrer"
           className="group inline-flex shrink-0 items-center gap-2.5 border-b border-ouro/40 pb-1.5 text-sm text-ouro transition-colors hover:border-ouro"
         >
-          {resultados.cta}
+          {t.resultados.cta}
           <Arrow />
         </Link>
       </div>
 
       {/* No celular, carrossel com deslize (o gesto dos stories); do sm para
-          cima, as três lado a lado. Empilhadas, eram 1.900 px de rolagem. */}
-      <div className="stagger -mx-6 mt-8 flex snap-x snap-mandatory items-start gap-3 overflow-x-auto px-6 pb-2 [scrollbar-width:none] sm:mx-0 sm:mt-10 sm:grid sm:grid-cols-3 sm:gap-4 sm:overflow-visible sm:px-0">
-        {resultados.transformacoes.map((pessoa) => (
+          cima, lado a lado. */}
+      <div className="stagger -mx-6 mt-8 flex snap-x snap-mandatory items-start gap-3 overflow-x-auto px-6 pb-2 [scrollbar-width:none] sm:mx-0 sm:mt-10 sm:grid sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:px-0 lg:grid-cols-4">
+        {resultadosBase.transformacoes.map((pessoa) => (
           <Link
             key={pessoa.instagram}
             href={pessoa.link}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={`Ver ${pessoa.instagram} no Instagram`}
+            aria-label={t.resultados.verNoInstagram(pessoa.instagram)}
             className="group relative isolate w-[72%] shrink-0 snap-center overflow-hidden rounded-xl border border-linha bg-branco transition-all duration-500 hover:-translate-y-1.5 hover:border-ouro/45 sm:w-auto"
           >
             <Image
@@ -484,22 +486,24 @@ export function Resultados() {
       </div>
 
       <div className="mt-10 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-xs text-grafite/55">{resultados.aviso}</p>
-        <BotaoComecar de="resultados" />
+        <p className="text-xs text-grafite/55">{t.resultados.aviso}</p>
+        <BotaoComecar de="resultados" texto={t.ui.comecarConsultoria} />
       </div>
     </Section>
   );
 }
 
 /** Método e o que está incluso, num bloco só. */
-export function ComoFunciona() {
+export function ComoFunciona({ idioma = "pt" }: { idioma?: Idioma } = {}) {
+  const t = obterConteudo(idioma);
+
   return (
     <Section id="metodo" tone="grafite" denso>
-      <Eyebrow tone="claro">Como funciona</Eyebrow>
-      <h2 className="t-title reveal mt-6 text-balance text-porcelana">{metodo.titulo}</h2>
+      <Eyebrow tone="claro">{t.ui.comoFuncionaEyebrow}</Eyebrow>
+      <h2 className="t-title reveal mt-6 text-balance text-porcelana">{t.metodo.titulo}</h2>
 
       <ol className="stagger mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-xl bg-porcelana/15 sm:mt-10 lg:grid-cols-4">
-        {metodo.etapas.map((e) => (
+        {t.metodo.etapas.map((e) => (
           <li key={e.n} className="bg-grafite p-4 sm:p-6">
             <span className="font-display text-4xl leading-none text-[#8a6438]">{e.n}</span>
             <h3 className="mt-3 font-display text-xl uppercase text-porcelana sm:mt-4 sm:text-2xl">{e.titulo}</h3>
@@ -510,9 +514,9 @@ export function ComoFunciona() {
 
       <div className="mt-8 flex flex-wrap items-center gap-2">
         <span className="mr-2 text-xs font-bold uppercase tracking-[0.16em] text-porcelana/60">
-          Incluso
+          {t.ui.inclusoLabel}
         </span>
-        {programa.itens.map((i) => (
+        {t.programa.itens.map((i) => (
           <span
             key={i.titulo}
             className="rounded-full border border-porcelana/20 px-3.5 py-1.5 text-sm text-porcelana"
@@ -523,21 +527,23 @@ export function ComoFunciona() {
       </div>
 
       <div className="mt-10">
-        <BotaoComecar de="como-funciona" />
+        <BotaoComecar de="como-funciona" texto={t.ui.comecarConsultoria} />
       </div>
     </Section>
   );
 }
 
 /** Quem está do outro lado — foto e duas linhas. */
-export function SobreCurto() {
+export function SobreCurto({ idioma = "pt" }: { idioma?: Idioma } = {}) {
+  const t = obterConteudo(idioma);
+
   return (
     <Section id="sobre" denso>
       <div className="grid items-center gap-10 sm:grid-cols-[minmax(0,14rem)_1fr] sm:gap-12">
         <div className="relative mx-auto w-48 overflow-hidden rounded-2xl border border-linha sm:mx-0 sm:w-full">
           <Image
             src="/sobre/carlos-seiti.png"
-            alt="Carlos Seiti em ambiente de treino"
+            alt={t.sobre.altFoto}
             width={1087}
             height={1448}
             sizes="14rem"
@@ -545,12 +551,12 @@ export function SobreCurto() {
           />
         </div>
         <div>
-          <Eyebrow>Quem vai te acompanhar</Eyebrow>
+          <Eyebrow>{t.ui.quemVaiAcompanhar}</Eyebrow>
           <p className="t-title mt-5">{marca.nome}</p>
           <p className="mt-4 max-w-xl text-pretty leading-relaxed text-grafite/75">
-            {sobre.curto}
+            {t.sobre.curto}
           </p>
-          <p className="mt-5 font-serif text-xl italic text-ouro">{sobre.citacao}</p>
+          <p className="mt-5 font-serif text-xl italic text-ouro">{t.sobre.citacao}</p>
         </div>
       </div>
     </Section>

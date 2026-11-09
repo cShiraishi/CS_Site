@@ -377,3 +377,32 @@ export function jsonLdCSFlix(total: number) {
     ],
   };
 }
+
+
+/** Receitas Fit — coleção de receitas no estilo CSFlix. */
+export function jsonLdReceitas(total: number) {
+  const url = `${marca.site}${rotas.receitas}`;
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CollectionPage",
+        "@id": `${url}#pagina`,
+        url,
+        name: "Receitas Fit — CSFlix",
+        inLanguage: "pt-BR",
+        author: { "@id": `${marca.site}/#pessoa` },
+        description: `Receitas fit práticas com macros calculados e base em Ciência de Alimentos. ${total} receitas disponíveis.`,
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${url}#breadcrumb`,
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Início", item: marca.site },
+          { "@type": "ListItem", position: 2, name: "Receitas", item: url },
+        ],
+      },
+    ],
+  };
+}
