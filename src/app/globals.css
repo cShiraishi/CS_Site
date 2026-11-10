@@ -68,12 +68,36 @@ html[data-modo="ela"] {
   --color-destaque-profundo: #f0bfc2;
 }
 
-/* Opção ativa do seletor Ele | Ela, lida direto do atributo do <html>. */
-html:not([data-modo="ela"]) .modo-opcao[data-valor="ele"],
+/* Seletor Ele | Ela. A opção ativa vem do atributo do <html> (sem piscar
+   na hidratação) e é preenchida, não só contornada: é o controle de
+   "tema" do site e precisa ser visto. "Ela" fica sempre rosé, mesmo
+   inativa, para anunciar que existe outro modo. */
+.modo-opcao[data-valor="ela"] {
+  color: #e2a6aa;
+}
+html:not([data-modo="ela"]) .modo-opcao[data-valor="ele"] {
+  background: #c7a06a;
+  color: #0b0a09;
+  box-shadow: 0 4px 14px rgb(199 160 106 / 0.35);
+}
 html[data-modo="ela"] .modo-opcao[data-valor="ela"] {
-  background: color-mix(in srgb, var(--color-destaque) 20%, transparent);
-  color: var(--color-destaque);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-destaque) 60%, transparent);
+  background: #e2a6aa;
+  color: #0b0a09;
+  box-shadow: 0 4px 16px rgb(226 166 170 / 0.45);
+}
+
+/* Quem nunca escolheu um modo vê o "Ela" chamando, como o dock no
+   celular. Some na primeira escolha (gravarModo tira o atributo). */
+@keyframes modo-chama {
+  0% { outline-offset: 0; outline-color: rgb(226 166 170 / 0.9); }
+  100% { outline-offset: 7px; outline-color: transparent; }
+}
+html[data-modo-novo] .modo-opcao[data-valor="ela"] {
+  outline: 2px solid transparent;
+  animation: modo-chama 1.8s ease-out 0.8s infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-modo-novo] .modo-opcao[data-valor="ela"] { animation: none; }
 }
 
 html {

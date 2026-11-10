@@ -18,6 +18,7 @@ export type { Modo } from "./modo";
  */
 export function gravarModo(modo: Modo) {
   document.documentElement.setAttribute("data-modo", modo);
+  document.documentElement.removeAttribute("data-modo-novo");
   gravarArmazenado(CHAVE_MODO, modo);
 }
 

@@ -41,9 +41,9 @@ export function SeletorModo({
     <div
       role="radiogroup"
       aria-label={t.ui.escolherModo}
-      className={`flex items-center rounded-full border p-1 font-medium ${
-        compacto ? "h-8 text-[11px]" : "h-10 text-xs"
-      } ${escuro ? "border-porcelana/25" : "border-white/15"} ${className}`}
+      className={`flex items-center gap-0.5 rounded-full border bg-black/40 p-1 font-semibold backdrop-blur-md ${
+        compacto ? "h-8 text-[11px]" : "h-11 text-sm"
+      } ${escuro ? "border-porcelana/25" : "border-white/20"} ${className}`}
     >
       {opcoes.map(({ valor, rotulo }) => (
         <button
@@ -58,10 +58,31 @@ export function SeletorModo({
             // nelas só faz sentido saindo para a home.
             if (valor === "ele" && caminhoForcaEla(caminho)) router.push(t.rotaHome);
           }}
-          className={`modo-opcao h-full rounded-full transition-colors duration-300 ${
-            compacto ? "px-2.5" : "px-3"
-          } ${escuro ? "text-porcelana/60 hover:text-porcelana" : "text-grafite/60 hover:text-grafite"}`}
+          className={`modo-opcao flex h-full items-center gap-1.5 rounded-full transition-[background-color,color,box-shadow] duration-300 ${
+            compacto ? "px-2.5" : "px-4"
+          } ${escuro ? "text-porcelana/65 hover:text-porcelana" : "text-grafite/65 hover:text-grafite"}`}
         >
+          <svg
+            aria-hidden
+            viewBox="0 0 24 24"
+            className={compacto ? "size-3" : "size-3.5"}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2.4}
+            strokeLinecap="round"
+          >
+            {valor === "ele" ? (
+              <>
+                <circle cx="10" cy="14" r="6" />
+                <path d="M14.5 9.5 20 4M15 4h5v5" />
+              </>
+            ) : (
+              <>
+                <circle cx="12" cy="9" r="6" />
+                <path d="M12 15v7M9 19h6" />
+              </>
+            )}
+          </svg>
           {rotulo}
         </button>
       ))}
