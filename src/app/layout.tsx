@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Anton, EB_Garamond, Inter } from "next/font/google";
 import { Analytics } from "@/components/Analytics";
 import { marca } from "@/lib/content";
+import { SCRIPT_MODO } from "@/lib/modo";
 import "./globals.css";
 
 /* 06 / TIPOGRAFIA — Primária: EB Garamond. Secundária: Inter. */
@@ -110,7 +111,15 @@ export default function RootLayout({
   return (
     // As variáveis das fontes precisam existir em :root — é lá que
     // --font-display e --font-sans as consomem (globals.css).
-    <html lang="pt-BR" className={`${anton.variable} ${garamond.variable} ${inter.variable}`}>
+    <html
+      lang="pt-BR"
+      className={`${anton.variable} ${garamond.variable} ${inter.variable}`}
+      // O script do <head> pode pôr data-modo="ela" antes do React hidratar.
+      suppressHydrationWarning
+    >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: SCRIPT_MODO }} />
+      </head>
       <body>
         {children}
         <Analytics />

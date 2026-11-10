@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Assinatura } from "./Logo";
 import { Container, buttonClass, Arrow } from "./ui";
 import { LanguageSelector } from "./LanguageSelector";
+import { SeletorModo } from "./SeletorModo";
 import { Dock } from "./Dock";
 import { rotas } from "@/lib/content";
 import { obterConteudo, type Idioma } from "@/lib/i18n";
@@ -73,7 +74,14 @@ export function Header({
             {/* A navegação entre ferramentas mora no Dock, preso ao rodapé da
                 tela. No topo fica a marca, a chamada e o menu completo. */}
 
-            <div className="flex shrink-0 items-center gap-3">
+            <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+              {/* Ele | Ela: troca acentos e apps, como um seletor de tema.
+                  No celular não cabe ao lado do idioma; lá ele mora no
+                  painel de ferramentas do dock e no menu ☰. */}
+              <div className="hidden sm:block">
+                <SeletorModo escuro={escuro} idioma={idioma} />
+              </div>
+
               {/* Visível também no celular: escondido no menu ☰, quem vinha
                   de fora não achava a troca de idioma. */}
               <LanguageSelector escuro={escuro} idioma={idioma} />
@@ -132,6 +140,17 @@ export function Header({
         >
           <Container className="max-h-[80svh] overflow-y-auto py-2">
             <nav className="flex flex-col" aria-label="Menu">
+              <div
+                className={`flex items-center justify-between gap-3 border-b py-3 sm:hidden ${
+                  escuro ? "border-porcelana/12" : "border-linha"
+                }`}
+              >
+                <span className="text-xs font-bold uppercase tracking-[0.16em] text-destaque">
+                  {t.ui.escolherModo}
+                </span>
+                <SeletorModo escuro={escuro} idioma={idioma} />
+              </div>
+
               {/* Pasta Apps no menu ☰ */}
               <div
                 className={`border-b py-3 ${
@@ -147,10 +166,10 @@ export function Header({
                   }`}
                 >
                   <span className="flex items-center gap-3">
-                    <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-ouro" />
+                    <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-destaque" />
                     {t.ui.pastaApps}
                   </span>
-                  <span className="text-xs font-sans font-bold uppercase tracking-[0.16em] text-ouro">
+                  <span className="text-xs font-sans font-bold uppercase tracking-[0.16em] text-destaque">
                     {appsAberto ? t.ui.fecharApps : t.ui.abrirApps}
                   </span>
                 </button>
@@ -164,7 +183,7 @@ export function Header({
                           setAberto(false);
                           setAppsAberto(false);
                         }}
-                        className="rounded-xl border border-ouro/30 bg-ouro/10 px-3.5 py-2.5 text-sm font-medium text-ouro transition-colors hover:bg-ouro/20"
+                        className="rounded-xl border border-destaque/30 bg-destaque/10 px-3.5 py-2.5 text-sm font-medium text-destaque transition-colors hover:bg-destaque/20"
                       >
                         {app.label}
                       </Link>

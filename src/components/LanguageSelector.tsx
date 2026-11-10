@@ -66,8 +66,8 @@ export function LanguageSelector({
       <DropdownMenu.Trigger
         className={`group flex h-10 items-center gap-2 rounded-full border px-3 text-xs font-medium transition-colors ${
           escuro
-            ? "border-porcelana/25 text-porcelana hover:border-ouro"
-            : "border-linha text-grafite hover:border-ouro"
+            ? "border-porcelana/25 text-porcelana hover:border-destaque"
+            : "border-linha text-grafite hover:border-destaque"
         }`}
         aria-label={t.ui.escolherIdioma}
       >
@@ -120,7 +120,7 @@ export function LanguageSelector({
                 </span>
                 <span>{item.nome}</span>
                 {ativo ? (
-                  <span className="ml-auto rounded-full bg-ouro/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-ouro">
+                  <span className="ml-auto rounded-full bg-destaque/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-destaque">
                     {t.ui.idiomaAtual}
                   </span>
                 ) : (

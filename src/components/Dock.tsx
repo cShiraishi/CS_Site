@@ -6,6 +6,8 @@ import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } fro
 import { rotas } from "@/lib/content";
 import { obterConteudo, type Idioma } from "@/lib/i18n";
 import { useIdioma } from "@/lib/useIdioma";
+import { useModo } from "@/lib/useModo";
+import { SeletorModo } from "./SeletorModo";
 
 /**
  * Dock de navegação — porta do AppleDock do SmileRender para o site.
@@ -71,7 +73,7 @@ const inativo =
   "bg-white/[0.08] text-[#f2ede5] ring-1 ring-inset ring-white/15 hover:bg-white/[0.14]";
 /* Ferramentas é a porta dos Reels: dourado para se separar dos outros. */
 const dourado =
-  "bg-ouro/15 text-ouro ring-1 ring-inset ring-ouro/60 hover:bg-ouro/25";
+  "bg-destaque/15 text-destaque ring-1 ring-inset ring-destaque/60 hover:bg-destaque/25";
 /* Receitas Fit: Coral-Laranja gastronômico apelativo, distinto do ouro e do verde da consultoria. */
 const coralApelativo =
   "bg-gradient-to-br from-[#ff5e3a]/28 via-[#ff7a2f]/22 to-[#ff9f1c]/20 text-[#ff8c42] ring-1 ring-inset ring-[#ff6b35]/75 shadow-[0_0_20px_rgba(255,94,58,0.28)] hover:from-[#ff5e3a]/40 hover:to-[#ff9f1c]/30 hover:text-[#ffb074]";
@@ -95,12 +97,12 @@ function IconePastaApps() {
   return (
     <span
       aria-hidden
-      className="grid size-7 shrink-0 grid-cols-2 gap-0.5 rounded-lg border border-ouro/40 bg-ouro/15 p-1 text-ouro"
+      className="grid size-7 shrink-0 grid-cols-2 gap-0.5 rounded-lg border border-destaque/40 bg-destaque/15 p-1 text-destaque"
     >
-      <span className=" rounded-[2px] bg-ouro/80" />
-      <span className=" rounded-[2px] bg-ouro/55" />
-      <span className=" rounded-[2px] bg-ouro/55" />
-      <span className=" rounded-[2px] bg-ouro/80" />
+      <span className=" rounded-[2px] bg-destaque/80" />
+      <span className=" rounded-[2px] bg-destaque/55" />
+      <span className=" rounded-[2px] bg-destaque/55" />
+      <span className=" rounded-[2px] bg-destaque/80" />
     </span>
   );
 }
@@ -112,6 +114,41 @@ export function Dock({ idioma: idiomaForcado }: { idioma?: Idioma } = {}) {
   const [pastaAppsAberta, setPastaAppsAberta] = useState(false);
   const idioma = useIdioma(idiomaForcado);
   const t = obterConteudo(idioma);
+  const modo = useModo();
+
+  /* Modo Ela = tudo do Modo Ele + o canal feminino. Enquanto os apps
+     não existem, aparecem como "em breve" (sem link quebrado). */
+  const APPS_ELA: { label: string; icone: ReactNode }[] = [
+    {
+      label: t.ui.elaCiclo,
+      icone: (
+        <svg viewBox="0 0 24 24" {...s}>
+          <circle cx="12" cy="12" r="8" />
+          <path d="M12 4a8 8 0 0 1 0 16" fill="currentColor" opacity={0.25} />
+          <circle cx="12" cy="4" r="1.4" fill="currentColor" />
+        </svg>
+      ),
+    },
+    {
+      label: t.ui.elaTreinoCasa,
+      icone: (
+        <svg viewBox="0 0 24 24" {...s}>
+          <path d="M4 11 12 4l8 7" />
+          <path d="M6 10v10h12V10" />
+          <path d="M9 15h6M9 13.5v3M15 13.5v3" />
+        </svg>
+      ),
+    },
+    {
+      label: t.ui.elaGestacao,
+      icone: (
+        <svg viewBox="0 0 24 24" {...s}>
+          <circle cx="12" cy="4.5" r="2" />
+          <path d="M11 7.5c-1.5 1.5-2 4-1 6.5l-.5 7.5M12.5 8c2.5 1 4 3 3.5 5.5-.4 2-2.2 2.6-4 2l-.5 5.5" />
+        </svg>
+      ),
+    },
+  ];
 
   const APPS: Item[] = [
     {
@@ -342,9 +379,13 @@ export function Dock({ idioma: idiomaForcado }: { idioma?: Idioma } = {}) {
       >
         {!pastaAppsAberta ? (
           <>
-            <p className="px-2.5 pb-1.5 pt-1 text-[0.65rem] font-bold uppercase tracking-[0.18em] text-[#f2ede5]/50">
-              {t.ui.ferramentasGratuitas}
-            </p>
+            <div className="flex items-center justify-between gap-2 pb-1.5 pl-2.5 pt-0.5">
+              <p className="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-[#f2ede5]/50">
+                {t.ui.ferramentasGratuitas}
+              </p>
+              {/* Os apps mudam com o modo: a troca mora junto deles. */}
+              <SeletorModo compacto idioma={idioma} />
+            </div>
 
             {/* Card Apelativo RECEITAS FIT em destaque vibrante (Coral-Laranja) */}
             <Link
@@ -385,8 +426,8 @@ export function Dock({ idioma: idiomaForcado }: { idioma?: Idioma } = {}) {
               aria-expanded={pastaAppsAberta}
               className={`mb-1.5 flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-left ring-1 ring-inset transition-all duration-150 ${
                 appAtual
-                  ? "bg-ouro/20 text-ouro ring-ouro/60"
-                  : "bg-white/[0.05] text-[#f2ede5] ring-white/12 hover:bg-ouro/15 hover:text-ouro hover:ring-ouro/50"
+                  ? "bg-destaque/20 text-destaque ring-destaque/60"
+                  : "bg-white/[0.05] text-[#f2ede5] ring-white/12 hover:bg-destaque/15 hover:text-destaque hover:ring-destaque/50"
               }`}
             >
               <span className="flex items-center gap-3">
@@ -400,7 +441,7 @@ export function Dock({ idioma: idiomaForcado }: { idioma?: Idioma } = {}) {
                   </span>
                 </span>
               </span>
-              <span className="flex items-center gap-1.5 rounded-full bg-ouro/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-ouro">
+              <span className="flex items-center gap-1.5 rounded-full bg-destaque/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-destaque">
                 5 apps
                 <svg
                   viewBox="0 0 16 16"
@@ -433,7 +474,7 @@ export function Dock({ idioma: idiomaForcado }: { idioma?: Idioma } = {}) {
                             : "bg-[#f2ede5] text-[#0b0a09] ring-transparent"
                           : ehReset
                           ? "bg-[#00ff66]/15 text-[#00ff66] font-bold ring-[#00ff66]/65 shadow-[0_0_18px_rgba(0,255,102,0.2)] hover:bg-[#00ff66]/25"
-                          : "text-[#f2ede5]/85 ring-white/8 hover:bg-ouro/15 hover:text-ouro hover:ring-ouro/50"
+                          : "text-[#f2ede5]/85 ring-white/8 hover:bg-destaque/15 hover:text-destaque hover:ring-destaque/50"
                       }`}
                     >
                       {f.icone}
@@ -443,6 +484,28 @@ export function Dock({ idioma: idiomaForcado }: { idioma?: Idioma } = {}) {
                 );
               })}
             </ul>
+
+            {modo === "ela" && (
+              <div className="mt-2 border-t border-white/8 pt-2">
+                <p className="px-2.5 pb-1.5 text-[0.65rem] font-bold uppercase tracking-[0.18em] text-destaque">
+                  {t.ui.modoElaEmBreve}
+                </p>
+                <ul className="grid grid-cols-3 gap-1">
+                  {APPS_ELA.map((app) => (
+                    <li
+                      key={app.label}
+                      className="relative flex flex-col items-center justify-center gap-1.5 rounded-xl px-2 py-2.5 text-center text-xs font-medium text-[#f2ede5]/55 ring-1 ring-inset ring-destaque/25 [&>svg]:size-[18px] [&>svg]:shrink-0 [&>svg]:text-destaque/80"
+                    >
+                      {app.icone}
+                      <span className="leading-tight">{app.label}</span>
+                      <span className="absolute -top-1.5 right-1 rounded-full bg-destaque px-1.5 py-px text-[0.5rem] font-extrabold uppercase tracking-[0.06em] text-[#0b0a09]">
+                        {t.ui.emBreve}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </>
         ) : (
           <>
@@ -450,7 +513,7 @@ export function Dock({ idioma: idiomaForcado }: { idioma?: Idioma } = {}) {
               <button
                 type="button"
                 onClick={() => setPastaAppsAberta(false)}
-                className="inline-flex items-center gap-1.5 rounded-lg px-1.5 py-1 text-[0.68rem] font-bold uppercase tracking-[0.14em] text-ouro transition-colors hover:bg-white/10"
+                className="inline-flex items-center gap-1.5 rounded-lg px-1.5 py-1 text-[0.68rem] font-bold uppercase tracking-[0.14em] text-destaque transition-colors hover:bg-white/10"
               >
                 <svg
                   viewBox="0 0 16 16"
@@ -484,7 +547,7 @@ export function Dock({ idioma: idiomaForcado }: { idioma?: Idioma } = {}) {
                     className={`flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm ring-1 ring-inset transition-all duration-150 [&>svg]:size-[18px] [&>svg]:shrink-0 [&>svg]:transition-transform [&>svg]:duration-150 ${
                       ehAtual(app.href)
                         ? "bg-[#f2ede5] text-[#0b0a09] ring-transparent"
-                        : "text-[#f2ede5]/85 ring-transparent hover:translate-x-0.5 hover:bg-ouro/15 hover:text-ouro hover:ring-ouro/50 hover:[&>svg]:scale-115 focus-visible:bg-ouro/15 focus-visible:text-ouro focus-visible:ring-ouro/50"
+                        : "text-[#f2ede5]/85 ring-transparent hover:translate-x-0.5 hover:bg-destaque/15 hover:text-destaque hover:ring-destaque/50 hover:[&>svg]:scale-115 focus-visible:bg-destaque/15 focus-visible:text-destaque focus-visible:ring-destaque/50"
                     }`}
                   >
                     {app.icone}
@@ -566,7 +629,7 @@ export function Dock({ idioma: idiomaForcado }: { idioma?: Idioma } = {}) {
           {chamar && !aberto && (
             <span
               aria-hidden
-              className="pointer-events-none absolute -top-2.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-ouro px-1.5 py-0.5 text-[0.55rem] font-bold uppercase leading-none tracking-[0.06em] text-[#0b0a09] sm:hidden"
+              className="pointer-events-none absolute -top-2.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-destaque px-1.5 py-0.5 text-[0.55rem] font-bold uppercase leading-none tracking-[0.06em] text-[#0b0a09] sm:hidden"
             >
               {t.ui.novoBadge}
             </span>

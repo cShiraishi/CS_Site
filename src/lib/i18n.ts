@@ -38,6 +38,14 @@ export interface ConteudoTraduzido {
   ui: {
     escolherIdioma: string;
     idiomaAtual: string;
+    escolherModo: string;
+    modoEle: string;
+    modoEla: string;
+    modoElaEmBreve: string;
+    emBreve: string;
+    elaCiclo: string;
+    elaTreinoCasa: string;
+    elaGestacao: string;
     idiomaNativoNota: string;
     inicio: string;
     comecarConsultoria: string;
@@ -133,6 +141,14 @@ const pt: ConteudoTraduzido = {
   ui: {
     escolherIdioma: "Escolher idioma",
     idiomaAtual: "Atual",
+    escolherModo: "Modo do site",
+    modoEle: "Ele",
+    modoEla: "Ela",
+    modoElaEmBreve: "Modo Ela · chegando",
+    emBreve: "Em breve",
+    elaCiclo: "Ciclo & TPM",
+    elaTreinoCasa: "Treino em casa",
+    elaGestacao: "Gestação",
     idiomaNativoNota: "Páginas nativas em Português, Español e English.",
     inicio: "Início",
     comecarConsultoria: "Começar consultoria",
@@ -203,6 +219,14 @@ const es: ConteudoTraduzido = {
   ui: {
     escolherIdioma: "Elegir idioma",
     idiomaAtual: "Actual",
+    escolherModo: "Modo del sitio",
+    modoEle: "Él",
+    modoEla: "Ella",
+    modoElaEmBreve: "Modo Ella · muy pronto",
+    emBreve: "Pronto",
+    elaCiclo: "Ciclo y SPM",
+    elaTreinoCasa: "Entreno en casa",
+    elaGestacao: "Embarazo",
     idiomaNativoNota: "Páginas nativas en Português, Español e English.",
     inicio: "Inicio",
     comecarConsultoria: "Empezar asesoría",
@@ -398,6 +422,14 @@ const en: ConteudoTraduzido = {
   ui: {
     escolherIdioma: "Choose language",
     idiomaAtual: "Current",
+    escolherModo: "Site mode",
+    modoEle: "Him",
+    modoEla: "Her",
+    modoElaEmBreve: "Her Mode · coming soon",
+    emBreve: "Soon",
+    elaCiclo: "Cycle & PMS",
+    elaTreinoCasa: "Home workouts",
+    elaGestacao: "Pregnancy",
     idiomaNativoNota: "Native pages in Português, Español, and English.",
     inicio: "Home",
     comecarConsultoria: "Start coaching",

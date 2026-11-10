@@ -18,6 +18,13 @@
   --color-ouro-profundo: #dcb57c;
   --color-grafite: #f2ede5;
 
+  /* Destaque: o ouro dos detalhes (linhas, hover, item ativo, seleção).
+     No Modo Ele é o próprio ouro; no Modo Ela vira ouro rosé — a marca
+     fica a mesma e só os acentos mudam. Valores literais: o Tailwind v4
+     descarta variável de tema que aponta para outra variável. */
+  --color-destaque: #c7a06a;
+  --color-destaque-profundo: #dcb57c;
+
   /* Verde "Close Friends": cor exclusiva do caminho para a consultoria.
      Nenhum outro elemento do site usa verde — onde ele aparece, é ali
      que se começa. */
@@ -52,6 +59,21 @@
   --motion-fast: 180ms;
   --motion-standard: 320ms;
   --motion-editorial: 520ms;
+}
+
+/* Modo Ela — ouro rosé nos acentos. Aplicado por script inline no <head>
+   (layout.tsx) antes da primeira pintura, então não pisca dourado. */
+html[data-modo="ela"] {
+  --color-destaque: #e2a6aa;
+  --color-destaque-profundo: #f0bfc2;
+}
+
+/* Opção ativa do seletor Ele | Ela, lida direto do atributo do <html>. */
+html:not([data-modo="ela"]) .modo-opcao[data-valor="ele"],
+html[data-modo="ela"] .modo-opcao[data-valor="ela"] {
+  background: color-mix(in srgb, var(--color-destaque) 20%, transparent);
+  color: var(--color-destaque);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-destaque) 60%, transparent);
 }
 
 html {
@@ -122,7 +144,7 @@ body {
 }
 
 :where(a, button, input, select, textarea, summary):focus-visible {
-  outline: 2px solid var(--color-ouro-profundo);
+  outline: 2px solid var(--color-destaque-profundo);
   outline-offset: 3px;
 }
 
@@ -162,8 +184,8 @@ body {
 @utility rule-gold {
   background-image: linear-gradient(
     90deg,
-    var(--color-ouro) 0%,
-    color-mix(in srgb, var(--color-ouro) 22%, transparent) 100%
+    var(--color-destaque) 0%,
+    color-mix(in srgb, var(--color-destaque) 22%, transparent) 100%
   );
 }
 
@@ -392,12 +414,12 @@ body {
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--color-ouro) 30%, transparent);
+  background: color-mix(in srgb, var(--color-destaque) 30%, transparent);
   color: var(--color-grafite);
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-ouro-profundo);
+  outline: 2px solid var(--color-destaque-profundo);
   outline-offset: 3px;
 }
 
