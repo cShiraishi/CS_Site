@@ -55,7 +55,7 @@ export function LanguageSelector({
         /* Mesmo peso visual do seletor Ele | Ela ao lado: altura, fundo e
            texto. Globo em vez de depender da bandeira — no Windows o emoji
            de bandeira vira só as letras "BR". */
-        className={`group flex h-11 items-center gap-2 rounded-full border bg-black/40 px-4 text-sm font-semibold backdrop-blur-md transition-colors data-[state=open]:border-destaque data-[state=open]:text-destaque ${
+        className={`group flex h-11 items-center gap-1.5 rounded-full border bg-black/40 px-3 text-sm sm:gap-2 sm:px-4 font-semibold backdrop-blur-md transition-colors data-[state=open]:border-destaque data-[state=open]:text-destaque ${
           escuro
             ? "border-porcelana/30 text-porcelana hover:border-destaque hover:text-destaque"
             : "border-white/20 text-grafite hover:border-destaque hover:text-destaque"
@@ -78,7 +78,7 @@ export function LanguageSelector({
         <svg
           aria-hidden
           viewBox="0 0 10 6"
-          className="h-1.5 w-2.5 transition-transform group-data-[state=open]:rotate-180"
+          className="hidden h-1.5 w-2.5 transition-transform group-data-[state=open]:rotate-180 sm:block"
         >
           <path
             d="M1 1l4 4 4-4"

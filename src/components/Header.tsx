@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Assinatura } from "./Logo";
 import { Container, buttonClass, Arrow } from "./ui";
 import { LanguageSelector } from "./LanguageSelector";
@@ -35,8 +35,19 @@ export function Header({
   const idioma = useIdioma(idiomaForcado);
   const t = obterConteudo(idioma);
 
+  /* Linha do Ele | Ela no celular: aparece no topo e ao rolar para cima,
+     some ao rolar para baixo (não rouba tela de quem está lendo). */
+  const [linhaModo, setLinhaModo] = useState(true);
+  const ultimoY = useRef(0);
+
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 16);
+    const onScroll = () => {
+      const y = window.scrollY;
+      setScrolled(y > 16);
+      if (y < 16 || y < ultimoY.current - 4) setLinhaModo(true);
+      else if (y > ultimoY.current + 4) setLinhaModo(false);
+      ultimoY.current = y;
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -80,10 +91,10 @@ export function Header({
             {/* A navegação entre ferramentas mora no Dock, preso ao rodapé da
                 tela. No topo fica a marca, a chamada e o menu completo. */}
 
-            <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+            <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
               {/* Ele | Ela: troca acentos e apps, como um seletor de tema.
-                  No celular não cabe ao lado do idioma; lá ele mora no
-                  painel de ferramentas do dock e no menu ☰. */}
+                  No celular não cabe ao lado do idioma: ganha uma linha
+                  própria logo abaixo, de ponta a ponta. */}
               <div className="hidden sm:block">
                 <SeletorModo escuro={escuro} idioma={idioma} />
               </div>
@@ -128,6 +139,17 @@ export function Header({
               </button>
             </div>
           </div>
+
+          {/* Celular: Ele | Ela largo, à vista, como um seletor de tema. */}
+          <div
+            className={`overflow-hidden transition-[max-height,opacity] duration-300 sm:hidden ${
+              linhaModo || aberto ? "max-h-16 opacity-100" : "max-h-0 opacity-0"
+            }`}
+          >
+            <div className="pb-3">
+              <SeletorModo largo idioma={idioma} />
+            </div>
+          </div>
         </Container>
 
         {/* Progresso da leitura — scroll-timeline nativa, sem listener de scroll. */}
@@ -146,17 +168,6 @@ export function Header({
         >
           <Container className="max-h-[80svh] overflow-y-auto py-2">
             <nav className="flex flex-col" aria-label="Menu">
-              <div
-                className={`flex items-center justify-between gap-3 border-b py-3 sm:hidden ${
-                  escuro ? "border-porcelana/12" : "border-linha"
-                }`}
-              >
-                <span className="text-xs font-bold uppercase tracking-[0.16em] text-destaque">
-                  {t.ui.escolherModo}
-                </span>
-                <SeletorModo escuro={escuro} idioma={idioma} />
-              </div>
-
               {/* Pasta Apps no menu ☰ */}
               <div
                 className={`border-b py-3 ${
@@ -246,6 +257,9 @@ export function Header({
           </Container>
         </div>
       </header>
+      {/* No celular o cabeçalho fixo tem a linha extra do Ele | Ela; este
+          respiro empurra o começo da página para ela não cobrir nada. */}
+      <div aria-hidden className="h-14 sm:hidden" />
     </>
   );
 }

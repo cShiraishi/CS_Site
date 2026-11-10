@@ -18,11 +18,14 @@ import { gravarModo, useModo, type Modo } from "@/lib/useModo";
 export function SeletorModo({
   escuro = false,
   compacto = false,
+  largo = false,
   idioma: idiomaForcado,
   className = "",
 }: {
   escuro?: boolean;
   compacto?: boolean;
+  /** Ocupa a largura toda, opções divididas ao meio (topo do celular). */
+  largo?: boolean;
   idioma?: Idioma;
   className?: string;
 }) {
@@ -42,6 +45,8 @@ export function SeletorModo({
       role="radiogroup"
       aria-label={t.ui.escolherModo}
       className={`flex items-center gap-0.5 rounded-full border bg-black/40 p-1 font-semibold backdrop-blur-md ${
+        largo ? "w-full" : ""
+      } ${
         compacto ? "h-8 text-[11px]" : "h-11 text-sm"
       } ${escuro ? "border-porcelana/25" : "border-white/20"} ${className}`}
     >
@@ -58,7 +63,9 @@ export function SeletorModo({
             // nelas só faz sentido saindo para a home.
             if (valor === "ele" && caminhoForcaEla(caminho)) router.push(t.rotaHome);
           }}
-          className={`modo-opcao flex h-full items-center gap-1.5 rounded-full transition-[background-color,color,box-shadow] duration-300 ${
+          className={`modo-opcao flex h-full items-center justify-center gap-1.5 rounded-full transition-[background-color,color,box-shadow] duration-300 ${
+            largo ? "flex-1" : ""
+          } ${
             compacto ? "px-2.5" : "px-4"
           } ${escuro ? "text-porcelana/65 hover:text-porcelana" : "text-grafite/65 hover:text-grafite"}`}
         >
