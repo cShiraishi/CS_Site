@@ -44,7 +44,7 @@ export function SeletorModo({
     <div
       role="radiogroup"
       aria-label={t.ui.escolherModo}
-      className={`flex items-center gap-0.5 rounded-full border bg-black/40 p-1 font-semibold backdrop-blur-md ${
+      className={`seletor-brilho flex items-center gap-0.5 rounded-full border bg-black/40 p-1 font-semibold backdrop-blur-md ${
         largo ? "w-full" : ""
       } ${
         compacto ? "h-8 text-[11px]" : "h-11 text-sm"

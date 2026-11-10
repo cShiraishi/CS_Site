@@ -86,6 +86,46 @@ html[data-modo="ela"] .modo-opcao[data-valor="ela"] {
   box-shadow: 0 4px 16px rgb(226 166 170 / 0.45);
 }
 
+/* O seletor Ele | Ela brilha sempre, para ser achado: halo rosé que
+   respira em volta da pílula + um reflexo de luz que a atravessa. */
+@keyframes seletor-halo {
+  0%, 100% {
+    box-shadow: 0 0 0 1px rgb(226 166 170 / 0.3), 0 0 10px rgb(226 166 170 / 0.22);
+  }
+  50% {
+    box-shadow: 0 0 0 1px rgb(226 166 170 / 0.75), 0 0 28px rgb(226 166 170 / 0.55);
+  }
+}
+@keyframes seletor-reflexo {
+  0% { transform: translateX(-130%) skewX(-18deg); }
+  45%, 100% { transform: translateX(230%) skewX(-18deg); }
+}
+.seletor-brilho {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  animation: seletor-halo 2.4s ease-in-out infinite;
+}
+.seletor-brilho::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 45%;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(255 255 255 / 0.32),
+    transparent
+  );
+  animation: seletor-reflexo 3.6s ease-in-out 1s infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .seletor-brilho { animation: none; box-shadow: 0 0 0 1px rgb(226 166 170 / 0.6), 0 0 18px rgb(226 166 170 / 0.4); }
+  .seletor-brilho::after { animation: none; display: none; }
+}
+
 /* Quem nunca escolheu um modo vê o "Ela" chamando, como o dock no
    celular. Some na primeira escolha (gravarModo tira o atributo). */
 @keyframes modo-chama {
