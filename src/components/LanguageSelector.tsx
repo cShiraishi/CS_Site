@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { DropdownMenu } from "radix-ui";
+import { marca } from "@/lib/content";
 import { IDIOMAS_DISPONIVEIS, obterConteudo, type Idioma } from "@/lib/i18n";
 import { gravarPreferenciaIdioma, useIdioma } from "@/lib/useIdioma";
 
@@ -30,10 +31,34 @@ export function LanguageSelector({
       IDIOMAS_DISPONIVEIS.find((i) => i.codigo === codigo)?.rotaHome ?? "/";
     const hash = typeof window !== "undefined" ? window.location.hash : "";
 
-    // Se estiver na home (/, /es ou /en), navega para a página nativa correspondente
+    // Na home (/, /es ou /en) existe página nativa: navega para ela.
     if (pathname === "/" || pathname === "/es" || pathname === "/en") {
       router.push(`${destinoHome}${hash}`);
+      return;
     }
+
+    /*
+     * Nas outras páginas só o dock e o menu têm texto traduzido; o corpo
+     * está em português. Sem isto, escolher ES/EN parecia não fazer nada.
+     * A página abre então na tradução automática do Google — e, de dentro
+     * dela, escolher português volta ao endereço original.
+     */
+    const pagina = new URL(
+      `${pathname}${window.location.search}${hash}`,
+      marca.site,
+    ).toString();
+    const naTraducao = window.location.hostname.endsWith(".translate.goog");
+
+    if (codigo === "pt") {
+      if (naTraducao) window.location.assign(pagina);
+      return;
+    }
+
+    const traducao = new URL("https://translate.google.com/translate");
+    traducao.searchParams.set("sl", "pt");
+    traducao.searchParams.set("tl", codigo);
+    traducao.searchParams.set("u", pagina);
+    window.location.assign(traducao.toString());
   }
 
   return (

@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import { gravarArmazenado, lerJson, useArmazenado } from "@/lib/useArmazenado";
 import { marca, rotas } from "@/lib/content";
 import type { Protocolo } from "@/lib/protocolos";
 import { montar, type Perfil, type Programa as Plano } from "@/lib/programa";
@@ -198,6 +199,16 @@ type EstadoDiario = {
 
 const CHAVE_STORAGE = "cs_performance_reset21d_v1";
 
+/** No preview aberto (`?demo=1`) só a primeira semana abre; o resto é de quem comprou. */
+const DIAS_PREVIEW = 7;
+
+const DIARIO_INICIAL: EstadoDiario = {
+  diasConcluidos: [1, 2, 3, 4],
+  missoesPorDia: { 4: [true, false, false, false] },
+  pesoAtual: "",
+  cinturaAtual: "",
+};
+
 export function PlataformaReset21D({
   emailUsuario,
   perfilSalvo,
@@ -212,40 +223,34 @@ export function PlataformaReset21D({
   const [aba, setAba] = useState<Aba>("inicio");
   const [diaAtivo, setDiaAtivo] = useState<number>(4);
   const [modalAulaAberto, setModalAulaAberto] = useState(false);
-  const [diario, setDiario] = useState<EstadoDiario>({
-    diasConcluidos: [1, 2, 3, 4],
-    missoesPorDia: {
-      4: [true, false, false, false],
-    },
-    pesoAtual: "",
-    cinturaAtual: "",
-  });
-
-  useEffect(() => {
-    try {
-      const bruto = window.localStorage.getItem(CHAVE_STORAGE);
-      if (bruto) {
-        const lido = JSON.parse(bruto) as Partial<EstadoDiario>;
-        setDiario((atual) => ({
-          diasConcluidos: Array.isArray(lido.diasConcluidos)
-            ? lido.diasConcluidos
-            : atual.diasConcluidos,
-          missoesPorDia: lido.missoesPorDia ?? atual.missoesPorDia,
-          pesoAtual: lido.pesoAtual ?? atual.pesoAtual,
-          cinturaAtual: lido.cinturaAtual ?? atual.cinturaAtual,
-        }));
-      }
-    } catch {}
-  }, []);
+  const [avisoPreview, setAvisoPreview] = useState(false);
+  const diarioBruto = useArmazenado(CHAVE_STORAGE);
+  const diario: EstadoDiario = useMemo(() => {
+    const lido = lerJson<Partial<EstadoDiario>>(diarioBruto);
+    if (!lido) return DIARIO_INICIAL;
+    return {
+      diasConcluidos: Array.isArray(lido.diasConcluidos)
+        ? lido.diasConcluidos
+        : DIARIO_INICIAL.diasConcluidos,
+      missoesPorDia: lido.missoesPorDia ?? DIARIO_INICIAL.missoesPorDia,
+      pesoAtual: lido.pesoAtual ?? "",
+      cinturaAtual: lido.cinturaAtual ?? "",
+    };
+  }, [diarioBruto]);
 
   const salvarDiario = (atualizar: (atual: EstadoDiario) => EstadoDiario) => {
-    setDiario((atual) => {
-      const novo = atualizar(atual);
-      try {
-        window.localStorage.setItem(CHAVE_STORAGE, JSON.stringify(novo));
-      } catch {}
-      return novo;
-    });
+    gravarArmazenado(CHAVE_STORAGE, JSON.stringify(atualizar(diario)));
+  };
+
+  /** Devolve `false` quando o dia está fora do preview. */
+  const escolherDia = (d: number) => {
+    if (modoDemo && d > DIAS_PREVIEW) {
+      setAvisoPreview(true);
+      return false;
+    }
+    setAvisoPreview(false);
+    setDiaAtivo(d);
+    return true;
   };
 
   const perfil: Perfil = useMemo(
@@ -322,6 +327,12 @@ export function PlataformaReset21D({
           >
             Voltar para a Página de Vendas →
           </Link>
+          {avisoPreview && (
+            <p role="status" className="mt-2 font-bold text-[#7dff1a]">
+              O preview mostra só os {DIAS_PREVIEW} primeiros dias. Do dia {DIAS_PREVIEW + 1} ao 21 é
+              conteúdo de quem tem o Reset 21D.
+            </p>
+          )}
         </div>
       )}
 
@@ -728,7 +739,7 @@ export function PlataformaReset21D({
                               <button
                                 type="button"
                                 onClick={() => {
-                                  setDiaAtivo(d);
+                                  if (!escolherDia(d)) return;
                                   setModalAulaAberto(true);
                                 }}
                                 className="cursor-pointer rounded-lg bg-[#7dff1a] px-4 py-2 text-xs font-extrabold uppercase text-[#041208]"
@@ -940,7 +951,7 @@ export function PlataformaReset21D({
                             key={d}
                             type="button"
                             onClick={() => {
-                              setDiaAtivo(d);
+                              if (!escolherDia(d)) return;
                               setAba("inicio");
                             }}
                             className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border p-4 transition-all ${
@@ -1141,7 +1152,7 @@ export function PlataformaReset21D({
                           key={d}
                           type="button"
                           onClick={() => {
-                            setDiaAtivo(d);
+                            if (!escolherDia(d)) return;
                             setAba("inicio");
                           }}
                           aria-label={`Dia ${d}`}

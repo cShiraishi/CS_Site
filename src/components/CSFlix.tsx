@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { gravarArmazenado, lerArmazenado, lerJson, useArmazenado } from "@/lib/useArmazenado";
 import type { Trilha, Video } from "@/lib/csflix";
 
 const STORAGE_ASSISTIDOS = "csflix_episodios_assistidos_v1";
@@ -563,40 +564,26 @@ function PlayerMaratona({
 export function CSFlix({ trilhas, total }: { trilhas: Trilha[]; total: number }) {
   const [selecao, setSelecao] = useState<SelecaoAtiva | null>(null);
   const [temporadaFiltro, setTemporadaFiltro] = useState<string>("todas");
-  const [assistidos, setAssistidos] = useState<Record<string, boolean>>({});
-  const [ultimoAssistido, setUltimoAssistido] = useState<{
-    trilhaId: string;
-    indice: number;
-    titulo: string;
-  } | null>(null);
-
-  useEffect(() => {
-    try {
-      const salvo = localStorage.getItem(STORAGE_ASSISTIDOS);
-      if (salvo) setAssistidos(JSON.parse(salvo));
-      const ult = localStorage.getItem(STORAGE_ULTIMO);
-      if (ult) setUltimoAssistido(JSON.parse(ult));
-    } catch {}
-  }, []);
+  type Ultimo = { trilhaId: string; indice: number; titulo: string };
+  const assistidosBruto = useArmazenado(STORAGE_ASSISTIDOS);
+  const ultimoBruto = useArmazenado(STORAGE_ULTIMO);
+  const assistidos = useMemo(
+    () => lerJson<Record<string, boolean>>(assistidosBruto) ?? {},
+    [assistidosBruto],
+  );
+  const ultimoAssistido = useMemo(() => lerJson<Ultimo>(ultimoBruto), [ultimoBruto]);
 
   const abrirEpisodio = useCallback((trilha: Trilha, indice: number) => {
     const ep = trilha.videos[indice];
     if (!ep) return;
     setSelecao({ trilha, indice });
 
-    setAssistidos((prev) => {
-      const novo = { ...prev, [ep.id]: true };
-      try {
-        localStorage.setItem(STORAGE_ASSISTIDOS, JSON.stringify(novo));
-      } catch {}
-      return novo;
-    });
+    const antes =
+      lerJson<Record<string, boolean>>(lerArmazenado(STORAGE_ASSISTIDOS)) ?? {};
+    gravarArmazenado(STORAGE_ASSISTIDOS, JSON.stringify({ ...antes, [ep.id]: true }));
 
-    const registroUltimo = { trilhaId: trilha.id, indice, titulo: ep.titulo };
-    setUltimoAssistido(registroUltimo);
-    try {
-      localStorage.setItem(STORAGE_ULTIMO, JSON.stringify(registroUltimo));
-    } catch {}
+    const registroUltimo: Ultimo = { trilhaId: trilha.id, indice, titulo: ep.titulo };
+    gravarArmazenado(STORAGE_ULTIMO, JSON.stringify(registroUltimo));
   }, []);
 
   const trilhasVisiveis = useMemo(() => {

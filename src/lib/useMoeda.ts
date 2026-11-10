@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { TABELA_PRECOS, moedaPorPais, type Moeda } from "./produto";
 
 const STORAGE_KEY = "cs_moeda_preferida";
@@ -55,27 +55,35 @@ export function alterarMoedaPreferida(nova: Moeda) {
   if (typeof window === "undefined") return;
   try {
     window.localStorage.setItem(STORAGE_KEY, nova);
+    /* `?moeda=` e `?pais=` mandam na detecção; se ficassem na URL, o
+       botão de trocar moeda não faria nada para quem chegou por esse link. */
+    const url = new URL(window.location.href);
+    if (url.searchParams.has("moeda") || url.searchParams.has("pais")) {
+      url.searchParams.delete("moeda");
+      url.searchParams.delete("pais");
+      window.history.replaceState(window.history.state, "", url);
+    }
   } catch {}
   window.dispatchEvent(new CustomEvent(EVENTO_MOEDA, { detail: nova }));
 }
 
+function assinar(callback: () => void) {
+  window.addEventListener(EVENTO_MOEDA, callback);
+  window.addEventListener("storage", callback);
+  return () => {
+    window.removeEventListener(EVENTO_MOEDA, callback);
+    window.removeEventListener("storage", callback);
+  };
+}
+
 export function useMoeda(moedaServidor?: Moeda | null) {
-  const [moeda, setMoeda] = useState<Moeda>(moedaServidor ?? "BRL");
-
-  useEffect(() => {
-    setMoeda(detectarMoedaCliente(moedaServidor));
-
-    const atualizar = () => {
-      setMoeda(detectarMoedaCliente(moedaServidor));
-    };
-
-    window.addEventListener(EVENTO_MOEDA, atualizar);
-    window.addEventListener("storage", atualizar);
-    return () => {
-      window.removeEventListener(EVENTO_MOEDA, atualizar);
-      window.removeEventListener("storage", atualizar);
-    };
-  }, [moedaServidor]);
+  /* Store externo em vez de efeito + setState: o servidor e a hidratação
+     usam a moeda do IP; a preferência salva e o fuso entram logo depois. */
+  const moeda = useSyncExternalStore<Moeda>(
+    assinar,
+    () => detectarMoedaCliente(moedaServidor),
+    () => moedaServidor ?? "BRL",
+  );
 
   return {
     moeda,
