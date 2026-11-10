@@ -200,6 +200,24 @@ type EstadoDiario = {
 
 const CHAVE_STORAGE = "cs_performance_reset21d_v1";
 
+/**
+ * O menu tem 5 entradas; cada uma mostra um grupo de blocos empilhados.
+ * O valor é o primeiro bloco do grupo (o que aparece no topo), e é ele
+ * que o menu marca como ativo. Antes eram 9 abas soltas, e quem entrava
+ * não sabia por onde começar.
+ */
+const GRUPO: Record<Aba, Aba> = {
+  inicio: "inicio",
+  alimentar: "alimentar",
+  treinos: "alimentar",
+  receitas: "receitas",
+  calendario: "calendario",
+  diario: "calendario",
+  aulas: "aulas",
+  materiais: "aulas",
+  comunidade: "aulas",
+};
+
 /** No preview aberto (`?demo=1`) só a primeira semana abre; o resto é de quem comprou. */
 const DIAS_PREVIEW = 7;
 
@@ -298,19 +316,29 @@ export function PlataformaReset21D({
     });
   };
 
+  /** O bloco aparece se a aba ativa for do mesmo grupo. */
+  const mostra = (bloco: Aba) => GRUPO[aba] === GRUPO[bloco];
+
+  /** Troca de aba e leva a tela até o bloco pedido dentro do grupo. */
+  const ir = (destino: Aba) => {
+    setAba(destino);
+    window.setTimeout(() => {
+      const alvo =
+        document.getElementById(`aba-${destino}`) ??
+        document.getElementById("conteudo-plataforma");
+      alvo?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 60);
+  };
+
   const blocoAtual = plano?.blocos[diaAtivo <= 7 ? 0 : diaAtivo <= 14 ? 1 : 2] ?? plano?.blocos[0];
   const nomeExibicao = emailUsuario.split("@")[0] || "Participante";
 
   const MENU_LATERAL: { id: Aba; label: string; icone: string }[] = [
-    { id: "inicio", label: "Início", icone: "🏠" },
-    { id: "aulas", label: "Aulas & Missões", icone: "🎬" },
-    { id: "alimentar", label: "Plano Alimentar", icone: "🍽️" },
-    { id: "treinos", label: "Treinos", icone: "🏋️" },
+    { id: "inicio", label: "Hoje", icone: "🏠" },
+    { id: "alimentar", label: "Plano", icone: "🍽️" },
     { id: "receitas", label: "Receitas", icone: "👨‍🍳" },
-    { id: "calendario", label: "Calendário 21D", icone: "📅" },
-    { id: "diario", label: "Diário de Progresso", icone: "📊" },
-    { id: "materiais", label: "Materiais de Apoio", icone: "📚" },
-    { id: "comunidade", label: "Comunidade", icone: "👥" },
+    { id: "calendario", label: "Progresso", icone: "📊" },
+    { id: "aulas", label: "Aulas e materiais", icone: "📚" },
   ];
 
   return (
@@ -371,12 +399,12 @@ export function PlataformaReset21D({
             className="flex gap-1.5 overflow-x-auto px-4 pb-4 lg:flex-col lg:px-4 lg: pb-8 [scrollbar-width:none]"
           >
             {MENU_LATERAL.map((item) => {
-              const ativo = aba === item.id;
+              const ativo = GRUPO[aba] === item.id;
               return (
                 <button
                   key={item.id}
                   type="button"
-                  onClick={() => setAba(item.id)}
+                  onClick={() => ir(item.id)}
                   className={`flex shrink-0 cursor-pointer items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-semibold transition-all ${
                     ativo
                       ? "bg-linear-to-r from-[#80ff1a] to-[#39ff14] font-extrabold text-[#041208] shadow-[0_0_24px_rgba(125,255,26,0.4)]"
@@ -411,7 +439,7 @@ export function PlataformaReset21D({
             <div className="flex items-center gap-4">
               <button
                 type="button"
-                onClick={() => setAba("calendario")}
+                onClick={() => ir("calendario")}
                 className="relative flex size-9 cursor-pointer items-center justify-center rounded-full border border-white/15 bg-white/5 text-sm hover:border-[#7dff1a]"
                 aria-label="Notificações e metas do dia"
               >
@@ -428,9 +456,13 @@ export function PlataformaReset21D({
           </header>
 
           {/* Conteúdo Dinâmico + Coluna Lateral Direita */}
-          <div className="p-4 sm:p-6 lg:p-8">
+          <div id="conteudo-plataforma" className="scroll-mt-4 p-4 sm:p-6 lg:p-8">
             {/* Banner Hero Oficial DIA 0 vs DIA 21 */}
-            <div className="relative overflow-hidden rounded-2xl border border-[#7dff1a]/35 bg-[#050a07] shadow-[0_0_50px_rgba(57,255,20,0.15)]">
+            <div
+              className={`relative overflow-hidden rounded-2xl border border-[#7dff1a]/35 bg-[#050a07] shadow-[0_0_50px_rgba(57,255,20,0.15)] ${
+                aba === "inicio" ? "" : "hidden"
+              }`}
+            >
               <Image
                 src="/brand/banner-dia0-dia21.jpg"
                 alt="CS Performance — Reset Metabólico 21D: O teu plano prático para perder gordura em 21 dias (Dia 0 vs Dia 21)"
@@ -442,7 +474,7 @@ export function PlataformaReset21D({
               />
             </div>
 
-            <div className="mt-7 grid gap-7 xl:grid-cols-[1fr_21rem]">
+            <div className={`grid gap-7 xl:grid-cols-[1fr_21rem] ${aba === "inicio" ? "mt-7" : ""}`}>
               {/* ============================================================
                  COLUNA PRINCIPAL ESQUERDA
                  ============================================================ */}
@@ -585,7 +617,7 @@ export function PlataformaReset21D({
                           <div className="flex gap-2.5">
                             <button
                               type="button"
-                              onClick={() => setAba("alimentar")}
+                              onClick={() => ir("alimentar")}
                               className="cursor-pointer rounded-xl border border-[#7dff1a]/35 bg-[#131d17] p-3 text-center transition-all hover:border-[#7dff1a]"
                             >
                               <span className="block text-2xl">🥗</span>
@@ -595,7 +627,7 @@ export function PlataformaReset21D({
                             </button>
                             <button
                               type="button"
-                              onClick={() => setAba("treinos")}
+                              onClick={() => ir("treinos")}
                               className="cursor-pointer rounded-xl border border-[#7dff1a]/35 bg-[#131d17] p-3 text-center transition-all hover:border-[#7dff1a]"
                             >
                               <span className="block text-2xl">🏋️</span>
@@ -607,97 +639,14 @@ export function PlataformaReset21D({
                         </div>
                       </div>
                     </section>
-
-                    {/* Grid: Explora o Programa (8 Cards Visuais com Glow Verde Neon) */}
-                    <section>
-                      <h2 className="font-display text-2xl uppercase text-white">
-                        Explora o Programa
-                      </h2>
-
-                      <div className="mt-4 grid grid-cols-2 gap-3.5 sm:grid-cols-4">
-                        {[
-                          {
-                            titulo: "GUIA ALIMENTAR PRÁTICO",
-                            sub: "Macros & Refeições",
-                            icone: "📖",
-                            acao: () => setAba("alimentar"),
-                          },
-                          {
-                            titulo: "PLANO DE TREINOS R21",
-                            sub: "Casa & Academia",
-                            icone: "🏋️",
-                            acao: () => setAba("treinos"),
-                          },
-                          {
-                            titulo: "CALENDÁRIO DE EXECUÇÃO 21D",
-                            sub: "Checklist 21 Dias",
-                            icone: "📅",
-                            acao: () => setAba("calendario"),
-                          },
-                          {
-                            titulo: "20 RECEITAS PRÁTICAS",
-                            sub: "Proteicas & Rápidas",
-                            icone: "👨‍🍳",
-                            acao: () => setAba("receitas"),
-                          },
-                          {
-                            titulo: "RECEITAS COM MENOS DE 100 KCAL",
-                            sub: "Doces & Salgadas Fit",
-                            icone: "🌱",
-                            acao: () => setAba("receitas"),
-                          },
-                          {
-                            titulo: "DIÁRIO DE PROGRESSO",
-                            sub: "Peso & Cintura",
-                            icone: "📊",
-                            acao: () => setAba("diario"),
-                          },
-                          {
-                            titulo: "PRÓXIMOS 30 DIAS",
-                            sub: "Consultoria Individual",
-                            icone: "🔄",
-                            acao: () => setAba("comunidade"),
-                          },
-                          {
-                            titulo: "COMUNIDADE R21",
-                            sub: "Grupo & Suporte",
-                            icone: "💬",
-                            acao: () => setAba("comunidade"),
-                          },
-                        ].map((card) => (
-                          <button
-                            key={card.titulo}
-                            type="button"
-                            onClick={card.acao}
-                            className="group relative flex min-h-40 cursor-pointer flex-col items-center justify-end overflow-hidden rounded-2xl border border-[#7dff1a]/40 bg-linear-to-b from-[#152119] via-[#0d1510] to-[#09120b] p-4 text-center shadow-[0_10px_30px_rgba(0,0,0,0.45)] transition-all duration-300 hover:-translate-y-1 hover:border-[#7dff1a] hover:shadow-[0_0_30px_rgba(125,255,26,0.28)]"
-                          >
-                            <div
-                              aria-hidden
-                              className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-linear-to-t from-[#7dff1a]/20 to-transparent"
-                            />
-                            <span className="mb-2 flex size-12 items-center justify-center rounded-full border border-[#7dff1a]/45 bg-[#7dff1a]/15 text-2xl shadow-[0_0_18px_rgba(125,255,26,0.25)] transition-transform group-hover:scale-110">
-                              {card.icone}
-                            </span>
-                            <span className="relative font-display text-base leading-tight uppercase text-white">
-                              {card.titulo}
-                            </span>
-                            <span className="relative mt-1 text-[0.68rem] font-semibold text-[#7dff1a]">
-                              {card.sub}
-                            </span>
-                          </button>
-                        ))}
-                      </div>
-                    </section>
                   </>
                 )}
 
                 {/* ============================================================
                    ABA: AULAS & MISSÕES (21 DIAS)
                    ============================================================ */}
-                {(aba === "inicio" || aba === "diario") && <GamificacaoReset diario={diario} />}
-
-                {aba === "aulas" && (
-                  <section className="rounded-2xl border border-white/12 bg-[#111715] p-6">
+                {mostra("aulas") && (
+                  <section id="aba-aulas" className="rounded-2xl border border-white/12 bg-[#111715] p-6">
                     <h2 className="font-display text-2xl uppercase text-white">
                       Aulas & Missões Diárias (Dias 1 a 21)
                     </h2>
@@ -767,8 +716,8 @@ export function PlataformaReset21D({
                 {/* ============================================================
                    ABA: PLANO ALIMENTAR (3 BLOCOS DE 7 DIAS)
                    ============================================================ */}
-                {aba === "alimentar" && plano && (
-                  <section className="space-y-6">
+                {mostra("alimentar") && plano && (
+                  <section id="aba-alimentar" className="space-y-6">
                     <div className="rounded-2xl border border-white/12 bg-[#111715] p-6">
                       <span className="text-xs font-extrabold uppercase tracking-widest text-[#7dff1a]">
                         Nutrição Calculada · Com Science
@@ -855,8 +804,8 @@ export function PlataformaReset21D({
                 {/* ============================================================
                    ABA: TREINOS R21
                    ============================================================ */}
-                {aba === "treinos" && plano && (
-                  <section className="rounded-2xl border border-white/12 bg-[#111715] p-6">
+                {mostra("treinos") && plano && (
+                  <section id="aba-treinos" className="rounded-2xl border border-white/12 bg-[#111715] p-6">
                     <span className="text-xs font-extrabold uppercase tracking-widest text-[#7dff1a]">
                       Sinalização Mecânica · {plano.dias}× por semana
                     </span>
@@ -902,8 +851,8 @@ export function PlataformaReset21D({
                 {/* ============================================================
                    ABA: RECEITAS PRÁTICAS & < 100 KCAL
                    ============================================================ */}
-                {aba === "receitas" && (
-                  <section className="rounded-2xl border border-white/12 bg-[#111715] p-6">
+                {mostra("receitas") && (
+                  <section id="aba-receitas" className="rounded-2xl border border-white/12 bg-[#111715] p-6">
                     <span className="text-xs font-extrabold uppercase tracking-widest text-[#7dff1a]">
                       Saciedade & Controle de Doce
                     </span>
@@ -937,8 +886,8 @@ export function PlataformaReset21D({
                 {/* ============================================================
                    ABA: CALENDÁRIO 21D
                    ============================================================ */}
-                {aba === "calendario" && (
-                  <section className="rounded-2xl border border-white/12 bg-[#111715] p-6">
+                {mostra("calendario") && (
+                  <section id="aba-calendario" className="rounded-2xl border border-white/12 bg-[#111715] p-6">
                     <h2 className="font-display text-2xl uppercase text-white">
                       Calendário de Execução · 21 Dias
                     </h2>
@@ -955,7 +904,7 @@ export function PlataformaReset21D({
                             type="button"
                             onClick={() => {
                               if (!escolherDia(d)) return;
-                              setAba("inicio");
+                              ir("inicio");
                             }}
                             className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border p-4 transition-all ${
                               concluido
@@ -980,8 +929,8 @@ export function PlataformaReset21D({
                 {/* ============================================================
                    ABA: DIÁRIO DE PROGRESSO
                    ============================================================ */}
-                {aba === "diario" && (
-                  <section className="rounded-2xl border border-white/12 bg-[#111715] p-6">
+                {mostra("diario") && (
+                  <section id="aba-diario" className="rounded-2xl border border-white/12 bg-[#111715] p-6">
                     <h2 className="font-display text-2xl uppercase text-white">
                       Diário de Progresso (Aferições)
                     </h2>
@@ -1027,11 +976,13 @@ export function PlataformaReset21D({
                   </section>
                 )}
 
+                {mostra("diario") && <GamificacaoReset diario={diario} />}
+
                 {/* ============================================================
                    ABA: MATERIAIS DE APOIO (PDFS)
                    ============================================================ */}
-                {aba === "materiais" && (
-                  <section className="rounded-2xl border border-white/12 bg-[#111715] p-6">
+                {mostra("materiais") && (
+                  <section id="aba-materiais" className="rounded-2xl border border-white/12 bg-[#111715] p-6">
                     <h2 className="font-display text-2xl uppercase text-white">
                       Materiais de Apoio & Protocolos em PDF
                     </h2>
@@ -1079,8 +1030,8 @@ export function PlataformaReset21D({
                 {/* ============================================================
                    ABA: COMUNIDADE R21 & PRÓXIMOS 30 DIAS (UPSELL CONSULTORIA)
                    ============================================================ */}
-                {aba === "comunidade" && (
-                  <section className="space-y-6">
+                {mostra("comunidade") && (
+                  <section id="aba-comunidade" className="space-y-6">
                     <div className="rounded-2xl border-2 border-[#7dff1a]/60 bg-[#0d1610] p-6 sm:p-8">
                       <span className="rounded-full bg-[#7dff1a] px-3 py-1 text-xs font-extrabold uppercase text-[#041208]">
                         Próximo Nível · Acompanhamento 1 a 1
@@ -1117,7 +1068,8 @@ export function PlataformaReset21D({
               {/* ============================================================
                  COLUNA DIREITA (PROGRESSO, CALENDÁRIO 21D, PRÓXIMA AÇÃO, RESULTADOS)
                  ============================================================ */}
-              <aside className="space-y-5">
+              {/* Em Progresso o calendário e o percentual já estão no corpo. */}
+              <aside className={`space-y-5 ${GRUPO[aba] === "calendario" ? "hidden" : ""}`}>
                 {/* 1. O teu progresso */}
                 <div className="rounded-2xl border border-white/12 bg-[#111715] p-5">
                   <h2 className="font-display text-lg uppercase text-white">O teu progresso</h2>
@@ -1156,7 +1108,7 @@ export function PlataformaReset21D({
                           type="button"
                           onClick={() => {
                             if (!escolherDia(d)) return;
-                            setAba("inicio");
+                            ir("inicio");
                           }}
                           aria-label={`Dia ${d}`}
                           className={`flex size-9 cursor-pointer flex-col items-center justify-center rounded-full text-xs font-extrabold transition-all ${
@@ -1172,82 +1124,6 @@ export function PlataformaReset21D({
                       );
                     })}
                   </div>
-                </div>
-
-                {/* 3. Próxima Ação */}
-                <div className="rounded-2xl border border-white/12 bg-[#111715] p-5">
-                  <h2 className="font-display text-lg uppercase text-white">Próxima Ação</h2>
-                  <button
-                    type="button"
-                    onClick={() => setAba("treinos")}
-                    className="mt-3 flex w-full cursor-pointer items-center justify-between gap-3 rounded-xl border border-[#7dff1a]/55 bg-[#0b120e] p-3.5 text-left transition-all hover:border-[#7dff1a] hover:shadow-[0_0_20px_rgba(125,255,26,0.2)]"
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="flex size-9 items-center justify-center rounded-lg bg-[#7dff1a]/15 text-lg text-[#7dff1a]">
-                        🏋️
-                      </span>
-                      <div>
-                        <span className="block text-xs font-extrabold text-white">
-                          {aulaHoje.treinoDia}
-                        </span>
-                        <span className="block text-[0.68rem] text-white/65">
-                          Duração: 20–30 min
-                        </span>
-                      </div>
-                    </div>
-                    <span className="text-[#7dff1a]">›</span>
-                  </button>
-                </div>
-
-                {/* 4. Os teus resultados */}
-                <div className="rounded-2xl border border-white/12 bg-[#111715] p-5">
-                  <div className="flex items-center justify-between">
-                    <h2 className="font-display text-lg uppercase text-white">
-                      Os teus resultados
-                    </h2>
-                    <button
-                      type="button"
-                      onClick={() => setAba("diario")}
-                      className="cursor-pointer text-[0.68rem] font-bold uppercase text-[#7dff1a] hover:underline"
-                    >
-                      Editar
-                    </button>
-                  </div>
-
-                  <ul className="mt-3 divide-y divide-white/10 text-xs">
-                    <li className="flex items-center justify-between py-2.5">
-                      <span className="text-white/75">⚖️ Peso (opcional)</span>
-                      <button
-                        type="button"
-                        onClick={() => setAba("diario")}
-                        className="cursor-pointer font-bold text-white hover:text-[#7dff1a]"
-                      >
-                        {diario.pesoAtual ? `${diario.pesoAtual} kg` : `${perfil.peso} kg`} ›
-                      </button>
-                    </li>
-                    <li className="flex items-center justify-between py-2.5">
-                      <span className="text-white/75">📏 Cintura</span>
-                      <button
-                        type="button"
-                        onClick={() => setAba("diario")}
-                        className="cursor-pointer font-bold text-white hover:text-[#7dff1a]"
-                      >
-                        {diario.cinturaAtual ? `${diario.cinturaAtual} cm` : "-- cm"} ›
-                      </button>
-                    </li>
-                    <li className="flex items-center justify-between py-2.5">
-                      <span className="text-white/75">📊 Dias concluídos</span>
-                      <span className="font-bold text-[#7dff1a]">
-                        {diario.diasConcluidos.length} / 21
-                      </span>
-                    </li>
-                    <li className="flex items-center justify-between py-2.5">
-                      <span className="text-white/75">✅ Adesão alimentar</span>
-                      <span className="font-bold text-[#7dff1a]">
-                        {Math.min(100, Math.max(75, percentualConcluido + 60))}%
-                      </span>
-                    </li>
-                  </ul>
                 </div>
               </aside>
             </div>
