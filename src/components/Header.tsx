@@ -26,7 +26,12 @@ export function Header({
   const [scrolled, setScrolled] = useState(false);
   const [aberto, setAberto] = useState(false);
   const [appsAberto, setAppsAberto] = useState(false);
-  const escuro = tone === "escuro";
+  /* Desde o tema escuro (nov/2026), "porcelana" é o fundo quase preto e
+     "grafite" é a tinta clara. As variantes `escuro` abaixo eram do tema
+     claro: usadas hoje, pintavam nome, idioma e ☰ de preto sobre preto.
+     O tom agora só escolhe o vidro do fundo; texto e traços ficam claros. */
+  const vidroEscuro = tone === "escuro";
+  const escuro = false;
   const idioma = useIdioma(idiomaForcado);
   const t = obterConteudo(idioma);
 
@@ -44,7 +49,7 @@ export function Header({
     };
   }, [aberto]);
 
-  const fundo = escuro
+  const fundo = vidroEscuro
     ? "glass-dark border-b"
     : "glass-light border-b";
   const painel = escuro

@@ -52,16 +52,28 @@ export function LanguageSelector({
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger
-        className={`group flex h-10 items-center gap-2 rounded-full border px-3 text-xs font-medium transition-colors ${
+        /* Mesmo peso visual do seletor Ele | Ela ao lado: altura, fundo e
+           texto. Globo em vez de depender da bandeira — no Windows o emoji
+           de bandeira vira só as letras "BR". */
+        className={`group flex h-11 items-center gap-2 rounded-full border bg-black/40 px-4 text-sm font-semibold backdrop-blur-md transition-colors data-[state=open]:border-destaque data-[state=open]:text-destaque ${
           escuro
-            ? "border-porcelana/25 text-porcelana hover:border-destaque"
-            : "border-linha text-grafite hover:border-destaque"
+            ? "border-porcelana/30 text-porcelana hover:border-destaque hover:text-destaque"
+            : "border-white/20 text-grafite hover:border-destaque hover:text-destaque"
         }`}
         aria-label={t.ui.escolherIdioma}
       >
-        <span aria-hidden className="text-base leading-none">
-          {atualInfo.bandeira}
-        </span>
+        <svg
+          aria-hidden
+          viewBox="0 0 24 24"
+          className="size-4 text-destaque"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        >
+          <circle cx="12" cy="12" r="9" />
+          <path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3Z" />
+        </svg>
         <span>{atualInfo.sigla}</span>
         <svg
           aria-hidden
