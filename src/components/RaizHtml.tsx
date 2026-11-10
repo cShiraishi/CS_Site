@@ -155,6 +155,11 @@ export function RaizHtml({
     <html
       lang={LANG_HTML[idioma]}
       className={classesFontes}
+      // O globals.css usa scroll-behavior: smooth (âncoras da home). Com
+      // este atributo o Next desliga o smooth na troca de página e volta
+      // ao topo de verdade; sem ele, a página nova abria na altura da
+      // anterior ("desce tudo pra baixo").
+      data-scroll-behavior="smooth"
       // O script do <head> pode pôr data-modo="ela" antes do React hidratar.
       suppressHydrationWarning
     >

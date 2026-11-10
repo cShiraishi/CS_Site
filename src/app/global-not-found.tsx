@@ -20,7 +20,7 @@ const CSS = `html:not([lang="es"]) [data-so="es"],html:not([lang="en"]) [data-so
 
 export default function GlobalNotFound() {
   return (
-    <html lang="pt-BR" className={classesFontes} suppressHydrationWarning>
+    <html lang="pt-BR" className={classesFontes} data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: SCRIPT_IDIOMA }} />
         <script dangerouslySetInnerHTML={{ __html: SCRIPT_MODO }} />
