@@ -8,6 +8,16 @@
 
 export type Moeda = "BRL" | "EUR";
 
+/**
+ * O preço em euro só pode aparecer quando houver como cobrá-lo.
+ *
+ * O checkout é Mercado Pago Brasil e cobra sempre em reais. Mostrar "19 €"
+ * e cobrar R$ 47 seria anunciar um preço e praticar outro. Enquanto não
+ * existir um meio de pagamento em euro, todo mundo vê e paga em reais;
+ * ligar isto sem esse meio reabre o problema.
+ */
+export const EUR_ATIVO = false;
+
 export const TABELA_PRECOS: Record<
   Moeda,
   {
@@ -66,7 +76,7 @@ const PAISES_EUROPA = new Set([
  * da Vercel `x-vercel-ip-country` ou Cloudflare `cf-ipcountry`).
  */
 export function moedaPorPais(pais?: string | null): Moeda {
-  if (!pais) return "BRL";
+  if (!EUR_ATIVO || !pais) return "BRL";
   const iso = pais.trim().toUpperCase();
   if (iso === "BR") return "BRL";
   if (PAISES_EUROPA.has(iso)) return "EUR";

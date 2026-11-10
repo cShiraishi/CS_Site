@@ -1,7 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { TABELA_PRECOS, moedaPorPais, type Moeda } from "./produto";
+import { EUR_ATIVO, TABELA_PRECOS, moedaPorPais, type Moeda } from "./produto";
 
 const STORAGE_KEY = "cs_moeda_preferida";
 const EVENTO_MOEDA = "cs:moeda-mudou";
@@ -12,6 +12,7 @@ const EVENTO_MOEDA = "cs:moeda-mudou";
  * detecção de IP/VPN vinda do servidor (`moedaServidor`).
  */
 export function detectarMoedaCliente(moedaServidor?: Moeda | null): Moeda {
+  if (!EUR_ATIVO) return "BRL";
   if (typeof window === "undefined") return moedaServidor ?? "BRL";
 
   try {
@@ -82,7 +83,7 @@ export function useMoeda(moedaServidor?: Moeda | null) {
   const moeda = useSyncExternalStore<Moeda>(
     assinar,
     () => detectarMoedaCliente(moedaServidor),
-    () => moedaServidor ?? "BRL",
+    () => (EUR_ATIVO ? moedaServidor ?? "BRL" : "BRL"),
   );
 
   return {

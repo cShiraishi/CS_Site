@@ -1,10 +1,13 @@
 "use client";
 
-import type { Moeda } from "@/lib/produto";
+import { EUR_ATIVO, type Moeda } from "@/lib/produto";
 import { useMoeda } from "@/lib/useMoeda";
 
 export function SeletorMoeda({ moedaServidor }: { moedaServidor?: Moeda | null }) {
   const { moeda, alternarMoeda } = useMoeda(moedaServidor);
+
+  // Sem cobrança em euro, não há o que escolher.
+  if (!EUR_ATIVO) return null;
 
   return (
     <div

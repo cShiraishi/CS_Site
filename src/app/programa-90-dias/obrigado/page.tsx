@@ -8,7 +8,7 @@ import { PROGRAMA } from "@/lib/produto";
 import { criarSupabaseAdmin } from "@/lib/supabase/admin";
 
 export const metadata: Metadata = {
-  title: "Pagamento | Programa 90 Dias",
+  title: "Pagamento | Reset Metabólico 21 Dias",
   /* Página de passagem, e com o estado de uma compra: não entra em busca. */
   robots: { index: false, follow: false },
 };
@@ -80,11 +80,11 @@ export default async function Page({
                   </h1>
                   <p className="mt-7 leading-relaxed text-grafite sm:text-lg">
                     Seu programa está liberado. Para abrir, entre com o mesmo e-mail que você
-                    usou na compra — o acesso vai para a sua área de cliente, e fica lá.
+                    usou na compra — a plataforma do Reset 21D abre na hora, e o acesso fica na sua conta.
                   </p>
                   <div className="mt-9 flex flex-wrap gap-4">
                     <Link
-                      href="/entrar?retorno=/minha-conta"
+                      href={`/entrar?retorno=${rotas.programa}/area`}
                       className="inline-flex min-h-12 items-center rounded-full bg-grafite px-8 py-3.5 text-sm font-medium tracking-wide text-porcelana transition-colors hover:bg-ouro-profundo"
                     >
                       Entrar e abrir meu programa
@@ -114,7 +114,7 @@ export default async function Page({
                   </h1>
                   <p className="mt-7 leading-relaxed text-grafite sm:text-lg">
                     O Pix costuma confirmar em segundos; cartão e boleto podem levar mais. Assim
-                    que o pagamento for aprovado, o programa aparece na sua área de cliente —
+                    que o pagamento for aprovado, a plataforma do Reset 21D abre para você —
                     entre com o mesmo e-mail da compra.
                   </p>
                   <p className="mt-5 leading-relaxed text-grafite/80">
@@ -122,10 +122,10 @@ export default async function Page({
                   </p>
                   <div className="mt-9 flex flex-wrap gap-4">
                     <Link
-                      href="/entrar?retorno=/minha-conta"
+                      href={`/entrar?retorno=${rotas.programa}/area`}
                       className="inline-flex min-h-12 items-center rounded-full border border-linha px-8 py-3.5 text-sm font-medium tracking-wide text-grafite transition-colors hover:border-ouro hover:text-ouro-profundo"
                     >
-                      Ir para a minha conta
+                      Entrar na plataforma
                     </Link>
                   </div>
                 </>
