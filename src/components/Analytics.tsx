@@ -1,9 +1,11 @@
 import Script from "next/script";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
+import { SCRIPT_GTM } from "@/lib/consentimento";
 
 /**
- * Analytics sem cookies — não exige banner de consentimento e não coleta
- * dado pessoal.
+ * Vercel/Plausible/Umami medem sem cookies. O Google Tag Manager entra
+ * com Consent Mode v2: o que usa cookie só liga depois do "Aceitar" no
+ * BannerCookies.
  *
  * Vercel Web Analytics vai sempre (é o que mede Reel → página → clique
  * desde já; os `utm_*` da visita aparecem no painel do projeto). Plausible
@@ -21,6 +23,9 @@ export function Analytics() {
   return (
     <>
       <VercelAnalytics />
+      {/* Google Tag Manager. Carrega sempre, mas as tags com cookie só
+          ligam depois do "Aceitar" (Consent Mode v2, ver consentimento.ts). */}
+      <Script id="gtm" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html: SCRIPT_GTM }} />
       {plausible && (
         <Script
           defer

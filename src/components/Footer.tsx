@@ -6,6 +6,7 @@ import { Container, Arrow } from "./ui";
 import { marca, rotas } from "@/lib/content";
 import { obterConteudo, type Idioma } from "@/lib/i18n";
 import { useIdioma } from "@/lib/useIdioma";
+import { EVENTO_REABRIR } from "@/lib/consentimento";
 
 export function Footer({ idioma: idiomaForcado }: { idioma?: Idioma } = {}) {
   const ano = new Date().getFullYear();
@@ -115,8 +116,18 @@ export function Footer({ idioma: idiomaForcado }: { idioma?: Idioma } = {}) {
 
         <div className="flex flex-col gap-6 text-xs text-grafite/70 lg:flex-row lg:items-start lg:justify-between">
           <p className="max-w-2xl leading-relaxed">{t.rodape.disclaimer}</p>
-          <p className="shrink-0">
-            © {ano} {marca.nome}
+          <p className="flex shrink-0 items-center gap-4">
+            {/* RGPD: mudar de ideia tem de ser tão fácil quanto escolher. */}
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new Event(EVENTO_REABRIR))}
+              className="underline-offset-4 transition-colors hover:text-ouro hover:underline"
+            >
+              Cookies
+            </button>
+            <span>
+              © {ano} {marca.nome}
+            </span>
           </p>
         </div>
       </Container>

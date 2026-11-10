@@ -3,6 +3,8 @@ import { Anton, EB_Garamond, Inter } from "next/font/google";
 import { Analytics } from "@/components/Analytics";
 import { marca } from "@/lib/content";
 import { SCRIPT_MODO } from "@/lib/modo";
+import { GTM_ID, SCRIPT_CONSENTIMENTO } from "@/lib/consentimento";
+import { BannerCookies } from "@/components/BannerCookies";
 import { LANG_HTML, LOCALE_OG, rotaIdioma, type Idioma } from "@/lib/rotas-idioma";
 import "@/app/globals.css";
 
@@ -168,10 +170,21 @@ export function RaizHtml({
       {/* eslint-disable-next-line @next/next/no-head-element */}
       <head>
         <script dangerouslySetInnerHTML={{ __html: SCRIPT_MODO }} />
+        {/* Consent Mode v2: padrão negado, antes de o GTM carregar. */}
+        <script dangerouslySetInnerHTML={{ __html: SCRIPT_CONSENTIMENTO }} />
       </head>
       <body>
+        <noscript>
+          <iframe
+            src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
+            height="0"
+            width="0"
+            style={{ display: "none", visibility: "hidden" }}
+          />
+        </noscript>
         {children}
         <Analytics />
+        <BannerCookies idioma={idioma} />
       </body>
     </html>
   );
