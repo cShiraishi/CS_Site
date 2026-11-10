@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CanalEla } from "./CanalEla";
+import { GestacaoSemanas } from "./GestacaoSemanas";
+import { UI_GESTACAO } from "@/lib/gestacao";
 import { Footer } from "./Footer";
 import { Header } from "./Header";
 import { Arrow, Container, Eyebrow, buttonClass } from "./ui";
@@ -177,7 +179,16 @@ export function PaginaAppEla({ idioma, slug }: { idioma: Idioma; slug: string })
             {app.aviso[idioma]}
           </p>
 
-          <div className="mt-16">
+          {/* Gestação: a linha do tempo semana a semana vem primeiro; as
+              trilhas de alimentação, movimento e pós-parto vêm depois. */}
+          {app.slug === "gestacao" && (
+            <div className="mt-16">
+              <GestacaoSemanas idioma={idioma} fechar={ui.fechar} />
+              <h2 className="t-title mt-20 text-grafite">{UI_GESTACAO[idioma].alemDasSemanas}</h2>
+            </div>
+          )}
+
+          <div className={app.slug === "gestacao" ? "mt-10" : "mt-16"}>
             <CanalEla
               trilhas={app.trilhas[idioma]}
               ui={{ assistir: ui.assistir, fechar: ui.fechar, videos: ui.videos }}

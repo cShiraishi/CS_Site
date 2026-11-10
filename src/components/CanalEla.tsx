@@ -9,7 +9,7 @@ import type { TrilhaEla } from "@/lib/canal-ela";
  * player do YouTube (youtube-nocookie) num <dialog>, com a trilha ao lado
  * para seguir em sequência. Só carrega o iframe quando alguém dá play.
  */
-type Selecao = { trilha: TrilhaEla; indice: number };
+export type Selecao = { trilha: TrilhaEla; indice: number };
 
 export function CanalEla({
   trilhas,
@@ -93,7 +93,7 @@ export function CanalEla({
   );
 }
 
-function Player({
+export function Player({
   selecao,
   ui,
   aoTrocar,

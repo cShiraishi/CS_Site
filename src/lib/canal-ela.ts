@@ -1,4 +1,5 @@
 import type { Idioma } from "./i18n";
+import { totalVideosLinhaDoTempo } from "./gestacao";
 
 /**
  * Canal Ela — os apps do Modo Ela como trilhas de vídeos curados de canais
@@ -385,9 +386,9 @@ export const APPS_ELA: AppEla[] = [
       en: "Nine months of evidence,\nnot guesswork.",
     },
     descricao: {
-      pt: "Os primeiros meses, o que comer, como se movimentar com segurança e a recuperação do pós-parto — explicados por médicos, nutricionistas e fisioterapeutas.",
-      es: "Los primeros meses, qué comer, cómo moverte con seguridad y la recuperación posparto — explicados por médicos, nutricionistas y fisioterapeutas.",
-      en: "The first months, what to eat, how to move safely and postpartum recovery — explained by doctors, dietitians and physical therapists.",
+      pt: "Um lugar para aprender cada estágio da gestação: as 40 semanas em nove fases, com o que acontece com o bebê e com o seu corpo, os cuidados e exames de cada momento e um vídeo para cada semana.",
+      es: "Un lugar para aprender cada etapa del embarazo: las 40 semanas en nueve fases, con lo que pasa con el bebé y con tu cuerpo, los cuidados y pruebas de cada momento y un vídeo para cada semana.",
+      en: "A place to learn every stage of pregnancy: all 40 weeks in nine stages, with what's happening to your baby and your body, the care and tests for each moment, and a video for every week.",
     },
     aviso: {
       pt: "Nada aqui substitui o pré-natal. Sangramento, dor forte, perda de líquido, inchaço súbito ou bebê mexendo menos: procure a maternidade.",
@@ -408,16 +409,6 @@ export const APPS_ELA: AppEla[] = [
     },
     trilhas: {
       pt: [
-        {
-          id: "primeiros-meses",
-          nome: "Os primeiros meses",
-          descricao: "Sintomas, cuidados e o desenvolvimento do bebê no começo.",
-          videos: [
-            v("US4QH-781Kc", "Tudo sobre o primeiro mês de gravidez", "Dra Jannuzzi", "7:54"),
-            v("TnCjzfocdf8", "Primeiro mês, semana a semana", "Médico da Mulher", "12:25"),
-            v("XXYRDn9D9fI", "Cuidados nos três primeiros meses", "Médico da Mulher", "8:55"),
-          ],
-        },
         {
           id: "alimentacao",
           nome: "Alimentação na gravidez",
@@ -451,16 +442,6 @@ export const APPS_ELA: AppEla[] = [
       ],
       es: [
         {
-          id: "primeros-meses",
-          nome: "Los primeros meses",
-          descricao: "Síntomas, prueba de embarazo y primeras dudas.",
-          videos: [
-            v("U7R10e_A5Ac", "10 primeros síntomas de embarazo", "Dra. Pau Zúñiga", "8:59"),
-            v("8VJNWHjnG2c", "¿Cuándo hacerte una prueba de embarazo?", "Dra. Pau Zúñiga", "5:13"),
-            v("sDMdDndasos", "¿Sangrado de implantación o menstruación?", "Dra. Pau Zúñiga", "5:01"),
-          ],
-        },
-        {
           id: "alimentacion",
           nome: "Alimentación en el embarazo",
           descricao: "Qué comer en cada trimestre, explicado por nutricionistas.",
@@ -490,16 +471,6 @@ export const APPS_ELA: AppEla[] = [
         },
       ],
       en: [
-        {
-          id: "first-months",
-          nome: "The first months",
-          descricao: "Symptoms, care and your baby's early development.",
-          videos: [
-            v("cfn04QUO4B8", "What to expect in your first trimester", "Today's Parent", "19:08"),
-            v("Jr4nt6XM3gA", "Ob-Gyn answers first-trimester questions", "UT Dell Medicine", "5:22"),
-            v("x2sFwxX1Bzk", "How to survive the first trimester", "Natalie Crawford, MD", "12:06"),
-          ],
-        },
         {
           id: "nutrition",
           nome: "Pregnancy nutrition",
@@ -539,7 +510,9 @@ export function obterAppEla(slug: string) {
 }
 
 export function totalVideosEla(app: AppEla, idioma: Idioma) {
-  return app.trilhas[idioma].reduce((n, t) => n + t.videos.length, 0);
+  const trilhas = app.trilhas[idioma].reduce((n, t) => n + t.videos.length, 0);
+  // Gestação soma a linha do tempo: vídeos de cada fase + um por semana.
+  return app.slug === "gestacao" ? trilhas + totalVideosLinhaDoTempo(idioma) : trilhas;
 }
 
 export { rotaEla } from "./modo";
