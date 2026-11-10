@@ -515,7 +515,7 @@ function PlayerMaratona({
                 </p>
                 <a
                   href={rotaIdioma(idioma, "/consultoria?de=csflix_maratona")}
-                  className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#1fc15b] px-4 py-2.5 text-xs font-extrabold uppercase tracking-wider text-[#06140b] transition hover:opacity-90"
+                  className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-verde px-4 py-2.5 text-xs font-extrabold uppercase tracking-wider text-[#06140b] transition hover:opacity-90"
                 >
                   {ui.comecarMinhaConsultoria}
                 </a>

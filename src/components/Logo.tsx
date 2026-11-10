@@ -35,7 +35,7 @@ export function Logo({
         sizes={`${size}px`}
         priority={priority}
         loading={priority ? undefined : "lazy"}
-        className="h-full w-full object-cover"
+        className="logo-marca h-full w-full object-cover transition-[filter] duration-500"
       />
     </span>
   );

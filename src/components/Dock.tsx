@@ -671,7 +671,7 @@ export function Dock({ idioma: idiomaForcado }: { idioma?: Idioma } = {}) {
         <li className="ml-0.5 border-l border-white/10 pl-2 sm:ml-1 sm:pl-2.5">
           <a
             href={`${rotas.consultoria}?de=dock`}
-            className="flex h-[54px] items-center gap-2 whitespace-nowrap rounded-[0.95rem] bg-verde px-4 font-bold uppercase text-[#06140b] shadow-[0_8px_22px_rgba(31,193,91,0.4)] transition-colors hover:bg-verde-claro sm:h-[46px] sm:px-5 [&>svg]:size-4"
+            className="flex h-[54px] items-center gap-2 whitespace-nowrap rounded-[0.95rem] bg-verde px-4 font-bold uppercase text-[#06140b] shadow-[0_8px_22px_color-mix(in_srgb,var(--color-verde)_40%,transparent)] transition-colors hover:bg-verde-claro sm:h-[46px] sm:px-5 [&>svg]:size-4"
           >
             <span className="flex flex-col leading-[1.05] sm:flex-row sm:gap-[0.4em]">
               <span className="text-[0.66rem] tracking-[0.1em] sm:text-[0.78rem] sm:tracking-[0.12em]">

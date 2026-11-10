@@ -811,7 +811,7 @@ export function CalculadoraGordura({
                   ação da página, e no telefone divide espaço com nada. */}
                 <a
                   href={href("final")}
-                  className="group flex min-h-14 w-full items-center justify-center gap-3 rounded-md bg-verde px-8 text-[0.85rem] font-bold uppercase tracking-[0.14em] text-[#06140b] shadow-[0_10px_30px_rgba(31,193,91,0.3)] transition-colors duration-300 hover:bg-verde-claro sm:w-auto sm:self-start"
+                  className="group flex min-h-14 w-full items-center justify-center gap-3 rounded-md bg-verde px-8 text-[0.85rem] font-bold uppercase tracking-[0.14em] text-[#06140b] shadow-[0_10px_30px_color-mix(in_srgb,var(--color-verde)_30%,transparent)] transition-colors duration-300 hover:bg-verde-claro sm:w-auto sm:self-start"
                 >
                   {t.plano.fecho.cta}
                   <Arrow />

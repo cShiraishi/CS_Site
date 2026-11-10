@@ -108,7 +108,7 @@ export function Hero({ idioma = "pt" }: { idioma?: Idioma } = {}) {
                 height={1024}
                 priority
                 sizes="(max-width: 1024px) 90vw, 480px"
-                className="h-full w-full object-cover"
+                className="logo-marca h-full w-full object-cover transition-[filter] duration-500"
               />
             </div>
             <p className="mt-6 text-center font-display text-lg italic text-grafite">

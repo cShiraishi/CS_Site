@@ -66,6 +66,37 @@
 html[data-modo="ela"] {
   --color-destaque: #e2a6aa;
   --color-destaque-profundo: #f0bfc2;
+
+  /* O site inteiro muda de clima, de forma discreta: todo o ouro da marca
+     vira ouro rosé (metálico, pouco saturado — não rosa chiclete) e o
+     fundo ganha só um sopro de tom ameixa. Como todas as classes usam os
+     tokens (text-ouro, bg-ouro/15, rule-gold…), nada precisa mudar nos
+     componentes. O verde da consultoria fica: é a regra da marca. */
+  --color-ouro: #d4a39e;
+  --color-ouro-profundo: #e6b9b3;
+  --color-linha-ouro: color-mix(in srgb, #d4a39e 45%, transparent);
+  --color-porcelana: #0c0a0b;
+  --color-branco: #171314;
+  --color-papel: #1b1617;
+  --color-papel-claro: #211b1c;
+  --color-papel-escuro: #131011;
+
+  /* O botão da consultoria é o único verde do site — no Modo Ela ele
+     ganha a versão feminina: framboesa rosé, viva e apelativa, para
+     continuar sendo o elemento que mais chama o clique. */
+  --color-verde: #e0577f;
+  --color-verde-claro: #ee7c9c;
+}
+
+/* A troca de modo se percebe: fundo e acentos mudam com uma transição
+   curta em vez de piscar. */
+body {
+  transition: background-color 0.5s var(--ease-editorial), color 0.5s var(--ease-editorial);
+}
+
+/* Símbolo do logo (seta dourada) puxado para o ouro rosé, de leve. */
+html[data-modo="ela"] .logo-marca {
+  filter: hue-rotate(-28deg) saturate(0.9);
 }
 
 /* Seletor Ele | Ela. A opção ativa vem do atributo do <html> (sem piscar

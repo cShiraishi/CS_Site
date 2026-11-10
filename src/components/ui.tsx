@@ -168,7 +168,7 @@ export function buttonClass(
     /* Só para "começar a consultoria". O verde é reservado: a pessoa
        aprende numa tela que verde = começar, e reconhece nas outras. */
     consultoria:
-      "bg-verde text-[#06140b] hover:bg-verde-claro hover:-translate-y-0.5 shadow-[0_10px_30px_rgba(31,193,91,0.32)]",
+      "bg-verde text-[#06140b] hover:bg-verde-claro hover:-translate-y-0.5 shadow-[0_10px_30px_color-mix(in_srgb,var(--color-verde)_32%,transparent)]",
   } as const;
   return `${base} ${variants[variant]}`;
 }
