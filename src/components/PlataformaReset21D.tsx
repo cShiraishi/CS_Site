@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { gravarArmazenado, lerJson, useArmazenado } from "@/lib/useArmazenado";
 import { marca, rotas } from "@/lib/content";
+import { GamificacaoReset } from "./GamificacaoReset";
 import type { Protocolo } from "@/lib/protocolos";
 import { montar, type Perfil, type Programa as Plano } from "@/lib/programa";
 import { CATALOGO_RECEITAS } from "@/lib/receitas";
@@ -693,6 +694,8 @@ export function PlataformaReset21D({
                 {/* ============================================================
                    ABA: AULAS & MISSÕES (21 DIAS)
                    ============================================================ */}
+                {(aba === "inicio" || aba === "diario") && <GamificacaoReset diario={diario} />}
+
                 {aba === "aulas" && (
                   <section className="rounded-2xl border border-white/12 bg-[#111715] p-6">
                     <h2 className="font-display text-2xl uppercase text-white">
