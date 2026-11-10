@@ -1,6 +1,8 @@
 "use client";
 
+import { usePathname, useRouter } from "next/navigation";
 import { obterConteudo, type Idioma } from "@/lib/i18n";
+import { caminhoForcaEla } from "@/lib/modo";
 import { useIdioma } from "@/lib/useIdioma";
 import { gravarModo, useModo, type Modo } from "@/lib/useModo";
 
@@ -27,6 +29,8 @@ export function SeletorModo({
   const idioma = useIdioma(idiomaForcado);
   const t = obterConteudo(idioma);
   const modo = useModo();
+  const caminho = usePathname();
+  const router = useRouter();
 
   const opcoes: { valor: Modo; rotulo: string }[] = [
     { valor: "ele", rotulo: t.ui.modoEle },
@@ -48,7 +52,12 @@ export function SeletorModo({
           role="radio"
           aria-checked={modo === valor}
           data-valor={valor}
-          onClick={() => gravarModo(valor)}
+          onClick={() => {
+            gravarModo(valor);
+            // As páginas do Canal Ela forçam o Modo Ela: escolher "Ele"
+            // nelas só faz sentido saindo para a home.
+            if (valor === "ele" && caminhoForcaEla(caminho)) router.push(t.rotaHome);
+          }}
           className={`modo-opcao h-full rounded-full transition-colors duration-300 ${
             compacto ? "px-2.5" : "px-3"
           } ${escuro ? "text-porcelana/60 hover:text-porcelana" : "text-grafite/60 hover:text-grafite"}`}

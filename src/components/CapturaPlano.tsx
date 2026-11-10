@@ -5,7 +5,8 @@ import { useActionState, useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { enviarPlano } from "@/app/actions";
 import { estadoInicial } from "@/lib/contato";
-import { calculadora } from "@/lib/content";
+import { TEXTOS_CALORIAS } from "@/lib/i18n/calorias";
+import { type Idioma, rotaIdioma } from "@/lib/rotas-idioma";
 import { criarSupabaseBrowser } from "@/lib/supabase/client";
 import { Arrow, Rotulo, campoBase } from "./ui";
 
@@ -27,8 +28,30 @@ export type Parametros = {
  * de graça. Isto não é um portão — é a oferta de levar o
  * resultado embora por escrito.
  */
-export function CapturaPlano({ parametros, onLiberar }: { parametros: Parametros; onLiberar?: () => void }) {
+export function CapturaPlano({
+  parametros,
+  onLiberar,
+  idioma = "pt",
+}: {
+  parametros: Parametros;
+  onLiberar?: () => void;
+  idioma?: Idioma;
+}) {
+  const t = TEXTOS_CALORIAS[idioma].captura;
   const [estado, acao] = useActionState(enviarPlano, estadoInicial);
+  // A action responde em português. Em PT a mensagem segue como veio; em
+  // ES/EN ela é trocada pela equivalente — os erros pelo nome do campo, as
+  // mensagens gerais pelo texto conhecido.
+  const erro = (campo: "nome" | "email" | "whatsapp") => {
+    const msg = estado.erros?.[campo];
+    return msg && idioma !== "pt" ? t.erros[campo] : msg;
+  };
+  const mensagemErro = (msg: string) => {
+    if (idioma === "pt") return msg;
+    if (msg.startsWith("Revise")) return t.revisar;
+    if (msg.startsWith("Os dados do plano")) return t.incompleto;
+    return t.falha;
+  };
   const supabaseRef = useState(() => criarSupabaseBrowser())[0];
   const [verificando, setVerificando] = useState(Boolean(supabaseRef));
   const [temConta, setTemConta] = useState(false);
@@ -49,8 +72,8 @@ export function CapturaPlano({ parametros, onLiberar }: { parametros: Parametros
   if (verificando || temConta) {
     return (
       <div className="surface-elevated mt-10 bg-white p-7 sm:p-10">
-        <p className="t-eyebrow text-ouro-profundo">{verificando ? "Reconhecendo seu perfil" : "Perfil reconhecido"}</p>
-        <p className="mt-3 text-sm text-grafite">{verificando ? "Só um instante…" : "Seus dados serão vinculados ao histórico da sua conta."}</p>
+        <p className="t-eyebrow text-ouro-profundo">{verificando ? t.verificando : t.reconhecido}</p>
+        <p className="mt-3 text-sm text-grafite">{verificando ? t.instante : t.vinculado}</p>
       </div>
     );
   }
@@ -62,9 +85,9 @@ export function CapturaPlano({ parametros, onLiberar }: { parametros: Parametros
         {/* A ação manda a própria mensagem quando o e-mail não saiu. Anunciar
             "confira a caixa de entrada" nesse caso seria prometer o que não
             aconteceu — e o plano na tela, esse, foi mesmo liberado. */}
-        <h3 className="t-title mt-6">{estado.mensagem ? "Recebido." : "Enviado."}</h3>
+        <h3 className="t-title mt-6">{estado.mensagem ? t.recebido : t.enviado}</h3>
         <p className="mt-4 max-w-md leading-relaxed text-grafite">
-          {estado.mensagem ?? calculadora.captura.sucesso}
+          {estado.mensagem ? (idioma === "pt" ? estado.mensagem : t.semCopia) : t.sucesso}
         </p>
       </div>
     );
@@ -76,15 +99,15 @@ export function CapturaPlano({ parametros, onLiberar }: { parametros: Parametros
       <div className="p-7 sm:p-10 lg:p-12">
       <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
         <div>
-          <p className="t-eyebrow text-ouro-profundo">Seu plano está pronto</p>
-          <h3 className="t-title mt-4 text-balance">Libere o resultado completo.</h3>
+          <p className="t-eyebrow text-ouro-profundo">{t.pronto}</p>
+          <h3 className="t-title mt-4 text-balance">{t.titulo}</h3>
           <p className="mt-5 max-w-sm leading-relaxed text-grafite">
-            Informe apenas nome, e-mail e telefone para ver calorias, macros, refeições e receber uma cópia estruturada.
+            {t.texto}
           </p>
           <ul className="mt-6 space-y-2 text-sm text-grafite">
-            <li>✓ Meta calórica individual</li>
-            <li>✓ Proteína, carboidrato e gordura</li>
-            <li>✓ Distribuição por refeições</li>
+            {t.itens.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
           </ul>
         </div>
 
@@ -95,74 +118,80 @@ export function CapturaPlano({ parametros, onLiberar }: { parametros: Parametros
           ))}
 
           <div aria-hidden className="absolute h-0 w-0 overflow-hidden opacity-0">
-            <label htmlFor="plano-empresa">Empresa</label>
+            <label htmlFor="plano-empresa">{t.empresa}</label>
             <input id="plano-empresa" name="empresa" tabIndex={-1} autoComplete="off" />
           </div>
 
           <div className="grid gap-7 sm:grid-cols-2">
             <div>
-              <Rotulo htmlFor="plano-nome">Nome</Rotulo>
+              <Rotulo htmlFor="plano-nome">{t.nome}</Rotulo>
               <input
                 id="plano-nome"
                 name="nome"
                 autoComplete="name"
-                placeholder="Como você se chama"
+                placeholder={t.nomePlaceholder}
                 className={campoBase}
                 aria-invalid={Boolean(estado.erros?.nome)}
               />
-              {estado.erros?.nome && (
-                <p className="mt-2 text-xs text-ouro-profundo">{estado.erros.nome}</p>
+              {erro("nome") && (
+                <p className="mt-2 text-xs text-ouro-profundo">{erro("nome")}</p>
               )}
             </div>
 
             <div>
-              <Rotulo htmlFor="plano-email">E-mail</Rotulo>
+              <Rotulo htmlFor="plano-email">{t.email}</Rotulo>
               <input
                 id="plano-email"
                 name="email"
                 type="email"
                 autoComplete="email"
-                placeholder="voce@email.com"
+                placeholder={t.emailPlaceholder}
                 className={campoBase}
                 aria-invalid={Boolean(estado.erros?.email)}
               />
-              {estado.erros?.email && (
-                <p className="mt-2 text-xs text-ouro-profundo">{estado.erros.email}</p>
+              {erro("email") && (
+                <p className="mt-2 text-xs text-ouro-profundo">{erro("email")}</p>
               )}
             </div>
 
             <div>
-              <Rotulo htmlFor="plano-whatsapp">Telefone</Rotulo>
+              <Rotulo htmlFor="plano-whatsapp">{t.telefone}</Rotulo>
               <input
                 id="plano-whatsapp"
                 name="whatsapp"
                 type="tel"
                 autoComplete="tel"
-                placeholder="(00) 00000-0000"
+                placeholder={t.telefonePlaceholder}
                 className={campoBase}
                 aria-invalid={Boolean(estado.erros?.whatsapp)}
               />
-              {estado.erros?.whatsapp && (
-                <p className="mt-2 text-xs text-ouro-profundo">{estado.erros.whatsapp}</p>
+              {erro("whatsapp") && (
+                <p className="mt-2 text-xs text-ouro-profundo">{erro("whatsapp")}</p>
               )}
             </div>
           </div>
 
           {estado.status === "erro" && estado.mensagem && (
             <p role="alert" className="text-sm text-ouro-profundo">
-              {estado.mensagem}
+              {mensagemErro(estado.mensagem)}
             </p>
           )}
 
           <div className="flex flex-wrap items-center justify-between gap-6">
             <p className="max-w-xs text-xs leading-relaxed text-grafite">
-              Ao continuar, você concorda em receber este resultado e um contato relacionado à sua avaliação. Sem spam.
+              {t.consentimento}
             </p>
-            <Botao />
+            <Botao preparando={t.preparando} liberar={t.liberar} />
           </div>
           {process.env.NEXT_PUBLIC_SUPABASE_URL && (
             <p className="border-t border-linha pt-5 text-center text-sm text-grafite">
-              Já possui cadastro? <Link href="/entrar?retorno=/calculadora-de-calorias" className="font-medium underline decoration-ouro underline-offset-4">Entrar com código</Link>
+              {t.jaTem}{" "}
+              <Link
+                href={`/entrar?retorno=${rotaIdioma(idioma, "/calculadora-de-calorias")}`}
+                className="font-medium underline decoration-ouro underline-offset-4"
+              >
+                {t.entrar}
+              </Link>
             </p>
           )}
         </form>
@@ -172,7 +201,7 @@ export function CapturaPlano({ parametros, onLiberar }: { parametros: Parametros
   );
 }
 
-function Botao() {
+function Botao({ preparando, liberar }: { preparando: string; liberar: string }) {
   const { pending } = useFormStatus();
   return (
     <button
@@ -180,7 +209,7 @@ function Botao() {
       disabled={pending}
       className="group inline-flex items-center gap-2.5 rounded-full bg-grafite px-8 py-3.5 text-sm font-medium tracking-wide text-porcelana transition-all duration-300 hover:bg-ouro-profundo disabled:opacity-55"
     >
-      {pending ? "Preparando…" : "Liberar meu plano"}
+      {pending ? preparando : liberar}
       <Arrow />
     </button>
   );

@@ -23,6 +23,8 @@ export type IconeDoLink =
   | "whatsapp";
 
 export type LinkDaBio = {
+  /** Chave estável — as traduções do título (`lib/i18n/links.ts`) usam esta. */
+  id: "consultoria" | "site" | "youtube" | "zumub";
   /** Título tal como aparece no cartão. */
   titulo: string;
   href: string;
@@ -56,21 +58,25 @@ export const zumub = {
 
 export const linksDaBio: LinkDaBio[] = [
   {
+    id: "consultoria",
     titulo: "CONSULTORIA ONLINE | CLICA AQUI!!",
     href: comOrigem(marca.formulario, "consultoria"),
     icone: "marca",
   },
   {
+    id: "site",
     titulo: "Website",
     href: "/",
     icone: "marca",
   },
   {
+    id: "youtube",
     titulo: "Canal do Youtube",
     href: marca.youtube,
     icone: "youtube",
   },
   {
+    id: "zumub",
     titulo: `Zumub | 🏷️ Cupom ${zumub.cupom}`,
     href: comOrigem(zumub.loja, "zumub"),
     icone: "zumub",

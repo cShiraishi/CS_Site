@@ -12,6 +12,13 @@ import {
 } from "@/lib/content";
 import { obterConteudo, type Idioma } from "@/lib/i18n";
 
+/** O alt das fotos de resultado vem de content.ts, em português. */
+function altTransformacao(idioma: string, pessoa: { nome: string; alt: string }) {
+  if (idioma === "es") return `Evolución corporal de ${pessoa.nome}, con registros de antes y después`;
+  if (idioma === "en") return `${pessoa.nome}'s body transformation, with before and after photos`;
+  return pessoa.alt;
+}
+
 /*
  * A home tem cinco seções, mais o fecho em `Aplicar`:
  *
@@ -287,7 +294,7 @@ export function Programa({ idioma = "pt" }: { idioma?: Idioma } = {}) {
               <div className="relative aspect-[10/18] w-full overflow-hidden bg-black">
                 <Image
                   src={pessoa.imagem}
-                  alt={pessoa.alt}
+                  alt={altTransformacao(t.idioma, pessoa)}
                   fill
                   sizes="(max-width: 640px) 95vw, 25vw"
                   className="object-cover object-center opacity-95 transition-all duration-700 group-hover:scale-[1.03] group-hover:opacity-100"
@@ -465,7 +472,7 @@ export function Resultados({ idioma = "pt" }: { idioma?: Idioma } = {}) {
           >
             <Image
               src={pessoa.imagem}
-              alt={pessoa.alt}
+              alt={altTransformacao(t.idioma, pessoa)}
               width={pessoa.largura}
               height={pessoa.altura}
               sizes="(max-width: 640px) 100vw, 33vw"

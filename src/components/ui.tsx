@@ -156,7 +156,7 @@ export function buttonClass(
   variant: "solid" | "outline" | "ghost" | "consultoria" = "solid",
 ) {
   const base =
-    "group inline-flex items-center justify-center gap-2.5 rounded-md px-7 py-3.5 text-[0.8rem] font-bold uppercase tracking-[0.14em] transition-all duration-300 whitespace-nowrap";
+    "group inline-flex items-center justify-center gap-2.5 rounded-md px-7 py-3.5 text-[0.8rem] font-bold uppercase tracking-[0.14em] transition-all duration-300 text-center sm:whitespace-nowrap";
   /* Tema escuro: o botão principal é ouro chapado com tinta preta — o
      único bloco de cor saturada da tela, para o olho ir direto nele. */
   const variants = {

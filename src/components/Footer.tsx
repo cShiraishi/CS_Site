@@ -19,7 +19,7 @@ export function Footer({ idioma: idiomaForcado }: { idioma?: Idioma } = {}) {
           {/* Assinatura com respiro amplo (04 / brand book) */}
           <div>
             <div className="flex items-center gap-4">
-              <Logo size={56} />
+              <Logo size={56} idioma={idioma} />
               <div>
                 <p className="font-display text-lg tracking-[0.18em]">
                   {marca.nome.toUpperCase()}
@@ -35,7 +35,7 @@ export function Footer({ idioma: idiomaForcado }: { idioma?: Idioma } = {}) {
           </div>
 
           <div className="grid gap-10 sm:grid-cols-2">
-            <nav aria-label="Rodapé">
+            <nav aria-label={t.ui.navegacaoRodape}>
               <p className="t-eyebrow text-grafite/70">{t.ui.navegacaoRodape}</p>
               <ul className="mt-5 space-y-3 text-sm">
                 {t.nav.map((item) => (

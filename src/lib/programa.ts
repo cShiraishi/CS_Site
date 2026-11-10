@@ -41,6 +41,8 @@ import {
   type Local,
   type SessaoMontada,
 } from "./treino";
+import { MOTOR, numeroIdioma } from "./i18n/programa-motor";
+import type { Idioma } from "./rotas-idioma";
 
 export const DURACAO_PADRAO = 21;
 const BLOCOS_PADRAO = 3;
@@ -49,17 +51,13 @@ const BLOCOS_PADRAO = 3;
 const KCAL_POR_KG = 7700;
 
 /**
- * Número com vírgula decimal.
+ * Número com vírgula decimal (ponto em inglês) — ver `numeroIdioma`.
  *
- * Os avisos são texto corrido em português, e "8.4 kg" no meio de uma
- * frase em português é erro de acabamento — o resto do site já escreve
- * "15,5 %". Formatado à mão em vez de `toLocaleString` porque este módulo
- * roda no servidor e no cliente, e a formatação por locale pode divergir
- * entre os dois e quebrar a hidratação.
+ * Os avisos são texto corrido, e "8.4 kg" no meio de uma frase em
+ * português é erro de acabamento. Formatado à mão em vez de
+ * `toLocaleString` porque este módulo roda no servidor e no cliente.
  */
-function n1(valor: number): string {
-  return String(valor).replace(".", ",");
-}
+const n1 = numeroIdioma;
 
 export type Perfil = {
   sexo: Sexo;
@@ -257,6 +255,7 @@ export function simular(
   modo: Modo,
   duracao = DURACAO_PADRAO,
   formula: Formula = "mifflin",
+  idioma: Idioma = "pt",
 ): { etapas: Etapa[]; viabilidade: Viabilidade } | null {
   const diasPorBloco = Math.max(1, Math.round(duracao / BLOCOS_PADRAO));
   const blocos = Math.max(1, Math.round(duracao / diasPorBloco));
@@ -321,7 +320,7 @@ export function simular(
 
     etapas.push({
       bloco: (i + 1) as 1 | 2 | 3,
-      intervalo: `Dias ${inicioDoBloco} a ${fimDoBloco}`,
+      intervalo: MOTOR[idioma].intervalo(inicioDoBloco, fimDoBloco),
       pesoInicial: Math.round(peso * 10) / 10,
       pesoFinal: Math.round(pesoFinal * 10) / 10,
       tmb: Math.round(gasto.tmb),
@@ -376,27 +375,6 @@ export type Bloco = {
 
 type Texto = { titulo: string; foco: string; marco: string };
 
-const TITULOS: Record<1 | 2 | 3, Texto> = {
-  1: {
-    titulo: "Fundação",
-    foco:
-      "Descompressão glicêmica, ajuste da distribuição proteica e instalação da frequência de treino. Na primeira semana a retenção hídrica cede e os picos de fome à noite desaparecem.",
-    marco: "Peso em jejum no Dia 7, cintura, fotos de frente e de lado e 100% das sessões cumpridas.",
-  },
-  2: {
-    titulo: "Carga",
-    foco:
-      "Com a glicemia estável e a técnica ajustada, a sinalização mecânica sobe. É a semana onde a oxidação real de gordura acelera protegendo a massa muscular.",
-    marco: "Peso no Dia 14, circunferência abdominal e progressão de carga ou repetições sobre a Semana 1.",
-  },
-  3: {
-    titulo: "Definição",
-    foco:
-      "Intensidade mais perto da falha e calorias recalculadas sobre o peso novo — blindando o metabolismo contra platôs e entregando o protocolo do Dia 22 em diante.",
-    marco: "Peso final do Dia 21, fotos comparativas (Dia 1 vs. Dia 21), cintura e transição para manutenção ou próximo ciclo.",
-  },
-};
-
 /**
  * O bloco que vira manutenção precisa dizer isso.
  *
@@ -405,29 +383,21 @@ const TITULOS: Record<1 | 2 | 3, Texto> = {
  * anterior. Chamar esse bloco de "Definição" e não explicar o salto é a
  * diferença entre um plano e um plano que parece quebrado.
  */
-function rotular(bloco: 1 | 2 | 3, etapa: Etapa, modo: Modo): Texto {
+function rotular(bloco: 1 | 2 | 3, etapa: Etapa, modo: Modo, idioma: Idioma): Texto {
+  const t = MOTOR[idioma];
   if (etapa.manutencao && modo !== "manter") {
-    return {
-      titulo: "Manutenção",
-      foco:
-        "Você chega ao peso alvo antes do fim do programa, e este bloco existe para o resultado não ser temporário: " +
-        "as calorias voltam ao seu gasto total e o treino segue igual. É aqui que o corpo aprende a sustentar o peso novo.",
-      marco: "Peso estável por quatro semanas, fotos e cintura — e o seu gasto de manutenção, agora medido na prática.",
-    };
+    return t.manutencao;
   }
 
   if (modo === "recomposicao") {
-    const base = TITULOS[bloco];
+    const base = t.blocos[bloco];
     return {
       ...base,
-      marco:
-        bloco === 1
-          ? "Fotos de frente e de lado, cintura e as sessões cumpridas. O peso entra no registro, mas não é o que se avalia."
-          : base.marco,
+      marco: bloco === 1 ? t.recomposicaoMarco1 : base.marco,
     };
   }
 
-  return TITULOS[bloco];
+  return t.blocos[bloco];
 }
 
 export type Programa = {
@@ -452,6 +422,8 @@ export function montar(
   perfil: Perfil,
   duracao = DURACAO_PADRAO,
   formula: Formula = "mifflin",
+  /** idioma dos textos gerados; a área do aluno usa o padrão, português */
+  idioma: Idioma = "pt",
 ): Programa | null {
   const atual = nivel(perfil.sexo, perfil.shapeAtual);
   const alvo = nivel(perfil.sexo, perfil.shapeAlvo);
@@ -460,7 +432,7 @@ export function montar(
   const gorduraAlvo = alvo?.gordura ?? null;
 
   const modo = decidirModo(perfil, gorduraAtual, gorduraAlvo);
-  const simulacao = simular(perfil, modo, duracao, formula);
+  const simulacao = simular(perfil, modo, duracao, formula, idioma);
   if (!simulacao) return null;
 
   const dias = diasValidos(perfil.experiencia, perfil.diasPedidos);
@@ -479,8 +451,8 @@ export function montar(
 
   const blocos: Bloco[] = simulacao.etapas.map((etapa) => {
     const macros = calcularMacros(etapa.alvoKcal, etapa.pesoInicial, etapa.direcao);
-    const treino = montarSemana(perfil.local, dias, perfil.experiencia, etapa.bloco);
-    const texto = rotular(etapa.bloco, etapa, modo);
+    const treino = montarSemana(perfil.local, dias, perfil.experiencia, etapa.bloco, idioma);
+    const texto = rotular(etapa.bloco, etapa, modo, idioma);
 
     return {
       etapa,
@@ -517,6 +489,7 @@ export function montar(
       pesoDaSilhueta,
       gorduraAtual,
       gorduraAlvo,
+      idioma,
     }),
   };
 }
@@ -539,43 +512,36 @@ function avisar(ctx: {
   pesoDaSilhueta: number | null;
   gorduraAtual: number | null;
   gorduraAlvo: number | null;
+  idioma: Idioma;
 }): string[] {
-  const { perfil, modo, v, blocos, dias, leitura, duracao, pesoDaSilhueta } = ctx;
+  const { perfil, modo, v, blocos, dias, leitura, duracao, pesoDaSilhueta, idioma } = ctx;
+  const t = MOTOR[idioma].avisos;
+  const n = (valor: number) => n1(valor, idioma);
   const avisos: string[] = [];
 
   if (modo === "recomposicao") {
-    avisos.push(
-      `Você pediu praticamente o mesmo peso e uma silhueta bem mais magra. Isso tem nome — recomposição corporal — ` +
-        `e é o pedido mais comum de quem já está no peso e não gosta do que vê. O plano usa um déficit pequeno, ` +
-        `proteína alta e treino de força: a balança vai mexer pouco de propósito. ` +
-        `Quem mede o seu resultado aqui é a cintura e a foto, não o peso.`,
-    );
+    avisos.push(t.recomposicao);
   }
 
   if (!v.cabe && modo !== "manter" && modo !== "recomposicao") {
     const falta = Math.round((v.pedido - v.entregue) * 10) / 10;
 
-    // O preço de acelerar é diferente nos dois sentidos: no corte
-    // perde-se massa magra, no ganho acumula-se gordura. Dizer "massa
-    // magra" para quem está em bulk destruiria a credibilidade da frase.
-    const preco =
-      modo === "perder"
-        ? "o preço é massa magra, e ela não volta sozinha"
-        : "o preço é gordura, e aí o corte vem depois para desfazer o que se ganhou";
-
+    // O preço de acelerar é diferente nos dois sentidos (ver `naoCabe`):
+    // no corte perde-se massa magra, no ganho acumula-se gordura.
     avisos.push(
-      `Os ${n1(v.pedido)} kg que você pediu não cabem em ${duracao} dias no ritmo seguro. ` +
-        `O programa entrega ${n1(v.entregue)} kg — e os ${n1(falta)} kg que faltam levam cerca de ` +
-        `${v.semanasExtra} semanas a mais, mantendo o mesmo método. ` +
-        `Dá para ir mais rápido que isso; ${preco}.`,
+      t.naoCabe({
+        pedido: n(v.pedido),
+        duracao,
+        entregue: n(v.entregue),
+        falta: n(falta),
+        semanasExtra: v.semanasExtra,
+        modo,
+      }),
     );
   }
 
   if (v.diaDoAlvo !== null && v.diaDoAlvo < duracao) {
-    avisos.push(
-      `Pelo cálculo, você chega ao peso alvo por volta do dia ${v.diaDoAlvo}. ` +
-        `Os dias restantes não são sobra: são o bloco de manutenção, que é onde o resultado deixa de ser temporário.`,
-    );
+    avisos.push(t.diaDoAlvo(v.diaDoAlvo));
   }
 
   /*
@@ -598,9 +564,13 @@ function avisar(ctx: {
 
     if (precisa >= 2) {
       avisos.push(
-        `Os ${n1(perfil.pesoAlvo)} kg com a silhueta que você escolheu exigem cerca de ${n1(precisa)} kg de massa magra a mais do que você tem hoje. ` +
-          `Músculo natural vem a uns ${n1(porMes)} kg por mês no seu nível, então esse corpo é projeto de ${Math.ceil(precisa / porMes)} meses, não de ${duracao} dias. ` +
-          `Os ${duracao} dias são o primeiro bloco dele — e o bloco que decide se os outros acontecem.`,
+        t.massaMagra({
+          pesoAlvo: n(perfil.pesoAlvo),
+          precisa: n(precisa),
+          porMes: n(porMes),
+          meses: Math.ceil(precisa / porMes),
+          duracao,
+        }),
       );
     }
   } else if (
@@ -608,44 +578,33 @@ function avisar(ctx: {
     modo === "perder" &&
     Math.abs(pesoDaSilhueta - perfil.pesoAlvo) >= 3
   ) {
-    const acima = pesoDaSilhueta > perfil.pesoAlvo;
     avisos.push(
-      `A silhueta que você escolheu corresponde a cerca de ${n1(pesoDaSilhueta)} kg no seu caso, e você pediu ${n1(perfil.pesoAlvo)} kg. ` +
-        (acima
-          ? `Ou seja: o corpo que você quer pesa mais do que o número que você pediu — e com treino de força pesa mais ainda, porque músculo tem peso. Vale perseguir a silhueta, não a balança.`
-          : `Ou seja: o número que você pediu ainda não é magro o bastante para a silhueta que você escolheu. O programa segue o peso pedido; chegando lá, a continuação é a mesma.`),
+      t.silhueta({
+        pesoDaSilhueta: n(pesoDaSilhueta),
+        pesoAlvo: n(perfil.pesoAlvo),
+        acima: pesoDaSilhueta > perfil.pesoAlvo,
+      }),
     );
   }
 
   if (blocos.some((b) => b.etapa.limitado)) {
-    avisos.push(
-      "O déficit foi limitado pelo teto de segurança: nenhum bloco corta mais de 25 % do seu gasto, nem fica abaixo do seu metabolismo basal.",
-    );
+    avisos.push(t.limitado);
   }
 
   if (blocos.some((b) => b.macros.apertado)) {
-    avisos.push(
-      "Com proteína e gordura nos mínimos, sobra pouco carboidrato em algum bloco. É sinal de que o alvo calórico está apertado para o seu peso — considere um prazo mais longo.",
-    );
+    avisos.push(t.apertado);
   }
 
   if (dias !== perfil.diasPedidos) {
-    avisos.push(
-      `Você pediu ${perfil.diasPedidos} dias de treino por semana e o programa montou ${dias}. ` +
-        `Para o seu nível, é o número que você consegue sustentar por ${duracao} dias — e sustentar é o que faz diferença.`,
-    );
+    avisos.push(t.diasAjustados({ pedidos: perfil.diasPedidos, dias, duracao }));
   }
 
   if (leitura === "severa") {
-    avisos.push(
-      "A silhueta que você escolheu indica mais gordura do que o seu peso e altura sugerem. O plano foi feito sobre os números medidos, não sobre a autoimagem.",
-    );
+    avisos.push(t.severa);
   }
 
   if (modo === "ganhar" && blocos.some((b) => b.volume < 12)) {
-    avisos.push(
-      "O volume semanal está no limite de baixo para ganho de massa. Com mais um dia de treino por semana, o programa rende bem mais.",
-    );
+    avisos.push(t.volumeBaixo);
   }
 
   return avisos;

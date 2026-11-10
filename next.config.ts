@@ -6,6 +6,15 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
 
   /*
+   * Três root layouts (pt, es, en) — um por idioma, para o <html lang>
+   * sair certo do servidor. Sem layout único, o 404 de endereço que não
+   * casa com rota nenhuma vem de app/global-not-found.tsx.
+   */
+  experimental: {
+    globalNotFound: true,
+  },
+
+  /*
    * Os protocolos em PDF vivem em `protocolos/`, fora de `public/`, e são
    * lidos do disco pela rota que os serve. Sem esta linha o rastreador de
    * ficheiros do Next não os vê — nada no código os importa — e a função

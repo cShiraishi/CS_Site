@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { TEXTO_PROGRAMA } from "@/lib/i18n/programa";
 import type { Moeda } from "@/lib/produto";
+import type { Idioma } from "@/lib/rotas-idioma";
 import { useMoeda } from "@/lib/useMoeda";
 import { Arrow } from "./ui";
 
@@ -21,15 +23,19 @@ export function Comprar({
   plano,
   preco = "R$ 47",
   moedaServidor,
-  rotulo = "Quero o programa",
+  rotulo,
+  idioma = "pt",
 }: {
   /** o perfil que gerou o plano, guardado com o pedido */
   plano?: unknown;
   preco?: string;
   moedaServidor?: Moeda | null;
   rotulo?: string;
+  idioma?: Idioma;
 }) {
-  const { info } = useMoeda(moedaServidor);
+  const t = TEXTO_PROGRAMA[idioma].comprar;
+  const rotuloBotao = rotulo ?? t.rotuloPadrao;
+  const { moeda, info } = useMoeda(moedaServidor);
   const precoExibido = info.precoFormatado || preco;
   const [email, setEmail] = useState("");
   const [empresa, setEmpresa] = useState("");
@@ -54,7 +60,15 @@ export function Comprar({
 
       if (!resposta.ok || !dados?.url) {
         setEstado("erro");
-        setMensagem(dados?.erro ?? "Não consegui abrir o pagamento. Tente de novo.");
+        /* As mensagens do servidor são em português; fora dele, a
+           validação (400) vira "confira o e-mail" e o resto, a genérica. */
+        setMensagem(
+          t.erroEmail === null
+            ? (dados?.erro ?? t.erroAbrir)
+            : resposta.status === 400
+              ? t.erroEmail
+              : t.erroAbrir,
+        );
         return;
       }
 
@@ -66,7 +80,7 @@ export function Comprar({
       window.location.href = dados.url;
     } catch {
       setEstado("erro");
-      setMensagem("Sem conexão com o pagamento. Tente de novo em instantes.");
+      setMensagem(t.erroConexao);
     }
   }
 
@@ -86,7 +100,7 @@ export function Comprar({
       </div>
 
       <label htmlFor="compra-email" className="t-eyebrow block text-[#00ff66]">
-        Seu e-mail para liberar o acesso imediato
+        {t.email}
       </label>
       <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center">
         <input
@@ -95,7 +109,7 @@ export function Comprar({
           required
           autoComplete="email"
           inputMode="email"
-          placeholder="voce@email.com"
+          placeholder={t.placeholder}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           aria-invalid={estado === "erro"}
@@ -108,7 +122,7 @@ export function Comprar({
           disabled={estado === "indo"}
           className="group inline-flex min-h-12 shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-lg bg-[#00ff66] px-8 py-3.5 text-sm font-extrabold uppercase tracking-wider text-[#041208] shadow-[0_0_30px_rgba(0,255,102,0.45)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#4be283] hover:shadow-[0_0_45px_rgba(0,255,102,0.65)] disabled:opacity-60"
         >
-          {estado === "indo" ? "Abrindo o pagamento…" : `${rotulo} — ${precoExibido}`}
+          {estado === "indo" ? t.abrindo : `${rotuloBotao} — ${precoExibido}`}
           <Arrow />
         </button>
       </div>
@@ -120,7 +134,7 @@ export function Comprar({
       )}
 
       <p className="mt-5 text-xs leading-relaxed text-grafite/75">
-        Pagamento seguro ({info.meiosPagamento}). Liberação imediata na sua conta CS Performance.
+        {t.rodape(idioma === "pt" ? info.meiosPagamento : t.meios[moeda])}
       </p>
     </form>
   );

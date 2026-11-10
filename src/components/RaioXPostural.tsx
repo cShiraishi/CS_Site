@@ -3,23 +3,29 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import type { PadraoId } from "@/lib/postura";
 import {
-  EXPECTATIVA,
-  FASES,
-  PADROES,
-  PROMESSA,
-  SINAIS_DE_ALERTA,
-  TESTE,
-  type PadraoId,
-  exerciciosDe,
-} from "@/lib/postura";
+  TOTAL_EXERCICIOS,
+  UI_RAIOX,
+  exerciciosDoPadrao,
+  expectativa,
+  fases,
+  padroes,
+  promessa,
+  sinaisDeAlerta,
+  teste,
+} from "@/lib/i18n/postura";
 import { rotas } from "@/lib/content";
+import { rotaIdioma, type Idioma } from "@/lib/rotas-idioma";
 import { Arrow, Eyebrow, buttonClass } from "./ui";
 
 /** Padrões 3 e 4 são mutuamente exclusivos — pedem protocolos opostos. */
 const OPOSTOS: Partial<Record<PadraoId, PadraoId>> = { p3: "p4", p4: "p3" };
 
-export function RaioXPostural() {
+export function RaioXPostural({ idioma = "pt" }: { idioma?: Idioma }) {
+  const ui = UI_RAIOX[idioma];
+  const PADROES = useMemo(() => padroes(idioma), [idioma]);
+  const TESTE = useMemo(() => teste(idioma), [idioma]);
   const [modo, setModo] = useState<"escolher" | "teste">("escolher");
   const [selecionados, setSelecionados] = useState<PadraoId[]>([]);
   const [respostas, setRespostas] = useState<Record<string, string>>({});
@@ -33,7 +39,7 @@ export function RaioXPostural() {
       return [...limpo, id];
     });
 
-  const exercicios = useMemo(() => exerciciosDe(selecionados), [selecionados]);
+  const exercicios = useMemo(() => exerciciosDoPadrao(selecionados, idioma), [selecionados, idioma]);
   const escolhidos = PADROES.filter((p) => selecionados.includes(p.id));
 
   /* ── teste da parede ── */
@@ -57,7 +63,7 @@ export function RaioXPostural() {
       {/* ── Sinais de alerta, antes de tudo ─────────────────── */}
       <details className="group rounded-sm border border-ouro/35 bg-ouro/[0.06] p-6">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-6 text-[0.98rem] font-medium text-grafite [&::-webkit-details-marker]:hidden">
-          Antes de começar: quando isto não é postura
+          {ui.alertaTitulo}
           <span aria-hidden className="relative h-3 w-3 shrink-0 text-ouro-profundo">
             <span className="absolute left-0 top-1/2 h-px w-3 bg-current" />
             <span className="absolute left-1/2 top-0 h-3 w-px bg-current transition-transform duration-300 group-open:rotate-90 group-open:opacity-0" />
@@ -65,11 +71,10 @@ export function RaioXPostural() {
         </summary>
         <div className="mt-5">
           <p className="text-sm leading-relaxed text-grafite/75">
-            Há quadros que se parecem com problemas posturais e não são.
-            Interrompe e procura avaliação clínica se houver:
+            {ui.alertaIntro}
           </p>
           <ul className="mt-4 space-y-2">
-            {SINAIS_DE_ALERTA.map((s) => (
+            {sinaisDeAlerta(idioma).map((s) => (
               <li key={s} className="flex items-start gap-3 text-sm text-grafite/80">
                 <span aria-hidden className="mt-2 h-px w-3 shrink-0 bg-ouro-profundo" />
                 {s}
@@ -81,14 +86,14 @@ export function RaioXPostural() {
 
       {/* ── 01 · Identificar ────────────────────────────────── */}
       <section>
-        <Eyebrow>01 / Identificar</Eyebrow>
-        <h2 className="t-title mt-6 text-balance">Qual é o teu padrão?</h2>
+        <Eyebrow>{ui.identificar}</Eyebrow>
+        <h2 className="t-title mt-6 text-balance">{ui.qualPadrao}</h2>
 
         <div className="mt-7 inline-flex rounded-full border border-linha p-1">
           {(
             [
-              ["escolher", "Já sei — escolher na imagem"],
-              ["teste", "Não sei — fazer o teste"],
+              ["escolher", ui.modoEscolher],
+              ["teste", ui.modoTeste],
             ] as const
           ).map(([id, rotulo]) => (
             <button
@@ -144,19 +149,14 @@ export function RaioXPostural() {
 
             {testeCompleto && selecionados.length === 0 && (
               <p className="mt-9 border-l-2 border-ouro pl-5 text-[0.95rem] leading-relaxed text-grafite/80">
-                Os três pontos deram neutro. Não há padrão a corrigir — o que
-                não quer dizer que não valha treinar mobilidade. Os exercícios
-                dos padrões 1 e 2 são seguros em qualquer cenário.
+                {ui.neutro}
               </p>
             )}
           </div>
         ) : (
           <>
             <p className="mt-8 max-w-2xl text-[0.95rem] leading-relaxed text-grafite/70">
-              Perfil direito, comparando com o teu. A linha tracejada é o fio de
-              prumo. Resiste à tentação de te encaixares no padrão mais
-              dramático — a maior parte das pessoas tem uma versão ligeira de
-              um destes, ou uma combinação de dois.
+              {ui.escolherIntro}
             </p>
 
             <ul className="mt-9 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
@@ -204,13 +204,11 @@ export function RaioXPostural() {
       {/* ── 02 · Resultado ──────────────────────────────────── */}
       {escolhidos.length > 0 && (
         <section className="border-t border-linha-ouro pt-14">
-          <Eyebrow>02 / O teu protocolo</Eyebrow>
+          <Eyebrow>{ui.protocolo}</Eyebrow>
 
           {selecionados.includes("p1") && selecionados.includes("p2") && (
             <p className="mt-6 max-w-2xl text-[0.95rem] leading-relaxed text-grafite/75">
-              Os padrões 1 e 2 aparecem quase sempre juntos — a cabeça avança
-              para compensar a torácica curvada. Janda chamou-lhe síndrome
-              cruzada superior. Trata os dois em bloco.
+              {ui.p1p2}
             </p>
           )}
 
@@ -233,7 +231,7 @@ export function RaioXPostural() {
                 <dl className="mt-8 grid gap-px overflow-hidden rounded-sm bg-linha sm:grid-cols-2">
                   <div className="bg-porcelana p-5">
                     <dt className="text-xs uppercase tracking-[0.14em] text-grafite/55">
-                      Curto ou sobrecarregado
+                      {ui.curto}
                     </dt>
                     <dd className="mt-2.5 text-[0.92rem] leading-relaxed text-grafite/85">
                       {p.curto}
@@ -241,7 +239,7 @@ export function RaioXPostural() {
                   </div>
                   <div className="bg-porcelana p-5">
                     <dt className="text-xs uppercase tracking-[0.14em] text-grafite/55">
-                      Fraco ou inibido
+                      {ui.fraco}
                     </dt>
                     <dd className="mt-2.5 text-[0.92rem] leading-relaxed text-grafite/85">
                       {p.fraco}
@@ -251,13 +249,13 @@ export function RaioXPostural() {
 
                 {p.cuidado && (
                   <p className="mt-6 max-w-2xl border-l-2 border-ouro pl-5 text-[0.92rem] leading-relaxed text-grafite/85">
-                    <strong className="font-medium">Atenção.</strong> {p.cuidado}
+                    <strong className="font-medium">{ui.atencao}</strong> {p.cuidado}
                   </p>
                 )}
 
                 {p.naoFazer && (
                   <div className="mt-6">
-                    <p className="t-eyebrow text-grafite/50">Não fazer neste padrão</p>
+                    <p className="t-eyebrow text-grafite/50">{ui.naoFazer}</p>
                     <ul className="mt-3 space-y-1.5">
                       {p.naoFazer.map((x) => (
                         <li key={x} className="flex items-start gap-3 text-sm text-grafite/70">
@@ -271,7 +269,7 @@ export function RaioXPostural() {
 
                 <details className="group mt-6">
                   <summary className="inline-flex cursor-pointer list-none items-center gap-2.5 text-sm text-ouro-profundo [&::-webkit-details-marker]:hidden">
-                    Erros frequentes neste padrão
+                    {ui.erros}
                     <span aria-hidden className="transition-transform duration-300 group-open:rotate-90">
                       ›
                     </span>
@@ -293,7 +291,7 @@ export function RaioXPostural() {
 
           {/* Exercícios */}
           <h3 className="t-eyebrow mt-16 text-grafite/50">
-            Os teus exercícios · {exercicios.length} de 12
+            {ui.seusExercicios(exercicios.length, TOTAL_EXERCICIOS)}
           </h3>
 
           <ol className="mt-6 grid gap-px overflow-hidden rounded-sm bg-linha sm:grid-cols-2">
@@ -311,7 +309,7 @@ export function RaioXPostural() {
                   {e.como}
                 </p>
                 <p className="mt-4 border-l-2 border-ouro pl-4 text-[0.85rem] leading-relaxed text-grafite/70">
-                  <strong className="font-medium text-grafite">Ponto de falha.</strong>{" "}
+                  <strong className="font-medium text-grafite">{ui.pontoFalha}</strong>{" "}
                   {e.falha}
                 </p>
               </li>
@@ -319,9 +317,9 @@ export function RaioXPostural() {
           </ol>
 
           {/* Fases */}
-          <h3 className="t-eyebrow mt-16 text-grafite/50">As oito semanas</h3>
+          <h3 className="t-eyebrow mt-16 text-grafite/50">{ui.semanas}</h3>
           <div className="mt-6 grid gap-px overflow-hidden rounded-sm bg-linha sm:grid-cols-3">
-            {FASES.map((f) => (
+            {fases(idioma).map((f) => (
               <div key={f.fase} className="bg-porcelana p-6">
                 <p className="font-display text-4xl text-ouro/50">{f.fase}</p>
                 <p className="mt-3 text-xs uppercase tracking-[0.13em] text-grafite/55">
@@ -336,37 +334,36 @@ export function RaioXPostural() {
           </div>
 
           <div className="mt-10 max-w-2xl border-l border-linha-ouro pl-7">
-            <p className="t-eyebrow text-grafite/50">Expectativa realista</p>
+            <p className="t-eyebrow text-grafite/50">{ui.expectativa}</p>
             <dl className="mt-4 space-y-3">
-              {EXPECTATIVA.map((x) => (
+              {expectativa(idioma).map((x) => (
                 <div key={x.prazo} className="text-[0.9rem] leading-relaxed">
                   <dt className="inline text-grafite">{x.prazo}. </dt>
                   <dd className="inline text-grafite/70">{x.muda}</dd>
                 </div>
               ))}
             </dl>
-            <p className="mt-6 text-[0.9rem] leading-relaxed text-grafite/70">{PROMESSA}</p>
+            <p className="mt-6 text-[0.9rem] leading-relaxed text-grafite/70">{promessa(idioma)}</p>
           </div>
 
           {/* Ponte */}
           <div className="mt-14 border-t border-linha pt-9">
             <p className="max-w-xl leading-relaxed text-grafite/70">
-              O protocolo está aqui inteiro. O que muda o resultado é integrá-lo
-              no treino que já fazes — e ajustar quando o corpo responde.
+              {ui.ponte}
             </p>
             <div className="mt-7 flex flex-wrap items-center gap-4">
               <a
-                href={`${rotas.consultoria}?de=raio-x`}
+                href={rotaIdioma(idioma, `${rotas.consultoria}?de=raio-x`)}
                 className={`${buttonClass("consultoria")}`}
               >
-                Começar consultoria
+                {ui.cta}
                 <Arrow />
               </a>
               <Link
-                href="/leitura/postura"
+                href={rotaIdioma(idioma, "/leitura/postura")}
                 className="group inline-flex items-center gap-2.5 border-b border-linha-ouro pb-1.5 text-sm text-ouro-profundo"
               >
-                Ler o livro completo
+                {ui.livro}
                 <Arrow />
               </Link>
             </div>

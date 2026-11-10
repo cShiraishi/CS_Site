@@ -12,7 +12,13 @@
  *     um assunto real de interesse de quem quer emagrecer sem dieta extrema.
  *  3. Dentro de qualquer assunto, os vídeos também aparecem ordenados
  *     do mais visto para o menos visto.
+ *
+ * Este arquivo é a fonte em português. Espanhol e inglês ficam em
+ * `src/lib/i18n/receitas-catalogo.ts` (receitas) e `src/lib/i18n/receitas.ts`
+ * (assuntos, fileiras e interface), sobrepostos por id.
  */
+
+import type { Idioma } from "./rotas-idioma";
 
 export type MacrosReceita = {
   kcal: number;
@@ -144,7 +150,21 @@ export type TrilhaReceitas = {
   receitas: Receita[];
 };
 
-export function formatarViews(views: number): string {
+/**
+ * Views no formato do idioma. Português é o padrão (o texto PT não muda);
+ * es → "1,9 M vistas" / "950 mil vistas"; en → "1.9M views" / "950K views".
+ */
+export function formatarViews(views: number, idioma: Idioma = "pt"): string {
+  if (idioma === "es") {
+    if (views >= 1_000_000) return `${(views / 1_000_000).toFixed(1).replace(".", ",")} M vistas`;
+    if (views >= 1_000) return `${Math.round(views / 1_000).toLocaleString("es")} mil vistas`;
+    return `${views} vistas`;
+  }
+  if (idioma === "en") {
+    if (views >= 1_000_000) return `${(views / 1_000_000).toFixed(1)}M views`;
+    if (views >= 1_000) return `${Math.round(views / 1_000).toLocaleString("en")}K views`;
+    return `${views} views`;
+  }
   if (views >= 1_000_000) {
     return `${(views / 1_000_000).toFixed(1).replace(".", ",")} mi views`;
   }

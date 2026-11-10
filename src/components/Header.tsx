@@ -10,6 +10,7 @@ import { Dock } from "./Dock";
 import { rotas } from "@/lib/content";
 import { obterConteudo, type Idioma } from "@/lib/i18n";
 import { useIdioma } from "@/lib/useIdioma";
+import { rotaIdioma } from "@/lib/rotas-idioma";
 
 /**
  * `tone` acompanha o fundo da página: as páginas em grafite
@@ -68,7 +69,7 @@ export function Header({
               onClick={() => setAberto(false)}
               className="shrink-0"
             >
-              <Assinatura size={40} priority tone={escuro ? "porcelana" : "grafite"} />
+              <Assinatura size={40} priority tone={escuro ? "porcelana" : "grafite"} idioma={idioma} />
             </Link>
 
             {/* A navegação entre ferramentas mora no Dock, preso ao rodapé da
@@ -193,8 +194,8 @@ export function Header({
               </div>
 
               {t.nav.map((item) => {
-                const ehReceitas = item.href === rotas.receitas;
-                const ehReset = item.href === rotas.programa;
+                const ehReceitas = item.href === rotaIdioma(idioma, rotas.receitas);
+                const ehReset = item.href === rotaIdioma(idioma, rotas.programa);
                 return (
                   <Link
                     key={item.href}
@@ -217,7 +218,7 @@ export function Header({
                     </span>
                     {ehReset && (
                       <span className="rounded-full bg-[#00ff66] px-2.5 py-0.5 font-sans text-[10px] font-extrabold uppercase tracking-wider text-[#041208] shadow-[0_0_14px_rgba(0,255,102,0.5)]">
-                        21 Dias
+                        {idioma === "es" ? "21 Días" : idioma === "en" ? "21 Days" : "21 Dias"}
                       </span>
                     )}
                     {ehReceitas && (

@@ -12,7 +12,9 @@ import {
   sobre,
 } from "./content";
 
-export type Idioma = "pt" | "es" | "en";
+import { idiomaDoCaminho, rotaIdioma, type Idioma } from "./rotas-idioma";
+
+export type { Idioma };
 
 export const IDIOMAS_DISPONIVEIS = [
   { codigo: "pt" as const, bandeira: "🇧🇷", sigla: "PT", nome: "Português", rotaHome: "/" },
@@ -20,12 +22,9 @@ export const IDIOMAS_DISPONIVEIS = [
   { codigo: "en" as const, bandeira: "🇬🇧", sigla: "EN", nome: "English", rotaHome: "/en" },
 ] as const;
 
-export function detectarIdiomaPorCaminho(pathname: string | null): Idioma | null {
-  if (!pathname) return null;
-  if (pathname === "/es" || pathname.startsWith("/es/")) return "es";
-  if (pathname === "/en" || pathname.startsWith("/en/")) return "en";
-  if (pathname === "/") return "pt";
-  return null;
+/** Toda URL tem idioma: /es/… e /en/… pelo prefixo, o resto é português. */
+export function detectarIdiomaPorCaminho(pathname: string | null): Idioma {
+  return idiomaDoCaminho(pathname);
 }
 
 export interface ConteudoTraduzido {
@@ -41,8 +40,8 @@ export interface ConteudoTraduzido {
     escolherModo: string;
     modoEle: string;
     modoEla: string;
-    modoElaEmBreve: string;
-    emBreve: string;
+    modoElaCanal: string;
+    novoBadgeEla: string;
     elaCiclo: string;
     elaTreinoCasa: string;
     elaGestacao: string;
@@ -144,8 +143,8 @@ const pt: ConteudoTraduzido = {
     escolherModo: "Modo do site",
     modoEle: "Ele",
     modoEla: "Ela",
-    modoElaEmBreve: "Modo Ela · chegando",
-    emBreve: "Em breve",
+    modoElaCanal: "Canal Ela",
+    novoBadgeEla: "Novo",
     elaCiclo: "Ciclo & TPM",
     elaTreinoCasa: "Treino em casa",
     elaGestacao: "Gestação",
@@ -222,8 +221,8 @@ const es: ConteudoTraduzido = {
     escolherModo: "Modo del sitio",
     modoEle: "Él",
     modoEla: "Ella",
-    modoElaEmBreve: "Modo Ella · muy pronto",
-    emBreve: "Pronto",
+    modoElaCanal: "Canal Ella",
+    novoBadgeEla: "Nuevo",
     elaCiclo: "Ciclo y SPM",
     elaTreinoCasa: "Entreno en casa",
     elaGestacao: "Embarazo",
@@ -425,8 +424,8 @@ const en: ConteudoTraduzido = {
     escolherModo: "Site mode",
     modoEle: "Him",
     modoEla: "Her",
-    modoElaEmBreve: "Her Mode · coming soon",
-    emBreve: "Soon",
+    modoElaCanal: "Her Channel",
+    novoBadgeEla: "New",
     elaCiclo: "Cycle & PMS",
     elaTreinoCasa: "Home workouts",
     elaGestacao: "Pregnancy",
@@ -615,10 +614,19 @@ const en: ConteudoTraduzido = {
   },
 };
 
+/** Links do menu e do dock apontam para a versão do próprio idioma. */
+function localizar(c: ConteudoTraduzido): ConteudoTraduzido {
+  return {
+    ...c,
+    nav: c.nav.map((i) => ({ ...i, href: rotaIdioma(c.idioma, i.href) })),
+    appsNav: c.appsNav.map((i) => ({ ...i, href: rotaIdioma(c.idioma, i.href) })),
+  };
+}
+
 export const TRADUCOES: Record<Idioma, ConteudoTraduzido> = {
   pt,
-  es,
-  en,
+  es: localizar(es),
+  en: localizar(en),
 };
 
 export function obterConteudo(idioma: Idioma = "pt"): ConteudoTraduzido {

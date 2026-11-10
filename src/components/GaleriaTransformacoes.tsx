@@ -3,15 +3,21 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { resultados } from "@/lib/content";
+import { TEXTO_PROGRAMA } from "@/lib/i18n/programa";
+import type { Idioma } from "@/lib/rotas-idioma";
 import { Arrow } from "./ui";
 
 type Transformacao = (typeof resultados.transformacoes)[number];
 
 export function GaleriaTransformacoes({
   variante = "neon",
+  idioma = "pt",
 }: {
   variante?: "neon" | "ouro";
+  idioma?: Idioma;
 }) {
+  const t = TEXTO_PROGRAMA[idioma].galeria;
+  const alt = (p: Transformacao) => t.alts[p.instagram] ?? p.alt;
   const [selecionada, setSelecionada] = useState<Transformacao | null>(null);
 
   useEffect(() => {
@@ -41,12 +47,12 @@ export function GaleriaTransformacoes({
             <button
               type="button"
               onClick={() => setSelecionada(pessoa)}
-              aria-label={`Ampliar foto de antes e depois de ${pessoa.nome}`}
+              aria-label={t.ampliarAria(pessoa.nome)}
               className="relative block aspect-[10/18] w-full cursor-zoom-in overflow-hidden bg-[#080b09] text-left"
             >
               <Image
                 src={pessoa.imagem}
-                alt={pessoa.alt}
+                alt={alt(pessoa)}
                 fill
                 sizes="(max-width: 640px) 95vw, (max-width: 1024px) 48vw, 25vw"
                 className="object-cover object-center transition-transform duration-500 group-hover:scale-[1.03]"
@@ -60,7 +66,7 @@ export function GaleriaTransformacoes({
                     : "border-ouro/55 bg-black/75 text-ouro"
                 }`}
               >
-                <span aria-hidden>🔍</span> Ampliar
+                <span aria-hidden>🔍</span> {t.ampliar}
               </span>
             </button>
 
@@ -88,7 +94,7 @@ export function GaleriaTransformacoes({
                 href={pessoa.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={`Abrir Instagram de ${pessoa.nome} (${pessoa.instagram})`}
+                aria-label={t.abrirInstagram(pessoa.nome, pessoa.instagram)}
                 className={`flex size-9 shrink-0 items-center justify-center rounded-full border transition-all ${
                   isNeon
                     ? "border-[#00ff66]/55 bg-[#00ff66]/15 text-[#00ff66] hover:bg-[#00ff66] hover:text-[#041208]"
@@ -107,7 +113,7 @@ export function GaleriaTransformacoes({
         <div
           role="dialog"
           aria-modal="true"
-          aria-label={`Transformação de ${selecionada.nome}`}
+          aria-label={t.transformacao(selecionada.nome)}
           onClick={() => setSelecionada(null)}
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 backdrop-blur-md"
         >
@@ -129,12 +135,12 @@ export function GaleriaTransformacoes({
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 rounded-lg bg-[#00ff66] px-3.5 py-2 text-xs font-extrabold uppercase tracking-wider text-[#041208] hover:bg-[#4be283]"
                 >
-                  Ver Instagram <Arrow />
+                  {t.verInstagram} <Arrow />
                 </a>
                 <button
                   type="button"
                   onClick={() => setSelecionada(null)}
-                  aria-label="Fechar visualização ampliada"
+                  aria-label={t.fechar}
                   className="flex size-9 items-center justify-center rounded-lg border border-white/15 bg-white/5 text-sm font-bold text-white hover:bg-white/15"
                 >
                   ✕
@@ -145,7 +151,7 @@ export function GaleriaTransformacoes({
             <div className="relative flex-1 overflow-y-auto bg-black p-3 sm:p-5">
               <Image
                 src={selecionada.imagem}
-                alt={selecionada.alt}
+                alt={alt(selecionada)}
                 width={selecionada.largura}
                 height={selecionada.altura}
                 className="mx-auto max-h-[76vh] w-auto rounded-xl object-contain"

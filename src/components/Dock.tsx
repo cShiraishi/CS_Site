@@ -7,6 +7,8 @@ import { rotas } from "@/lib/content";
 import { obterConteudo, type Idioma } from "@/lib/i18n";
 import { useIdioma } from "@/lib/useIdioma";
 import { useModo } from "@/lib/useModo";
+import { rotaEla } from "@/lib/modo";
+import { rotaIdioma } from "@/lib/rotas-idioma";
 import { SeletorModo } from "./SeletorModo";
 
 /**
@@ -116,10 +118,10 @@ export function Dock({ idioma: idiomaForcado }: { idioma?: Idioma } = {}) {
   const t = obterConteudo(idioma);
   const modo = useModo();
 
-  /* Modo Ela = tudo do Modo Ele + o canal feminino. Enquanto os apps
-     não existem, aparecem como "em breve" (sem link quebrado). */
-  const APPS_ELA: { label: string; icone: ReactNode }[] = [
+  /* Modo Ela = tudo do Modo Ele + o Canal Ela (trilhas de vídeos). */
+  const APPS_ELA: Item[] = [
     {
+      href: rotaEla(idioma, "ciclo"),
       label: t.ui.elaCiclo,
       icone: (
         <svg viewBox="0 0 24 24" {...s}>
@@ -130,6 +132,7 @@ export function Dock({ idioma: idiomaForcado }: { idioma?: Idioma } = {}) {
       ),
     },
     {
+      href: rotaEla(idioma, "treino-em-casa"),
       label: t.ui.elaTreinoCasa,
       icone: (
         <svg viewBox="0 0 24 24" {...s}>
@@ -140,6 +143,7 @@ export function Dock({ idioma: idiomaForcado }: { idioma?: Idioma } = {}) {
       ),
     },
     {
+      href: rotaEla(idioma, "gestacao"),
       label: t.ui.elaGestacao,
       icone: (
         <svg viewBox="0 0 24 24" {...s}>
@@ -152,7 +156,7 @@ export function Dock({ idioma: idiomaForcado }: { idioma?: Idioma } = {}) {
 
   const APPS: Item[] = [
     {
-      href: rotas.gordura,
+      href: rotaIdioma(idioma, rotas.gordura),
       label: t.appsNav[0]?.label ?? "% Gordura",
       icone: (
         <svg viewBox="0 0 24 24" {...s}>
@@ -163,7 +167,7 @@ export function Dock({ idioma: idiomaForcado }: { idioma?: Idioma } = {}) {
       ),
     },
     {
-      href: rotas.postura,
+      href: rotaIdioma(idioma, rotas.postura),
       label: t.appsNav[1]?.label ?? "Postura",
       icone: (
         <svg viewBox="0 0 24 24" {...s}>
@@ -174,7 +178,7 @@ export function Dock({ idioma: idiomaForcado }: { idioma?: Idioma } = {}) {
       ),
     },
     {
-      href: rotas.raioX,
+      href: rotaIdioma(idioma, rotas.raioX),
       label: t.appsNav[2]?.label ?? "Raio-X",
       icone: (
         <svg viewBox="0 0 24 24" {...s}>
@@ -185,7 +189,7 @@ export function Dock({ idioma: idiomaForcado }: { idioma?: Idioma } = {}) {
       ),
     },
     {
-      href: rotas.calculadora,
+      href: rotaIdioma(idioma, rotas.calculadora),
       label: t.appsNav[3]?.label ?? "Calorias",
       icone: (
         <svg viewBox="0 0 24 24" {...s}>
@@ -194,7 +198,7 @@ export function Dock({ idioma: idiomaForcado }: { idioma?: Idioma } = {}) {
       ),
     },
     {
-      href: rotas.prato,
+      href: rotaIdioma(idioma, rotas.prato),
       label: t.appsNav[4]?.label ?? "Prato",
       icone: (
         <svg viewBox="0 0 24 24" {...s}>
@@ -208,7 +212,7 @@ export function Dock({ idioma: idiomaForcado }: { idioma?: Idioma } = {}) {
 
   const CONTEUDOS_GRATIS: Item[] = [
     {
-      href: rotas.biblioteca,
+      href: rotaIdioma(idioma, rotas.biblioteca),
       label: t.dockConteudos.biblioteca,
       icone: (
         <svg viewBox="0 0 24 24" {...s}>
@@ -218,7 +222,7 @@ export function Dock({ idioma: idiomaForcado }: { idioma?: Idioma } = {}) {
       ),
     },
     {
-      href: rotas.programa,
+      href: rotaIdioma(idioma, rotas.programa),
       label: t.dockConteudos.resetMetabolico,
       icone: (
         <svg viewBox="0 0 24 24" {...s}>
@@ -228,7 +232,7 @@ export function Dock({ idioma: idiomaForcado }: { idioma?: Idioma } = {}) {
       ),
     },
     {
-      href: rotas.csflix,
+      href: rotaIdioma(idioma, rotas.csflix),
       label: t.dockConteudos.csflix,
       icone: (
         <svg viewBox="0 0 24 24" {...s}>
@@ -240,7 +244,7 @@ export function Dock({ idioma: idiomaForcado }: { idioma?: Idioma } = {}) {
   ];
 
   const RECEITAS_FIT_ITEM: Item = {
-    href: rotas.receitas,
+    href: rotaIdioma(idioma, rotas.receitas),
     label: t.dockConteudos.receitas,
     icone: ICONE_RECEITAS_FIT,
   };
@@ -266,7 +270,12 @@ export function Dock({ idioma: idiomaForcado }: { idioma?: Idioma } = {}) {
     ),
   };
 
-  const FERRAMENTAS: Item[] = [...APPS, ...CONTEUDOS_GRATIS, RECEITAS_FIT_ITEM];
+  const FERRAMENTAS: Item[] = [
+    ...APPS,
+    ...CONTEUDOS_GRATIS,
+    RECEITAS_FIT_ITEM,
+    ...(modo === "ela" ? APPS_ELA : []),
+  ];
 
   const visto = useSyncExternalStore(
     nadaAssinar,
@@ -287,7 +296,7 @@ export function Dock({ idioma: idiomaForcado }: { idioma?: Idioma } = {}) {
       ? caminho === href
       : !href.includes("#") && caminho.startsWith(href.split("?")[0]);
   const appAtual = APPS.some((a) => ehAtual(a.href));
-  const receitasAtual = ehAtual(rotas.receitas);
+  const receitasAtual = ehAtual(rotaIdioma(idioma, rotas.receitas));
   const ferramentaAtual = FERRAMENTAS.some((f) => ehAtual(f.href));
 
   const alternar = () => {
@@ -368,7 +377,7 @@ export function Dock({ idioma: idiomaForcado }: { idioma?: Idioma } = {}) {
 
   return (
     <nav
-      aria-label="Navegação principal"
+      aria-label={idioma === "es" ? "Navegación principal" : idioma === "en" ? "Main navigation" : "Navegação principal"}
       className="pointer-events-none fixed inset-x-0 bottom-3 z-50 flex flex-col items-center px-3 sm:bottom-5"
     >
       {/* Lista das ferramentas gratuitas, por cima do dock. */}
@@ -460,7 +469,7 @@ export function Dock({ idioma: idiomaForcado }: { idioma?: Idioma } = {}) {
 
             <ul className="grid grid-cols-3 gap-1">
               {CONTEUDOS_GRATIS.map((f) => {
-                const ehReset = f.href === rotas.programa;
+                const ehReset = f.href === rotaIdioma(idioma, rotas.programa);
                 return (
                   <li key={f.href}>
                     <Link
@@ -487,22 +496,42 @@ export function Dock({ idioma: idiomaForcado }: { idioma?: Idioma } = {}) {
 
             {modo === "ela" && (
               <div className="mt-2 border-t border-white/8 pt-2">
-                <p className="px-2.5 pb-1.5 text-[0.65rem] font-bold uppercase tracking-[0.18em] text-destaque">
-                  {t.ui.modoElaEmBreve}
-                </p>
+                <Link
+                  href={rotaEla(idioma)}
+                  onClick={() => setAberto(false)}
+                  className="block px-2.5 pb-1.5 text-[0.65rem] font-bold uppercase tracking-[0.18em] text-destaque hover:underline"
+                >
+                  {t.ui.modoElaCanal}
+                </Link>
                 <ul className="grid grid-cols-3 gap-1">
-                  {APPS_ELA.map((app) => (
-                    <li
-                      key={app.label}
-                      className="relative flex flex-col items-center justify-center gap-1.5 rounded-xl px-2 py-2.5 text-center text-xs font-medium text-[#f2ede5]/55 ring-1 ring-inset ring-destaque/25 [&>svg]:size-[18px] [&>svg]:shrink-0 [&>svg]:text-destaque/80"
-                    >
-                      {app.icone}
-                      <span className="leading-tight">{app.label}</span>
-                      <span className="absolute -top-1.5 right-1 rounded-full bg-destaque px-1.5 py-px text-[0.5rem] font-extrabold uppercase tracking-[0.06em] text-[#0b0a09]">
-                        {t.ui.emBreve}
-                      </span>
-                    </li>
-                  ))}
+                  {APPS_ELA.map((app) => {
+                    const atual = ehAtual(app.href);
+                    return (
+                      <li key={app.href} className="relative">
+                        <Link
+                          href={app.href}
+                          onClick={() => setAberto(false)}
+                          aria-current={atual ? "page" : undefined}
+                          className={`flex flex-col items-center justify-center gap-1.5 rounded-xl px-2 py-2.5 text-center text-xs font-medium ring-1 ring-inset transition-all duration-150 [&>svg]:size-[18px] [&>svg]:shrink-0 ${
+                            atual
+                              ? "bg-destaque text-[#0b0a09] ring-transparent"
+                              : "text-[#f2ede5]/85 ring-destaque/35 hover:bg-destaque/15 hover:text-destaque [&>svg]:text-destaque"
+                          }`}
+                        >
+                          {app.icone}
+                          <span className="leading-tight">{app.label}</span>
+                        </Link>
+                        {!atual && (
+                          <span
+                            aria-hidden
+                            className="pointer-events-none absolute -top-1.5 right-1 rounded-full bg-destaque px-1.5 py-px text-[0.5rem] font-extrabold uppercase tracking-[0.06em] text-[#0b0a09]"
+                          >
+                            {t.ui.novoBadgeEla}
+                          </span>
+                        )}
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             )}
@@ -598,14 +627,14 @@ export function Dock({ idioma: idiomaForcado }: { idioma?: Idioma } = {}) {
             aria-current={receitasAtual ? "page" : undefined}
             data-dock
             style={{ transformOrigin: "bottom center" }}
-            className={`${botaoIcone} ${receitasAtual ? ativoCls : coralApelativo}`}
+            className={`${botaoIcone} ${receitasAtual ? ativoCls : `${coralApelativo} dock-apita`}`}
           >
             {RECEITAS_FIT_ITEM.icone}
-            <Nome texto="Receitas" />
+            <Nome texto={idioma === "es" ? "Recetas" : idioma === "en" ? "Recipes" : "Receitas"} />
           </Link>
           <span
             aria-hidden
-            className="pointer-events-none absolute -top-2.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-[#ff5e3a] px-1.5 py-0.5 text-[0.52rem] font-extrabold uppercase leading-none tracking-[0.06em] text-[#0b0a09] shadow-sm"
+            className={`pointer-events-none absolute -top-2.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-[#ff5e3a] px-1.5 py-0.5 text-[0.52rem] font-extrabold uppercase leading-none tracking-[0.06em] text-[#0b0a09] shadow-sm ${receitasAtual ? "" : "selo-apita"}`}
           >
             FIT
           </span>

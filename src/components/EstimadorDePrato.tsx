@@ -4,14 +4,15 @@ import Link from "next/link";
 import { useMemo, useState, useSyncExternalStore } from "react";
 import {
   ALIMENTOS,
-  AVISO,
   CATEGORIAS,
   POR_ID,
   QUANTIDADES,
-  REFERENCIAS,
+  type Alimento,
   type CategoriaId,
 } from "@/lib/alimentos";
 import { rotas } from "@/lib/content";
+import { TEXTOS_PRATO } from "@/lib/i18n/prato";
+import { type Idioma, LANG_HTML, rotaIdioma } from "@/lib/rotas-idioma";
 import { type ItemPrato, lerContraMeta, montarPrato } from "@/lib/prato";
 import { Arrow, Eyebrow, buttonClass } from "./ui";
 
@@ -55,10 +56,15 @@ function fracao(q: number): string {
   return meio ? `${inteiro}½` : String(inteiro);
 }
 
-const gramas = (n: number) =>
-  n >= 1000 ? `${(n / 1000).toLocaleString("pt-BR", { maximumFractionDigits: 1 })} kg` : `${Math.round(n)} g`;
+const formatarGramas = (lang: string) => (n: number) =>
+  n >= 1000 ? `${(n / 1000).toLocaleString(lang, { maximumFractionDigits: 1 })} kg` : `${Math.round(n)} g`;
 
-export function EstimadorDePrato() {
+export function EstimadorDePrato({ idioma = "pt" }: { idioma?: Idioma } = {}) {
+  const t = TEXTOS_PRATO[idioma];
+  const e = t.est;
+  const gramas = formatarGramas(LANG_HTML[idioma]);
+  const nome = (a: Alimento) => t.alimentos[a.id] ?? a.nome;
+  const unidade = (a: Alimento) => t.unidades[a.unidade] ?? a.unidade;
   const [escolhas, setEscolhas] = useState<ItemPrato[]>([]);
   const [aba, setAba] = useState<CategoriaId>("base");
   const meta = useSyncExternalStore(inscrever, lerMeta, metaNoServidor);
@@ -89,7 +95,7 @@ export function EstimadorDePrato() {
       {/* ── O guia de porção, antes de qualquer número ──────── */}
       <details className="group rounded-sm border border-ouro/35 bg-ouro/[0.06] p-6">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-6 text-[0.98rem] font-medium text-grafite [&::-webkit-details-marker]:hidden">
-          Como medir sem balança: o guia da mão
+          {e.guiaTitulo}
           <span aria-hidden className="relative h-3 w-3 shrink-0 text-ouro-profundo">
             <span className="absolute left-0 top-1/2 h-px w-3 bg-current" />
             <span className="absolute left-1/2 top-0 h-3 w-px bg-current transition-transform duration-300 group-open:rotate-90 group-open:opacity-0" />
@@ -97,12 +103,10 @@ export function EstimadorDePrato() {
         </summary>
         <div className="mt-5">
           <p className="max-w-2xl text-sm leading-relaxed text-grafite/75">
-            A mão acompanha o tamanho do corpo — quem é maior tem a mão maior,
-            e precisa de porção maior. É por isso que ela funciona melhor como
-            referência do que uma medida fixa em gramas.
+            {e.guiaTexto}
           </p>
           <dl className="mt-6 grid gap-px overflow-hidden rounded-sm bg-linha sm:grid-cols-2">
-            {REFERENCIAS.map((r) => (
+            {t.referencias.map((r) => (
               <div key={r.gesto} className="bg-porcelana p-5">
                 <dt className="font-display text-lg leading-tight">{r.gesto}</dt>
                 <dd className="mt-2 text-[0.9rem] text-ouro-profundo">{r.equivale}</dd>
@@ -123,11 +127,10 @@ export function EstimadorDePrato() {
             de abas empurrava a coluna a 892 px e estourava a tela no celular.
             O `overflow-x-auto` das abas só passa a valer com isto aqui. */}
         <section className="min-w-0">
-          <Eyebrow>01 / Montar o prato</Eyebrow>
-          <h2 className="t-title mt-6 text-balance">O que está na sua frente?</h2>
+          <Eyebrow>{e.montarEyebrow}</Eyebrow>
+          <h2 className="t-title mt-6 text-balance">{e.montarTitulo}</h2>
           <p className="mt-5 max-w-xl text-[0.95rem] leading-relaxed text-grafite/70">
-            Toque em tudo o que vai comer. Depois ajuste a quantidade — não em
-            gramas, em conchas e palmas, que é como a comida realmente aparece.
+            {e.montarTexto}
           </p>
 
           {/* Abas de categoria */}
@@ -136,7 +139,7 @@ export function EstimadorDePrato() {
           <div className="mt-8 flex min-w-0 gap-2 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {CATEGORIAS.map((c) => {
               const escolhidosAqui = escolhas.filter(
-                (e) => POR_ID.get(e.id)?.categoria === c.id,
+                (x) => POR_ID.get(x.id)?.categoria === c.id,
               ).length;
               return (
                 <button
@@ -150,7 +153,7 @@ export function EstimadorDePrato() {
                       : "border-linha text-grafite/65 hover:border-ouro/50 hover:text-grafite"
                   }`}
                 >
-                  {c.nome}
+                  {t.categorias[c.id].nome}
                   {escolhidosAqui > 0 && (
                     <span
                       className={`flex h-4.5 min-w-4.5 items-center justify-center rounded-full px-1 text-[0.62rem] ${
@@ -166,12 +169,12 @@ export function EstimadorDePrato() {
           </div>
 
           <p className="mt-4 text-[0.85rem] text-grafite/55">
-            {CATEGORIAS.find((c) => c.id === aba)?.nota}
+            {t.categorias[aba].nota}
           </p>
 
           <ul className="mt-6 grid gap-2.5 sm:grid-cols-2">
             {daAba.map((a) => {
-              const escolha = escolhas.find((e) => e.id === a.id);
+              const escolha = escolhas.find((x) => x.id === a.id);
               return (
                 <li key={a.id}>
                   <button
@@ -186,10 +189,10 @@ export function EstimadorDePrato() {
                   >
                     <span>
                       <span className="block text-[0.95rem] leading-tight text-grafite">
-                        {a.nome}
+                        {nome(a)}
                       </span>
                       <span className="mt-1.5 block text-xs text-grafite/55">
-                        1 {a.unidade} · {gramas(a.gramas)} ·{" "}
+                        1 {unidade(a)} · {gramas(a.gramas)} ·{" "}
                         {Math.round((a.kcal * a.gramas) / 100)} kcal
                       </span>
                     </span>
@@ -212,12 +215,11 @@ export function EstimadorDePrato() {
 
         {/* ── 02 · O prato e o resultado ───────────────────── */}
         <section className="min-w-0 lg:sticky lg:top-24 lg:self-start">
-          <Eyebrow>02 / A conta</Eyebrow>
+          <Eyebrow>{e.contaEyebrow}</Eyebrow>
 
           {!temPrato ? (
             <p className="mt-6 border-l-2 border-linha pl-5 text-[0.95rem] leading-relaxed text-grafite/60">
-              O prato está vazio. Escolha ao lado e a estimativa aparece aqui,
-              atualizando a cada item.
+              {e.vazio}
             </p>
           ) : (
             <>
@@ -227,15 +229,15 @@ export function EstimadorDePrato() {
                   <li key={i.alimento.id} className="py-4">
                     <div className="flex items-baseline justify-between gap-3">
                       <p className="text-[0.95rem] leading-tight text-grafite">
-                        {i.alimento.nome}
+                        {nome(i.alimento)}
                       </p>
                       <button
                         type="button"
                         onClick={() => adicionar(i.alimento.id)}
-                        aria-label={`Tirar ${i.alimento.nome} do prato`}
+                        aria-label={e.tirar(nome(i.alimento))}
                         className="shrink-0 text-xs text-grafite/40 transition-colors hover:text-ouro-profundo"
                       >
-                        remover
+                        {e.remover}
                       </button>
                     </div>
 
@@ -246,7 +248,7 @@ export function EstimadorDePrato() {
                           type="button"
                           onClick={() => ajustar(i.alimento.id, q)}
                           aria-pressed={i.quantidade === q}
-                          aria-label={`${fracao(q)} ${i.alimento.unidade}`}
+                          aria-label={`${fracao(q)} ${unidade(i.alimento)}`}
                           className={`min-w-9 rounded-full border px-2.5 py-1 text-xs transition-all duration-300 ${
                             i.quantidade === q
                               ? "border-ouro bg-ouro/15 text-grafite"
@@ -257,7 +259,7 @@ export function EstimadorDePrato() {
                         </button>
                       ))}
                       <span className="ml-1 text-xs text-grafite/55">
-                        {i.alimento.unidade} · {gramas(i.gramas)}
+                        {unidade(i.alimento)} · {gramas(i.gramas)}
                       </span>
                     </div>
                   </li>
@@ -266,21 +268,21 @@ export function EstimadorDePrato() {
 
               {/* Resultado */}
               <div className="mt-8">
-                <p className="t-eyebrow text-grafite/50">Estimativa da refeição</p>
+                <p className="t-eyebrow text-grafite/50">{e.estimativa}</p>
                 <p className="mt-3 font-display text-5xl leading-none text-grafite">
                   {prato.kcal.min}
-                  <span className="mx-2 text-2xl text-grafite/35">a</span>
+                  <span className="mx-2 text-2xl text-grafite/35">{e.a}</span>
                   {prato.kcal.max}
                 </p>
                 <p className="mt-2 text-sm text-grafite/55">
-                  kcal · {gramas(prato.gramas)} de comida
+                  {e.deComida(gramas(prato.gramas))}
                 </p>
 
                 <dl className="mt-7 grid grid-cols-3 gap-px overflow-hidden rounded-sm bg-linha">
                   {[
-                    ["Proteína", prato.proteina],
-                    ["Carboidrato", prato.carboidrato],
-                    ["Gordura", prato.gordura],
+                    [e.proteina, prato.proteina],
+                    [e.carboidrato, prato.carboidrato],
+                    [e.gordura, prato.gordura],
                   ].map(([rotulo, f]) => {
                     const faixa = f as typeof prato.proteina;
                     return (
@@ -302,12 +304,9 @@ export function EstimadorDePrato() {
                 {prato.alcool.medio > 0 && (
                   <p className="mt-4 border-l-2 border-ouro pl-4 text-[0.88rem] leading-relaxed text-grafite/75">
                     <strong className="font-medium text-grafite">
-                      Álcool: {prato.alcool.min}–{prato.alcool.max} g
+                      {e.alcool(prato.alcool.min, prato.alcool.max)}
                     </strong>{" "}
-                    — cerca de {Math.round((prato.alcool.medio * 7) / 5) * 5} kcal.
-                    O álcool tem 7 kcal por grama e não aparece em nenhum
-                    macronutriente, o que é justamente por que ele escapa da
-                    conta da maioria das pessoas.
+                    {e.alcoolTexto(Math.round((prato.alcool.medio * 7) / 5) * 5)}
                   </p>
                 )}
               </div>
@@ -318,7 +317,7 @@ export function EstimadorDePrato() {
                   htmlFor="meta-diaria"
                   className="t-eyebrow block text-grafite"
                 >
-                  Sua meta do dia
+                  {e.meta}
                 </label>
                 <div className="mt-3 flex items-center gap-3">
                   <input
@@ -329,19 +328,19 @@ export function EstimadorDePrato() {
                     max={6000}
                     step={10}
                     value={meta}
-                    onChange={(e) => gravarMeta(e.target.value)}
+                    onChange={(ev) => gravarMeta(ev.target.value)}
                     placeholder="2030"
                     className="w-28 border-b border-linha bg-transparent py-2 text-[0.98rem] text-grafite transition-colors placeholder:text-grafite/40 focus:border-ouro focus:outline-none"
                   />
-                  <span className="text-sm text-grafite/55">kcal por dia</span>
+                  <span className="text-sm text-grafite/55">{e.kcalDia}</span>
                 </div>
 
                 {!meta && (
                   <Link
-                    href={rotas.calculadora}
+                    href={rotaIdioma(idioma, rotas.calculadora)}
                     className="group mt-4 inline-flex items-center gap-2 border-b border-linha-ouro pb-1 text-sm text-ouro-profundo"
                   >
-                    Não sabe? Calcule em um minuto
+                    {e.naoSabe}
                     <Arrow />
                   </Link>
                 )}
@@ -353,7 +352,7 @@ export function EstimadorDePrato() {
                     <div
                       className="relative h-2 w-full overflow-hidden rounded-full bg-linha"
                       role="img"
-                      aria-label={`Entre ${leitura.pctMin}% e ${leitura.pctMax}% da meta do dia`}
+                      aria-label={e.barraAria(leitura.pctMin, leitura.pctMax)}
                     >
                       <span
                         className={`absolute inset-y-0 rounded-full transition-all duration-500 ${
@@ -367,18 +366,18 @@ export function EstimadorDePrato() {
                     </div>
                     <p className="mt-3 text-sm text-grafite">
                       <strong className="font-medium">
-                        {leitura.pctMin}% a {leitura.pctMax}%
+                        {e.pctFaixa(leitura.pctMin, leitura.pctMax)}
                       </strong>{" "}
-                      da meta do dia
+                      {e.daMeta}
                       {leitura.tom !== "estourou" && (
                         <span className="text-grafite/60">
                           {" "}
-                          · sobram cerca de {leitura.restante} kcal
+                          {e.sobram(leitura.restante)}
                         </span>
                       )}
                     </p>
                     <p className="mt-3 text-[0.9rem] leading-relaxed text-grafite/70">
-                      {leitura.frase}
+                      {idioma === "pt" ? leitura.frase : e.frases[leitura.tom]}
                     </p>
                   </div>
                 )}
@@ -386,14 +385,14 @@ export function EstimadorDePrato() {
 
               {/* Onde estão as calorias */}
               <div className="mt-9 border-t border-linha pt-7">
-                <p className="t-eyebrow text-grafite/50">Onde estão as calorias</p>
+                <p className="t-eyebrow text-grafite/50">{e.ondeEstao}</p>
                 <ol className="mt-4 space-y-2.5">
                   {prato.maiores.map((i) => (
                     <li
                       key={i.alimento.id}
                       className="flex items-baseline justify-between gap-4 text-[0.92rem]"
                     >
-                      <span className="text-grafite/80">{i.alimento.nome}</span>
+                      <span className="text-grafite/80">{nome(i.alimento)}</span>
                       <span className="shrink-0 tabular-nums text-grafite/55">
                         {Math.round(i.kcal / 5) * 5} kcal
                       </span>
@@ -406,32 +405,32 @@ export function EstimadorDePrato() {
               {prato.trocas.length > 0 && (
                 <div className="mt-9 border-t border-linha pt-7">
                   <p className="t-eyebrow text-grafite/50">
-                    Se quiser aliviar sem comer menos
+                    {e.aliviar}
                   </p>
                   <ul className="mt-4 space-y-4">
-                    {prato.trocas.map((t) => (
-                      <li key={t.de.id} className="text-[0.92rem] leading-relaxed">
+                    {prato.trocas.map((tr) => (
+                      <li key={tr.de.id} className="text-[0.92rem] leading-relaxed">
                         <p className="text-grafite/80">
-                          {t.de.nome} <span className="text-grafite/40">→</span>{" "}
+                          {nome(tr.de)} <span className="text-grafite/40">→</span>{" "}
                           <button
                             type="button"
                             onClick={() => {
                               const q =
-                                escolhas.find((e) => e.id === t.de.id)?.quantidade ?? 1;
+                                escolhas.find((x) => x.id === tr.de.id)?.quantidade ?? 1;
                               setEscolhas((atual) => [
                                 ...atual.filter(
-                                  (e) => e.id !== t.de.id && e.id !== t.para.id,
+                                  (x) => x.id !== tr.de.id && x.id !== tr.para.id,
                                 ),
-                                { id: t.para.id, quantidade: q },
+                                { id: tr.para.id, quantidade: q },
                               ]);
                             }}
                             className="border-b border-linha-ouro pb-0.5 text-ouro-profundo transition-colors hover:text-grafite"
                           >
-                            {t.para.nome}
+                            {nome(tr.para)}
                           </button>
                         </p>
                         <p className="mt-1 text-xs text-grafite/55">
-                          −{t.economia} kcal na mesma quantidade de comida
+                          {e.economia(tr.economia)}
                         </p>
                       </li>
                     ))}
@@ -444,7 +443,7 @@ export function EstimadorDePrato() {
                 onClick={() => setEscolhas([])}
                 className="mt-9 text-sm text-grafite/45 transition-colors hover:text-ouro-profundo"
               >
-                Limpar o prato
+                {e.limpar}
               </button>
             </>
           )}
@@ -453,32 +452,30 @@ export function EstimadorDePrato() {
 
       {/* ── O aviso fica no fim do fluxo, mas visível ───────── */}
       <p className="mt-16 max-w-2xl border-l-2 border-ouro-profundo/50 pl-5 text-[0.86rem] leading-relaxed text-grafite/65">
-        {AVISO}
+        {t.aviso}
       </p>
 
       {/* ── Ponte ───────────────────────────────────────────── */}
       <div className="mt-14 border-t border-linha pt-9">
         <h2 className="t-title max-w-xl text-balance">
-          Saber a conta ajuda. Ter um plano que a dispense é melhor.
+          {e.ponteTitulo}
         </h2>
         <p className="mt-6 max-w-lg leading-relaxed text-grafite/70">
-          Esta ferramenta resolve o jantar de hoje. O que muda o corpo é a
-          soma das semanas — e essa parte é montada com você, não estimada
-          a olho.
+          {e.ponteTexto}
         </p>
         <div className="mt-8 flex flex-wrap items-center gap-4">
           <a
-            href={`${rotas.consultoria}?de=prato`}
+            href={rotaIdioma(idioma, `${rotas.consultoria}?de=prato`)}
             className={`${buttonClass("consultoria")}`}
           >
-            Começar consultoria
+            {e.comecar}
             <Arrow />
           </a>
           <Link
-            href={rotas.calculadora}
+            href={rotaIdioma(idioma, rotas.calculadora)}
             className="group inline-flex items-center gap-2.5 border-b border-linha-ouro pb-1.5 text-sm text-ouro-profundo"
           >
-            Calcular minhas calorias
+            {e.calcular}
             <Arrow />
           </Link>
         </div>
@@ -495,9 +492,8 @@ export function EstimadorDePrato() {
               kcal
             </p>
             <p className="text-xs text-grafite/50">
-              {prato.itens.length}{" "}
-              {prato.itens.length === 1 ? "item" : "itens"}
-              {leitura && ` · ${leitura.pctMin}–${leitura.pctMax}% do dia`}
+              {e.itens(prato.itens.length)}
+              {leitura && e.doDia(leitura.pctMin, leitura.pctMax)}
             </p>
           </div>
         </div>

@@ -1,13 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import {
-  SITUACOES,
-  exercicio,
-  type Figura,
-  type Pose,
-  type Situacao,
-} from "@/lib/postura-cotidiano";
+import type { Figura, Pose, Situacao } from "@/lib/postura-cotidiano";
+import { UI_COTIDIANO, exercicioLocal, situacoes } from "@/lib/i18n/postura";
+import type { Idioma } from "@/lib/rotas-idioma";
 
 /* ── Figura animada ────────────────────────────────────────────
    As duas poses ficam sempre no SVG. Ao trocar, a pose habitual vira
@@ -105,8 +101,9 @@ function Palco({ figura, certo }: { figura: Figura; certo: boolean }) {
 
 /* ── Cartão de uma situação ────────────────────────────────── */
 
-function CartaoSituacao({ s }: { s: Situacao }) {
+function CartaoSituacao({ s, idioma }: { s: Situacao; idioma: Idioma }) {
   const [certo, setCerto] = useState(false);
+  const ui = UI_COTIDIANO[idioma];
 
   return (
     <article
@@ -132,7 +129,7 @@ function CartaoSituacao({ s }: { s: Situacao }) {
                   certo ? "bg-ouro text-[#0b0a09]" : "bg-[#e2563b]/15 text-[#ff8a70]"
                 }`}
               >
-                {certo ? "Ajustado" : "Como costuma ficar"}
+                {certo ? ui.seloCerto : ui.seloErrado}
               </span>
             </div>
             <div className="absolute inset-0 px-3 pb-[4.5rem] pt-12">
@@ -148,8 +145,8 @@ function CartaoSituacao({ s }: { s: Situacao }) {
                 }`}
               />
               {[
-                { v: false, rotulo: "Como fica" },
-                { v: true, rotulo: "Como arrumar" },
+                { v: false, rotulo: ui.botaoErrado },
+                { v: true, rotulo: ui.botaoCerto },
               ].map(({ v, rotulo }) => (
                 <button
                   key={rotulo}
@@ -190,7 +187,7 @@ function CartaoSituacao({ s }: { s: Situacao }) {
             {s.oQueAcontece}
           </p>
 
-          <h3 className="t-eyebrow mt-12 text-ouro-profundo">Como arrumar</h3>
+          <h3 className="t-eyebrow mt-12 text-ouro-profundo">{ui.comoArrumar}</h3>
           <ol className="mt-5 grid gap-px overflow-hidden rounded-xl border border-linha bg-linha">
             {s.ajustes.map((a, i) => (
               <li key={a.titulo} className="flex gap-5 bg-branco p-5 sm:p-6">
@@ -207,10 +204,10 @@ function CartaoSituacao({ s }: { s: Situacao }) {
             {s.regra}
           </p>
 
-          <h3 className="t-eyebrow mt-12 text-ouro-profundo">Exercícios para compensar</h3>
+          <h3 className="t-eyebrow mt-12 text-ouro-profundo">{ui.exercicios}</h3>
           <ul className="mt-5 space-y-3">
             {s.exercicios.map((n) => {
-              const e = exercicio(n);
+              const e = exercicioLocal(n, idioma);
               return (
                 <li key={n}>
                   <details className="group rounded-xl border border-linha bg-branco/60 open:border-ouro/50">
@@ -234,7 +231,7 @@ function CartaoSituacao({ s }: { s: Situacao }) {
                     <div className="space-y-3 px-4 pb-5 text-sm leading-relaxed text-grafite/75 sm:px-5">
                       <p>{e.como}</p>
                       <p className="rounded-lg bg-[#e2563b]/10 p-3 text-[#ffb3a3]">
-                        <strong className="font-semibold text-[#ff8a70]">Onde falha: </strong>
+                        <strong className="font-semibold text-[#ff8a70]">{ui.ondeFalha}</strong>
                         {e.falha}
                       </p>
                     </div>
@@ -249,16 +246,17 @@ function CartaoSituacao({ s }: { s: Situacao }) {
   );
 }
 
-export function PosturaCotidiano() {
+export function PosturaCotidiano({ idioma = "pt" }: { idioma?: Idioma }) {
+  const lista = situacoes(idioma);
   return (
     <>
       {/* Atalhos: no reel, cada chip é um corte. */}
       <nav
-        aria-label="Situações"
+        aria-label={UI_COTIDIANO[idioma].navAria}
         className="sticky top-20 z-30 -mx-6 border-y border-linha bg-porcelana/85 px-6 py-3 backdrop-blur-xl sm:-mx-8 sm:px-8 lg:-mx-12 lg:px-12"
       >
         <ul className="flex gap-2 overflow-x-auto [scrollbar-width:none]">
-          {SITUACOES.map((s) => (
+          {lista.map((s) => (
             <li key={s.id} className="shrink-0">
               <a
                 href={`#${s.id}`}
@@ -272,8 +270,8 @@ export function PosturaCotidiano() {
         </ul>
       </nav>
 
-      {SITUACOES.map((s) => (
-        <CartaoSituacao key={s.id} s={s} />
+      {lista.map((s) => (
+        <CartaoSituacao key={s.id} s={s} idioma={idioma} />
       ))}
     </>
   );

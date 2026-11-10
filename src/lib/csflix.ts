@@ -4,6 +4,9 @@
  * sinopse instigante por episódio e sincronização automática com o feed RSS do YouTube.
  */
 
+import { CATALOGO_CSFLIX } from "@/lib/i18n/csflix";
+import type { Idioma } from "@/lib/rotas-idioma";
+
 const CANAL = "UCSq4rGIePKS1u0ODvYsmR7w";
 
 export type Video = {
@@ -313,27 +316,41 @@ function extrairFeedRecente(xml: string): Video[] {
   return videos;
 }
 
-export async function carregarTrilhas(): Promise<Trilha[]> {
+/**
+ * Temporadas curadas no idioma pedido (padrão: português). ES/EN trocam só
+ * os textos (série, título e sinopse); ids, ordem e duração são os mesmos.
+ * O que faltar na tradução cai no português.
+ */
+export async function carregarTrilhas(idioma: Idioma = "pt"): Promise<Trilha[]> {
+  const traducao = idioma === "pt" ? null : CATALOGO_CSFLIX[idioma];
+
   // Monta todas as Temporadas curadas com numeração sequencial EP. 01..N
-  const trilhas: Trilha[] = SERIES_CSFLIX.map((serie) => ({
-    id: serie.id,
-    temporada: serie.temporada,
-    icone: serie.icone,
-    nome: serie.nome,
-    subtitulo: serie.subtitulo,
-    descricao: serie.descricao,
-    promessaMaratona: serie.promessaMaratona,
-    videos: serie.episodios.map((ep, idx) => ({
-      id: ep.id,
-      titulo: ep.titulo,
-      sinopse: ep.sinopse,
-      duracao: ep.duracao,
-      publicado: "2026",
-      url: `https://www.youtube.com/watch?v=${ep.id}`,
-      episodioNumero: idx + 1,
-      temporadaTag: serie.temporada,
-    })),
-  }));
+  const trilhas: Trilha[] = SERIES_CSFLIX.map((serie) => {
+    const s = traducao?.series[serie.id];
+    const temporada = s?.temporada ?? serie.temporada;
+    return {
+      id: serie.id,
+      temporada,
+      icone: serie.icone,
+      nome: s?.nome ?? serie.nome,
+      subtitulo: s?.subtitulo ?? serie.subtitulo,
+      descricao: s?.descricao ?? serie.descricao,
+      promessaMaratona: s?.promessaMaratona ?? serie.promessaMaratona,
+      videos: serie.episodios.map((ep, idx) => {
+        const e = traducao?.episodios[ep.id];
+        return {
+          id: ep.id,
+          titulo: e?.titulo ?? ep.titulo,
+          sinopse: e?.sinopse ?? ep.sinopse,
+          duracao: ep.duracao,
+          publicado: "2026",
+          url: `https://www.youtube.com/watch?v=${ep.id}`,
+          episodioNumero: idx + 1,
+          temporadaTag: temporada,
+        };
+      }),
+    };
+  });
 
   return trilhas;
 }

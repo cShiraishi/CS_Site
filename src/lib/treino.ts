@@ -19,6 +19,9 @@
  *    inseguro para quem está voltando.
  */
 
+import { TREINO_TRAD } from "./i18n/programa-motor";
+import type { Idioma } from "./rotas-idioma";
+
 export type Local = "casa" | "academia";
 export type Experiencia = "nunca" | "voltando" | "constante";
 
@@ -236,15 +239,19 @@ export function montarSemana(
   dias: number,
   experiencia: Experiencia,
   bloco: 1 | 2 | 3,
+  /** idioma dos nomes; o padrão, português, é o que a área do aluno usa */
+  idioma: Idioma = "pt",
 ): SessaoMontada[] {
   const divisao = DIVISOES[dias] ?? DIVISOES[3];
   const dose = prescrever(bloco, experiencia);
   const emCasa = local === "casa";
+  const trad = idioma === "pt" ? null : TREINO_TRAD[idioma];
+  const faixa = (texto: string) => (trad ? trad.faixa(texto) : texto);
 
   return divisao.map((sessao) => ({
-    nome: sessao.nome,
+    nome: trad?.sessoes[sessao.nome] ?? sessao.nome,
     itens: sessao.padroes.map((p) => {
-      const vaga = VAGAS[p];
+      const vaga = trad ? { padrao: p, ...trad.vagas[p] } : VAGAS[p];
 
       // No primeiro bloco em casa, quem nunca treinou começa pela
       // regressão: é o mesmo padrão com a chance de sair bem feito.
@@ -256,14 +263,14 @@ export function montarSemana(
             : vaga.academia;
 
       return {
-        padrao: NOME_PADRAO[p],
+        padrao: trad ? trad.padrao[p] : NOME_PADRAO[p],
         exercicio: principal,
         alternativa:
           emCasa && principal !== vaga.regressaoCasa ? vaga.regressaoCasa : null,
         series: dose.series,
-        reps: dose.reps,
+        reps: faixa(dose.reps),
         rir: dose.rir,
-        descanso: dose.descanso,
+        descanso: faixa(dose.descanso),
       };
     }),
   }));

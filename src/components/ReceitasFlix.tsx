@@ -3,22 +3,19 @@
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  ASSUNTOS_INTERESSE,
   CATALOGO_RECEITAS,
-  PILULAS_FILTRO,
   formatarViews,
-  type AlimentoBase,
   type PilulaFiltroId,
   type Receita,
   type TrilhaReceitas,
 } from "@/lib/receitas";
-
-const ROTULO_ALIMENTO: Record<AlimentoBase, string> = {
-  aveia: "🌾 Aveia",
-  tapioca: "🫓 Tapioca",
-  "ovos-iogurte": "🥚 Ovos & Iogurte",
-  "frutas-gelatina": "🍓 < 100 kcal",
-};
+import {
+  TEXTOS_RECEITAS,
+  assuntosInteresse,
+  pilulasFiltro,
+  type TextosReceitas,
+} from "@/lib/i18n/receitas";
+import type { Idioma } from "@/lib/rotas-idioma";
 
 /* ============================================================
    Destaque — Billboard estilo Netflix (Top 1 em Views)
@@ -27,10 +24,14 @@ function Destaque({
   receita,
   total,
   aoAbrir,
+  idioma,
+  t,
 }: {
   receita: Receita;
   total: number;
   aoAbrir: () => void;
+  idioma: Idioma;
+  t: TextosReceitas;
 }) {
   return (
     <section className="relative min-h-[42rem] overflow-hidden pt-32 sm:min-h-[46rem] sm:pt-40 lg:min-h-[50rem]">
@@ -63,7 +64,7 @@ function Destaque({
               className="h-auto w-32 drop-shadow-[0_4px_18px_rgba(0,0,0,0.7)] sm:w-40"
             />
             <span className="rounded border border-ouro/45 bg-ouro/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-ouro backdrop-blur-sm">
-              Receitas Fitness
+              {t.seloPagina}
             </span>
           </div>
 
@@ -73,10 +74,10 @@ function Destaque({
               TOP 1
             </span>
             <span className="text-xs font-semibold uppercase tracking-[.14em] text-white/85">
-              Mais assistido · {formatarViews(receita.views)}
+              {t.maisAssistido} · {formatarViews(receita.views, idioma)}
             </span>
             <span className="rounded-full border border-white/20 bg-white/10 px-2.5 py-0.5 text-[10px] font-medium text-white/85">
-              {ROTULO_ALIMENTO[receita.alimento]}
+              {t.rotuloAlimento[receita.alimento]}
             </span>
           </div>
 
@@ -86,13 +87,13 @@ function Destaque({
 
           <div className="mt-5 flex flex-wrap items-center gap-3 text-sm">
             <span className="font-semibold text-emerald-400">
-              {receita.macros.proteina}g Proteína
+              {receita.macros.proteina}g {t.proteina}
             </span>
             <span className="rounded border border-white/35 px-1.5 py-0.5 text-[10px] text-white/80">
               {receita.macros.kcal} kcal
             </span>
             <span className="text-white/65">⏱ {receita.tempo}</span>
-            <span className="text-white/65">{total} vídeos catalogados</span>
+            <span className="text-white/65">{t.videosCatalogados(total)}</span>
           </div>
 
           <p className="mt-5 max-w-xl text-base leading-relaxed text-white/75 sm:text-lg">
@@ -105,15 +106,19 @@ function Destaque({
               onClick={aoAbrir}
               className="inline-flex items-center gap-3 rounded-md bg-white px-7 py-3 text-sm font-semibold text-black transition hover:bg-white/80"
             >
-              <span className="text-lg">▶</span> Assistir agora
+              <span className="text-lg">▶</span> {t.assistirAgora}
             </button>
             <a
               href="#catalogo-receitas"
               className="inline-flex items-center gap-2 rounded-md bg-white/15 px-7 py-3 text-sm font-medium text-white backdrop-blur-md transition hover:bg-white/25"
             >
-              ⓘ Explorar categorias
+              ⓘ {t.explorarCategorias}
             </a>
           </div>
+
+          {t.notaVideos && (
+            <p className="mt-5 max-w-xl text-xs text-white/50">{t.notaVideos}</p>
+          )}
         </div>
       </div>
     </section>
@@ -127,17 +132,21 @@ function Cartao({
   receita,
   aoAbrir,
   posicaoRanking,
+  idioma,
+  t,
 }: {
   receita: Receita;
   aoAbrir: () => void;
   posicaoRanking?: number;
+  idioma: Idioma;
+  t: TextosReceitas;
 }) {
   return (
     <div className="w-64 shrink-0 sm:w-76 lg:w-84">
       <button
         type="button"
         onClick={aoAbrir}
-        aria-label={`Ver receita: ${receita.titulo}`}
+        aria-label={t.verReceita(receita.titulo)}
         className="group min-w-0 w-full flex-1 snap-start text-left"
       >
         <span className="relative block aspect-video overflow-hidden rounded-xl bg-zinc-900 shadow-[0_18px_45px_rgba(0,0,0,.28)] ring-1 ring-white/10 transition-all duration-500 group-hover:z-10 group-hover:-translate-y-2 group-hover:scale-[1.025] group-hover:shadow-[0_28px_70px_rgba(0,0,0,.55)] group-hover:ring-ouro/45 group-focus-visible:scale-[1.025]">
@@ -156,19 +165,19 @@ function Cartao({
             </span>
           ) : (
             <span className="absolute left-2.5 top-2.5 rounded-full border border-white/20 bg-black/65 px-2.5 py-0.5 text-[9px] font-semibold uppercase tracking-[.12em] text-white backdrop-blur-md">
-              {ROTULO_ALIMENTO[receita.alimento]}
+              {t.rotuloAlimento[receita.alimento]}
             </span>
           )}
 
           {/* Views no canto superior direito */}
           <span className="absolute right-2.5 top-2.5 rounded bg-black/80 px-2 py-1 text-[10px] font-semibold text-white backdrop-blur-sm">
-            👁 {formatarViews(receita.views)}
+            👁 {formatarViews(receita.views, idioma)}
           </span>
 
           {/* Faixa rápida de macros na base da miniatura */}
           <span className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-black/95 via-black/60 to-transparent px-3 pb-2 pt-7 text-[10px] text-white/85">
             <span className="font-semibold text-ouro">
-              {receita.macros.kcal} kcal · {receita.macros.proteina}g Proteína
+              {receita.macros.kcal} kcal · {receita.macros.proteina}g {t.proteina}
             </span>
             <span className="text-white/70">⏱ {receita.tempo}</span>
           </span>
@@ -190,8 +199,8 @@ function Cartao({
         <span className="mt-1.5 flex flex-wrap items-center gap-2 text-[10px] uppercase tracking-[.12em] text-white/50">
           <b className="font-semibold text-emerald-400">
             {receita.macros.kcal <= 100
-              ? `🍓 Só ${receita.macros.kcal} kcal`
-              : ROTULO_ALIMENTO[receita.alimento]}
+              ? t.soKcal(receita.macros.kcal)
+              : t.rotuloAlimento[receita.alimento]}
           </b>
           <span>·</span>
           <span>{receita.momento}</span>
@@ -207,9 +216,13 @@ function Cartao({
 function Faixa({
   trilha,
   aoAbrir,
+  idioma,
+  t,
 }: {
   trilha: TrilhaReceitas;
   aoAbrir: (r: Receita) => void;
+  idioma: Idioma;
+  t: TextosReceitas;
 }) {
   const pista = useRef<HTMLDivElement>(null);
   const [pode, setPode] = useState({ antes: false, depois: false });
@@ -265,7 +278,7 @@ function Faixa({
               onClick={() => deslizar(dir)}
               disabled={dir === -1 ? !pode.antes : !pode.depois}
               aria-label={
-                dir === -1 ? `${trilha.nome}: voltar` : `${trilha.nome}: avançar`
+                dir === -1 ? `${trilha.nome}: ${t.voltar}` : `${trilha.nome}: ${t.avancar}`
               }
               className="flex h-9 w-9 items-center justify-center rounded-full border border-white/20 text-white/70 transition-all duration-300 hover:border-[#E00513] hover:text-white disabled:pointer-events-none disabled:opacity-25"
             >
@@ -297,6 +310,8 @@ function Faixa({
             receita={r}
             aoAbrir={() => aoAbrir(r)}
             posicaoRanking={trilha.ranking ? i + 1 : undefined}
+            idioma={idioma}
+            t={t}
           />
         ))}
         <span aria-hidden className="w-2 shrink-0 sm:w-4" />
@@ -311,9 +326,13 @@ function Faixa({
 function ModalReceita({
   receita,
   aoFechar,
+  idioma,
+  t,
 }: {
   receita: Receita | null;
   aoFechar: () => void;
+  idioma: Idioma;
+  t: TextosReceitas;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
 
@@ -350,10 +369,10 @@ function ModalReceita({
               <div>
                 <div className="flex flex-wrap items-center gap-2 text-xs text-white/65">
                   <span className="rounded bg-white/10 px-2 py-0.5 font-semibold text-ouro">
-                    {ROTULO_ALIMENTO[receita.alimento]}
+                    {t.rotuloAlimento[receita.alimento]}
                   </span>
                   <span>·</span>
-                  <span>👁 {formatarViews(receita.views)} no YouTube</span>
+                  <span>👁 {formatarViews(receita.views, idioma)} {t.noYoutube}</span>
                 </div>
                 <h3 className="mt-2 font-display text-2xl leading-tight text-white sm:text-3xl">
                   {receita.titulo}
@@ -373,7 +392,7 @@ function ModalReceita({
                 <button
                   type="button"
                   onClick={aoFechar}
-                  aria-label="Fechar"
+                  aria-label={t.fechar}
                   className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-white/70 transition-colors hover:bg-white/10 hover:text-white"
                 >
                   ✕
@@ -385,7 +404,7 @@ function ModalReceita({
             <div className="grid grid-cols-2 gap-2.5 rounded-xl border border-white/10 bg-white/[0.04] p-4 sm:grid-cols-5">
               <div>
                 <span className="block text-[10px] uppercase tracking-[0.16em] text-white/50">
-                  Calorias
+                  {t.macros.calorias}
                 </span>
                 <span className="mt-1 block font-display text-2xl text-white">
                   {receita.macros.kcal} <small className="text-xs text-white/60">kcal</small>
@@ -393,7 +412,7 @@ function ModalReceita({
               </div>
               <div>
                 <span className="block text-[10px] uppercase tracking-[0.16em] text-ouro">
-                  Proteína
+                  {t.macros.proteina}
                 </span>
                 <span className="mt-1 block font-display text-2xl text-ouro">
                   {receita.macros.proteina}g
@@ -401,7 +420,7 @@ function ModalReceita({
               </div>
               <div>
                 <span className="block text-[10px] uppercase tracking-[0.16em] text-white/50">
-                  Carboidratos
+                  {t.macros.carbo}
                 </span>
                 <span className="mt-1 block font-display text-2xl text-white">
                   {receita.macros.carbo}g
@@ -409,7 +428,7 @@ function ModalReceita({
               </div>
               <div>
                 <span className="block text-[10px] uppercase tracking-[0.16em] text-white/50">
-                  Gorduras
+                  {t.macros.gordura}
                 </span>
                 <span className="mt-1 block font-display text-2xl text-white">
                   {receita.macros.gordura}g
@@ -417,7 +436,7 @@ function ModalReceita({
               </div>
               <div className="col-span-2 sm:col-span-1">
                 <span className="block text-[10px] uppercase tracking-[0.16em] text-emerald-400">
-                  Fibras
+                  {t.macros.fibras}
                 </span>
                 <span className="mt-1 block font-display text-2xl text-emerald-400">
                   {receita.macros.fibras}g
@@ -429,7 +448,7 @@ function ModalReceita({
             <div className="mt-7 grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
               <div>
                 <h4 className="text-xs font-bold uppercase tracking-[0.18em] text-ouro">
-                  Ingredientes · {receita.porcoes}
+                  {t.ingredientes} · {receita.porcoes}
                 </h4>
                 <ul className="mt-4 divide-y divide-white/10 border-y border-white/10 text-sm">
                   {receita.ingredientes.map((ing) => (
@@ -448,7 +467,7 @@ function ModalReceita({
 
               <div>
                 <h4 className="text-xs font-bold uppercase tracking-[0.18em] text-ouro">
-                  Modo de preparo · {receita.tempo}
+                  {t.preparo} · {receita.tempo}
                 </h4>
                 <ol className="mt-4 space-y-3.5 text-sm leading-relaxed text-white/80">
                   {receita.preparo.map((passo, i) => (
@@ -466,7 +485,7 @@ function ModalReceita({
             {/* Nota de Ciência de Alimentos */}
             <div className="mt-7 rounded-xl border border-ouro/30 bg-ouro/[0.07] p-4 sm:p-5">
               <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-ouro">
-                Por que funciona · Ciência de Alimentos
+                {t.ciencia}
               </p>
               <p className="mt-1.5 text-sm leading-relaxed text-white/85">
                 {receita.ciencia}
@@ -485,10 +504,18 @@ function ModalReceita({
 export function ReceitasFlix({
   trilhas: trilhasIniciais,
   total,
+  idioma = "pt",
+  catalogo = CATALOGO_RECEITAS,
 }: {
   trilhas: TrilhaReceitas[];
   total: number;
+  idioma?: Idioma;
+  /** Catálogo já no idioma da página (o servidor localiza). */
+  catalogo?: Receita[];
 }) {
+  const t = TEXTOS_RECEITAS[idioma];
+  const assuntos = useMemo(() => assuntosInteresse(idioma), [idioma]);
+  const pilulas = useMemo(() => pilulasFiltro(idioma), [idioma]);
   const [aberta, setAberta] = useState<Receita | null>(null);
   const [pilulaAtiva, setPilulaAtiva] = useState<PilulaFiltroId>("todas");
 
@@ -499,26 +526,24 @@ export function ReceitasFlix({
 
     const porViews = (a: Receita, b: Receita) => b.views - a.views;
 
-    const filtradas = CATALOGO_RECEITAS.filter((r) =>
+    const filtradas = catalogo.filter((r) =>
       r.interesses.includes(pilulaAtiva),
     ).sort(porViews);
 
-    const assunto = ASSUNTOS_INTERESSE.find((a) => a.id === pilulaAtiva);
+    const assunto = assuntos.find((a) => a.id === pilulaAtiva);
 
     return [
       {
         id: `filtro-${pilulaAtiva}`,
-        nome: `${assunto?.tituloTrilha ?? "Receitas"} · Ordenado por Views`,
-        descricao:
-          assunto?.descricao ??
-          "Do vídeo mais assistido ao menos assistido dentro deste assunto.",
+        nome: `${assunto?.tituloTrilha ?? t.filtro.nomePadrao} · ${t.filtro.sufixo}`,
+        descricao: assunto?.descricao ?? t.filtro.descricaoPadrao,
         ranking: true,
         receitas: filtradas,
       },
     ];
-  }, [pilulaAtiva, trilhasIniciais]);
+  }, [pilulaAtiva, trilhasIniciais, catalogo, assuntos, t]);
 
-  const destaque = trilhasVisiveis[0]?.receitas[0] ?? CATALOGO_RECEITAS[0];
+  const destaque = trilhasVisiveis[0]?.receitas[0] ?? catalogo[0];
 
   return (
     <>
@@ -527,13 +552,15 @@ export function ReceitasFlix({
           receita={destaque}
           total={total}
           aoAbrir={() => setAberta(destaque)}
+          idioma={idioma}
+          t={t}
         />
       )}
 
       <div id="catalogo-receitas" className="relative z-10 -mt-28 pb-16 sm:-mt-32">
         {/* Pílulas de filtro rápido no formato exato que o usuário destacou */}
         <div className="pista mb-10 flex flex-wrap items-center gap-2.5">
-          {PILULAS_FILTRO.map((p) => {
+          {pilulas.map((p) => {
             const ativo = pilulaAtiva === p.id;
             return (
               <button
@@ -552,12 +579,17 @@ export function ReceitasFlix({
           })}
         </div>
 
-        {trilhasVisiveis.map((t) => (
-          <Faixa key={t.id} trilha={t} aoAbrir={setAberta} />
+        {trilhasVisiveis.map((tr) => (
+          <Faixa key={tr.id} trilha={tr} aoAbrir={setAberta} idioma={idioma} t={t} />
         ))}
       </div>
 
-      <ModalReceita receita={aberta} aoFechar={() => setAberta(null)} />
+      <ModalReceita
+        receita={aberta}
+        aoFechar={() => setAberta(null)}
+        idioma={idioma}
+        t={t}
+      />
     </>
   );
 }

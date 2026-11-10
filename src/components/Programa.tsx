@@ -7,6 +7,9 @@ import { DURACAO_PADRAO, montar, type Perfil, type Programa as Plano } from "@/l
 import { ESCALA, figura as caminhoDaFigura, type Nivel } from "@/lib/shapes";
 import { precoEmReais } from "@/lib/produto";
 import { DIAS_POSSIVEIS, type Experiencia, type Local } from "@/lib/treino";
+import { TEXTO_PROGRAMA, type TextoPrograma } from "@/lib/i18n/programa";
+import { ATIVIDADE_TRAD, numeroIdioma, rotuloNivel } from "@/lib/i18n/programa-motor";
+import type { Idioma } from "@/lib/rotas-idioma";
 import { Comprar } from "./Comprar";
 import { PrecoDinamico, SeletorMoeda } from "./SeletorMoeda";
 import { Arrow, Container, Rotulo, campoBase } from "./ui";
@@ -51,13 +54,13 @@ const TOTAL_PASSOS = 7;
 const RESPIRO = 420;
 
 /**
- * Número com vírgula decimal.
+ * Número com vírgula decimal (ponto em inglês).
  *
  * "86.6 kg" numa página em português é erro de acabamento — a calculadora
  * de gordura ao lado já escreve "15,5 %". À mão em vez de
  * `toLocaleString` para o valor não depender do locale do ambiente.
  */
-const n1 = (valor: number) => String(valor).replace(".", ",");
+const n1 = numeroIdioma;
 
 type Estado = {
   sexo: Sexo | null;
@@ -94,8 +97,11 @@ export function Programa({
   abertura,
   rodape,
   vendaAberta = false,
+  idioma = "pt",
 }: {
   figuras?: string[];
+  /** idioma dos textos do funil e do plano gerado */
+  idioma?: Idioma;
   /** Checkout configurado no servidor (token do Mercado Pago, segredo do
       webhook e chave de serviço do Supabase). Sem isso, a oferta troca o
       botão de compra pelo caminho da consultoria. */
@@ -105,6 +111,8 @@ export function Programa({
   /** Texto de apoio abaixo do funil — idem. */
   rodape?: ReactNode;
 }) {
+  const t = TEXTO_PROGRAMA[idioma];
+  const f = t.funil;
   const [passo, setPasso] = useState(0);
   const [e, setE] = useState<Estado>(INICIAL);
   const [avancando, setAvancando] = useState(false);
@@ -167,8 +175,8 @@ export function Programa({
       refeicoes: e.refeicoes,
     };
 
-    return montar(perfil) ?? null;
-  }, [e]);
+    return montar(perfil, DURACAO_PADRAO, "mifflin", idioma) ?? null;
+  }, [e, idioma]);
 
   const avancar = () => setPasso((p) => Math.min(TOTAL_PASSOS, p + 1));
 
@@ -225,14 +233,14 @@ export function Programa({
         {passo === 0 && !noResultado && (
           <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p className="t-eyebrow text-[#00ff66]">Diagnóstico Interativo Gratuito</p>
+              <p className="t-eyebrow text-[#00ff66]">{f.eyebrow}</p>
               <p className="mt-2 font-display text-2xl text-grafite sm:text-3xl">
-                Simule seu Reset de 21 Dias em 60 segundos
+                {f.titulo}
               </p>
             </div>
             <span className="inline-flex items-center gap-2 rounded-full border border-[#00ff66]/45 bg-[#00ff66]/10 px-4 py-1.5 text-xs font-bold text-[#00ff66] shadow-[0_0_20px_rgba(0,255,102,0.18)]">
               <span aria-hidden className="pulso size-2 rounded-full bg-[#00ff66]" />
-              7 toques · Sem cadastro para ver o cálculo
+              {f.selo}
             </span>
           </div>
         )}
@@ -241,11 +249,13 @@ export function Programa({
             plano={plano}
             disponivel={disponivel}
             vendaAberta={vendaAberta}
+            idioma={idioma}
+            t={t}
             onVoltar={() => setPasso(TOTAL_PASSOS - 1)}
           />
         ) : (
           <div className="surface-elevated overflow-hidden rounded-xl border border-[#00ff66]/30 bg-branco shadow-[0_0_50px_rgba(0,255,102,0.08)]">
-            <Progresso passo={passo} />
+            <Progresso passo={passo} rotulo={f.passo(passo + 1, TOTAL_PASSOS)} />
 
             <div
               className={`p-6 sm:p-10 lg:p-12 ${avancando ? "pointer-events-none" : ""}`}
@@ -253,15 +263,15 @@ export function Programa({
             >
               {passo === 0 && (
                 <Tela
-                  indice={1}
-                  titulo="Você é homem ou mulher?"
-                  nota="A composição corporal e o gasto energético diferem o bastante para mudar todo o plano. É a única razão da pergunta."
+                  rotuloPasso={f.passo(1, TOTAL_PASSOS)}
+                  titulo={f.sexo.titulo}
+                  nota={f.sexo.nota}
                 >
                   <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
                     {(
                       [
-                        ["masculino", "Homem"],
-                        ["feminino", "Mulher"],
+                        ["masculino", f.sexo.homem],
+                        ["feminino", f.sexo.mulher],
                       ] as const
                     ).map(([valor, rotulo]) => (
                       <Opcao
@@ -294,32 +304,34 @@ export function Programa({
 
               {passo === 1 && (
                 <Tela
-                  indice={2}
-                  titulo="Qual silhueta é a sua hoje?"
-                  nota="Aponte o que você vê no espelho. O número vem depois, por trás."
+                  rotuloPasso={f.passo(2, TOTAL_PASSOS)}
+                  titulo={f.atual.titulo}
+                  nota={f.atual.nota}
                 >
                   <Silhuetas
                     escala={escala}
                     valor={e.shapeAtual}
                     onEscolher={(id) => responder(() => campo("shapeAtual", id))}
                     disponivel={disponivel}
-                    rotuloGrupo="Silhueta atual"
+                    rotuloGrupo={f.atual.grupo}
+                    idioma={idioma}
                   />
                 </Tela>
               )}
 
               {passo === 2 && (
                 <Tela
-                  indice={3}
-                  titulo="E qual é o corpo que você quer?"
-                  nota="Escolha pelo corpo, não pelo número. É esta distância que o programa percorre."
+                  rotuloPasso={f.passo(3, TOTAL_PASSOS)}
+                  titulo={f.alvo.titulo}
+                  nota={f.alvo.nota}
                 >
                   <Silhuetas
                     escala={escala}
                     valor={e.shapeAlvo}
                     onEscolher={(id) => responder(() => campo("shapeAlvo", id))}
                     disponivel={disponivel}
-                    rotuloGrupo="Silhueta desejada"
+                    rotuloGrupo={f.alvo.grupo}
+                    idioma={idioma}
                     aqui={e.shapeAtual}
                   />
                 </Tela>
@@ -327,15 +339,15 @@ export function Programa({
 
               {passo === 3 && (
                 <Tela
-                  indice={4}
-                  titulo="Seus números de hoje"
-                  nota="É com eles que o plano é calculado. A silhueta diz para onde ir; estes dizem de onde se parte."
+                  rotuloPasso={f.passo(4, TOTAL_PASSOS)}
+                  titulo={f.numeros.titulo}
+                  nota={f.numeros.nota}
                 >
                   <div className="grid gap-7 sm:grid-cols-3">
                     <Numero
                       id="prog-idade"
-                      rotulo="Idade"
-                      unidade="anos"
+                      rotulo={f.numeros.idade}
+                      unidade={f.numeros.anos}
                       valor={e.idade}
                       onChange={(v) => campo("idade", v)}
                       placeholder="32"
@@ -343,7 +355,7 @@ export function Programa({
                     />
                     <Numero
                       id="prog-altura"
-                      rotulo="Altura"
+                      rotulo={f.numeros.altura}
                       unidade="cm"
                       valor={e.altura}
                       onChange={(v) => campo("altura", v)}
@@ -351,7 +363,7 @@ export function Programa({
                     />
                     <Numero
                       id="prog-peso"
-                      rotulo="Peso"
+                      rotulo={f.numeros.peso}
                       unidade="kg"
                       valor={e.peso}
                       onChange={(v) => campo("peso", v)}
@@ -364,14 +376,14 @@ export function Programa({
 
               {passo === 4 && (
                 <Tela
-                  indice={5}
-                  titulo="Onde você quer chegar na balança?"
-                  nota="Se o número e a silhueta não combinarem, o programa diz — e explica qual dos dois vale a pena perseguir."
+                  rotuloPasso={f.passo(5, TOTAL_PASSOS)}
+                  titulo={f.pesoAlvo.titulo}
+                  nota={f.pesoAlvo.nota}
                 >
                   <div className="max-w-xs">
                     <Numero
                       id="prog-peso-alvo"
-                      rotulo="Peso desejado"
+                      rotulo={f.pesoAlvo.rotulo}
                       unidade="kg"
                       valor={e.pesoAlvo}
                       onChange={(v) => campo("pesoAlvo", v)}
@@ -385,12 +397,12 @@ export function Programa({
 
               {passo === 5 && (
                 <Tela
-                  indice={6}
-                  titulo="Como é o seu dia e onde você treina"
-                  nota="O programa é montado sobre o que você tem de verdade. Prometer cinco dias e cumprir dois é pior que planejar dois."
+                  rotuloPasso={f.passo(6, TOTAL_PASSOS)}
+                  titulo={f.rotina.titulo}
+                  nota={f.rotina.nota}
                 >
                   <fieldset>
-                    <legend className="t-eyebrow text-grafite">Seu dia hoje</legend>
+                    <legend className="t-eyebrow text-grafite">{f.rotina.seuDia}</legend>
                     <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                       {ATIVIDADES.map((a) => (
                         <Opcao
@@ -398,20 +410,24 @@ export function Programa({
                           ativo={e.atividade === a.id}
                           onClick={() => campo("atividade", a.id)}
                         >
-                          <span className="font-display text-base">{a.nome}</span>
-                          <span className="mt-1 block text-xs text-grafite/80">{a.nota}</span>
+                          <span className="font-display text-base">
+                            {idioma === "pt" ? a.nome : ATIVIDADE_TRAD[idioma][a.id].nome}
+                          </span>
+                          <span className="mt-1 block text-xs text-grafite/80">
+                            {idioma === "pt" ? a.nota : ATIVIDADE_TRAD[idioma][a.id].nota}
+                          </span>
                         </Opcao>
                       ))}
                     </div>
                   </fieldset>
 
                   <fieldset className="mt-9">
-                    <legend className="t-eyebrow text-grafite">Onde você vai treinar</legend>
+                    <legend className="t-eyebrow text-grafite">{f.rotina.onde}</legend>
                     <div className="mt-4 grid gap-3 sm:grid-cols-2">
                       {(
                         [
-                          ["academia", "Academia", "Máquinas, barras e halteres"],
-                          ["casa", "Em casa", "Peso do corpo e o que houver por aí"],
+                          ["academia", ...f.rotina.academia],
+                          ["casa", ...f.rotina.casa],
                         ] as const
                       ).map(([valor, nome, nota]) => (
                         <Opcao
@@ -430,18 +446,18 @@ export function Programa({
 
               {passo === 6 && (
                 <Tela
-                  indice={7}
-                  titulo="Quanto você consegue treinar"
-                  nota="Última pergunta. O número que você sustenta por 21 dias vale mais que o número que você gostaria de fazer."
+                  rotuloPasso={f.passo(7, TOTAL_PASSOS)}
+                  titulo={f.treino.titulo}
+                  nota={f.treino.nota}
                 >
                   <fieldset>
-                    <legend className="t-eyebrow text-grafite">Sua experiência</legend>
+                    <legend className="t-eyebrow text-grafite">{f.treino.experiencia}</legend>
                     <div className="mt-4 grid gap-3 sm:grid-cols-3">
                       {(
                         [
-                          ["nunca", "Nunca treinei", "Ou foi há muitos anos"],
-                          ["voltando", "Estou voltando", "Já treinei, parei"],
-                          ["constante", "Treino há tempo", "De forma constante"],
+                          ["nunca", ...f.treino.nunca],
+                          ["voltando", ...f.treino.voltando],
+                          ["constante", ...f.treino.constante],
                         ] as const
                       ).map(([valor, nome, nota]) => (
                         <Opcao
@@ -473,13 +489,13 @@ export function Programa({
                   </fieldset>
 
                   <fieldset className="mt-9">
-                    <legend className="t-eyebrow text-grafite">Dias de treino por semana</legend>
+                    <legend className="t-eyebrow text-grafite">{f.treino.dias}</legend>
                     <div className="mt-4 flex flex-wrap gap-3">
                       {DIAS_POSSIVEIS[e.experiencia].map((d) => (
                         <Pastilha
                           key={d}
                           ativo={e.diasPedidos === d}
-                          rotulo={`${d} dias de treino por semana`}
+                          rotulo={f.treino.diasAria(d)}
                           onClick={() => campo("diasPedidos", d)}
                         >
                           {d}
@@ -489,13 +505,13 @@ export function Programa({
                   </fieldset>
 
                   <fieldset className="mt-9">
-                    <legend className="t-eyebrow text-grafite">Refeições por dia</legend>
+                    <legend className="t-eyebrow text-grafite">{f.treino.refeicoes}</legend>
                     <div className="mt-4 flex flex-wrap gap-3">
                       {[2, 3, 4, 5, 6].map((r) => (
                         <Pastilha
                           key={r}
                           ativo={e.refeicoes === r}
-                          rotulo={`${r} refeições por dia`}
+                          rotulo={f.treino.refeicoesAria(r)}
                           onClick={() => campo("refeicoes", r)}
                         >
                           {r}
@@ -522,7 +538,7 @@ export function Programa({
                 disabled={passo === 0}
                 className="-m-3 p-3 text-sm text-grafite transition-colors hover:text-ouro-profundo disabled:opacity-40"
               >
-                Voltar
+                {f.voltar}
               </button>
 
               <button
@@ -531,7 +547,7 @@ export function Programa({
                 disabled={!podeAvancar}
                 className="group inline-flex min-h-12 cursor-pointer items-center gap-2.5 rounded-full bg-[#00ff66] px-7 py-3.5 text-sm font-extrabold uppercase tracking-wider text-[#041208] shadow-[0_0_25px_rgba(0,255,102,0.4)] transition-all duration-300 hover:bg-[#4be283] hover:shadow-[0_0_38px_rgba(0,255,102,0.6)] disabled:opacity-40 disabled:shadow-none sm:px-8"
               >
-                {passo === TOTAL_PASSOS - 1 ? "Ver meu programa" : "Continuar"}
+                {passo === TOTAL_PASSOS - 1 ? f.verPrograma : f.continuar}
                 <Arrow />
               </button>
             </div>
@@ -549,7 +565,7 @@ export function Programa({
    PEÇAS DO FUNIL
    ============================================================ */
 
-function Progresso({ passo }: { passo: number }) {
+function Progresso({ passo, rotulo }: { passo: number; rotulo: string }) {
   const pct = Math.round(((passo + 1) / TOTAL_PASSOS) * 100);
 
   return (
@@ -558,7 +574,7 @@ function Progresso({ passo }: { passo: number }) {
       aria-valuenow={passo + 1}
       aria-valuemin={1}
       aria-valuemax={TOTAL_PASSOS}
-      aria-label={`Passo ${passo + 1} de ${TOTAL_PASSOS}`}
+      aria-label={rotulo}
       className="h-1.5 w-full bg-porcelana"
     >
       <div
@@ -578,21 +594,20 @@ function Progresso({ passo }: { passo: number }) {
  * que havia para escolher.
  */
 function Tela({
-  indice,
+  rotuloPasso,
   titulo,
   nota,
   children,
 }: {
-  indice: number;
+  /** "Passo 1 de 7" */
+  rotuloPasso: string;
   titulo: string;
   nota: string;
   children: ReactNode;
 }) {
   return (
     <div>
-      <p className="t-eyebrow text-[#00ff66]">
-        Passo {indice} de {TOTAL_PASSOS}
-      </p>
+      <p className="t-eyebrow text-[#00ff66]">{rotuloPasso}</p>
       <h2 className="mt-3 font-display text-2xl leading-tight text-balance text-grafite sm:mt-4 sm:text-4xl">
         {titulo}
       </h2>
@@ -719,7 +734,9 @@ function Silhuetas({
   disponivel,
   rotuloGrupo,
   aqui,
+  idioma,
 }: {
+  idioma: Idioma;
   escala: readonly Nivel[];
   valor: string | null;
   onEscolher: (id: string) => void;
@@ -728,6 +745,7 @@ function Silhuetas({
   /** o nível já escolhido como "atual", marcado na tela do alvo */
   aqui?: string | null;
 }) {
+  const f = TEXTO_PROGRAMA[idioma].funil;
   return (
     <div
       role="radiogroup"
@@ -786,7 +804,7 @@ function Silhuetas({
 
               {estaAqui && (
                 <span className="absolute inset-x-0 top-0 bg-grafite/85 px-2 py-1 text-center text-[0.6rem] uppercase tracking-[0.14em] text-porcelana">
-                  Você está aqui
+                  {f.voceEstaAqui}
                 </span>
               )}
             </span>
@@ -795,11 +813,11 @@ function Silhuetas({
                 está no lugar da imagem, e repeti-lo aqui era ruído. */}
             <span className="flex flex-1 flex-col p-3">
               <span className="font-display text-base leading-tight text-grafite">
-                {n.rotulo}
+                {rotuloNivel(n, idioma)}
               </span>
               {temFigura && (
                 <span className="mt-1 text-[0.6rem] uppercase tracking-[0.14em] text-ouro-profundo">
-                  {n.gordura}% de gordura
+                  {f.deGordura(n.gordura)}
                 </span>
               )}
             </span>
@@ -818,27 +836,30 @@ function Resultado({
   plano,
   disponivel,
   vendaAberta,
+  idioma,
+  t,
   onVoltar,
 }: {
   plano: Plano | null;
   disponivel: Set<string>;
   vendaAberta: boolean;
+  idioma: Idioma;
+  t: TextoPrograma;
   onVoltar: () => void;
 }) {
+  const r = t.resultado;
+  const n = (valor: number) => n1(valor, idioma);
   if (!plano) {
     return (
       <div className="surface-elevated bg-branco p-6 sm:p-10">
-        <h2 className="t-title">Faltou algum dado.</h2>
-        <p className="mt-4 max-w-md leading-relaxed text-grafite">
-          Não consegui montar o programa com o que foi preenchido. Volte um passo e confira
-          idade, altura e peso.
-        </p>
+        <h2 className="t-title">{r.faltouTitulo}</h2>
+        <p className="mt-4 max-w-md leading-relaxed text-grafite">{r.faltouTexto}</p>
         <button
           type="button"
           onClick={onVoltar}
           className="mt-7 text-sm text-grafite underline decoration-ouro underline-offset-4"
         >
-          Voltar
+          {r.voltar}
         </button>
       </div>
     );
@@ -851,37 +872,33 @@ function Resultado({
       <div className="surface-elevated overflow-hidden bg-branco">
         <div className="h-1 bg-linear-to-r from-ouro-profundo via-ouro to-transparent" />
         <div className="p-6 sm:p-10 lg:p-12">
-          <p className="t-eyebrow text-ouro-profundo">Seu programa de {plano.duracao} dias</p>
+          <p className="t-eyebrow text-ouro-profundo">{r.eyebrow(plano.duracao)}</p>
           <h2 className="mt-3 font-display text-2xl leading-tight text-balance text-grafite sm:mt-4 sm:text-4xl">
             {v.modo === "recomposicao"
-              ? "O seu caso não é perder peso — é trocar composição."
+              ? r.tituloRecomp
               : v.cabe
-                ? `O que você pediu cabe nos ${plano.duracao} dias.`
-                : `Vamos ser exatos sobre o que cabe em ${plano.duracao} dias.`}
+                ? r.tituloCabe(plano.duracao)
+                : r.tituloNaoCabe(plano.duracao)}
           </h2>
 
-          <Comparacao plano={plano} disponivel={disponivel} />
+          <Comparacao plano={plano} disponivel={disponivel} idioma={idioma} t={t} />
 
           <div className="mt-8 grid grid-cols-2 gap-5 border-t border-linha pt-7 sm:grid-cols-3 sm:gap-6">
             <Metrica
-              rotulo="Hoje"
-              valor={`${n1(perfil.peso)} kg`}
-              nota={plano.gorduraAtual !== null ? `~${plano.gorduraAtual}% de gordura` : ""}
+              rotulo={r.hoje}
+              valor={`${n(perfil.peso)} kg`}
+              nota={plano.gorduraAtual !== null ? r.gorduraAprox(plano.gorduraAtual) : ""}
             />
             <Metrica
-              rotulo={`No dia ${plano.duracao}`}
-              valor={`${n1(v.pesoProjetado)} kg`}
-              nota={
-                v.modo === "recomposicao"
-                  ? "a balança mexe pouco de propósito"
-                  : `${n1(v.entregue)} kg de diferença`
-              }
+              rotulo={r.noDia(plano.duracao)}
+              valor={`${n(v.pesoProjetado)} kg`}
+              nota={v.modo === "recomposicao" ? r.balancaPouco : r.diferenca(n(v.entregue))}
               destaque
             />
             <Metrica
-              rotulo="Treino"
-              valor={`${plano.dias}× / semana`}
-              nota={perfil.local === "casa" ? "em casa" : "na academia"}
+              rotulo={r.treino}
+              valor={r.porSemana(plano.dias)}
+              nota={perfil.local === "casa" ? r.emCasa : r.naAcademia}
             />
           </div>
         </div>
@@ -889,7 +906,7 @@ function Resultado({
 
       {plano.avisos.length > 0 && (
         <div className="rounded-sm border border-linha border-l-2 border-l-ouro bg-porcelana p-6 shadow-(--shadow-soft) sm:p-10">
-          <p className="t-eyebrow text-ouro-profundo">O que você precisa saber</p>
+          <p className="t-eyebrow text-ouro-profundo">{r.precisaSaber}</p>
           <ul className="mt-5 space-y-5">
             {plano.avisos.map((aviso, i) => (
               <li key={i} className="flex gap-3 text-sm leading-relaxed text-grafite sm:gap-4 sm:text-base">
@@ -907,14 +924,14 @@ function Resultado({
             <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
               <div>
                 <p className="t-eyebrow text-ouro-profundo">
-                  Bloco {b.etapa.bloco} · {b.etapa.intervalo}
+                  {r.bloco(b.etapa.bloco, b.etapa.intervalo)}
                 </p>
                 <h3 className="mt-2 font-display text-2xl text-grafite sm:text-3xl">
                   {b.titulo}
                 </h3>
               </div>
               <p className="font-display text-xl text-grafite sm:text-2xl">
-                {n1(b.etapa.pesoInicial)} → {n1(b.etapa.pesoFinal)} kg
+                {n(b.etapa.pesoInicial)} → {n(b.etapa.pesoFinal)} kg
               </p>
             </div>
 
@@ -923,15 +940,15 @@ function Resultado({
             </p>
 
             <div className="mt-7 grid grid-cols-2 gap-5 border-t border-linha pt-6 sm:grid-cols-4 sm:gap-6 sm:pt-7">
-              <Metrica rotulo="Calorias" valor={`${b.etapa.alvoKcal}`} nota="kcal por dia" />
-              <Metrica rotulo="Proteína" valor={`${b.macros.proteina.g} g`} nota={`${b.macros.proteina.pct}%`} />
-              <Metrica rotulo="Carboidrato" valor={`${b.macros.carboidrato.g} g`} nota={`${b.macros.carboidrato.pct}%`} />
-              <Metrica rotulo="Gordura" valor={`${b.macros.gordura.g} g`} nota={`${b.macros.gordura.pct}%`} />
+              <Metrica rotulo={r.calorias} valor={`${b.etapa.alvoKcal}`} nota={r.kcalDia} />
+              <Metrica rotulo={r.proteina} valor={`${b.macros.proteina.g} g`} nota={`${b.macros.proteina.pct}%`} />
+              <Metrica rotulo={r.carboidrato} valor={`${b.macros.carboidrato.g} g`} nota={`${b.macros.carboidrato.pct}%`} />
+              <Metrica rotulo={r.gordura} valor={`${b.macros.gordura.g} g`} nota={`${b.macros.gordura.pct}%`} />
             </div>
 
             <details className="group mt-7 border-t border-linha pt-6 sm:pt-7">
               <summary className="-m-2 cursor-pointer list-none p-2 text-sm font-medium text-grafite transition-colors hover:text-ouro-profundo">
-                A semana de treino deste bloco — {b.treino.length} sessões, {b.volume} séries
+                {r.semanaTreino(b.treino.length, b.volume)}
                 <span aria-hidden className="ml-2 inline-block transition-transform group-open:rotate-90">
                   →
                 </span>
@@ -951,7 +968,7 @@ function Resultado({
                             {item.exercicio}
                             {item.alternativa && (
                               <span className="block text-xs text-grafite/70">
-                                mais fácil: {item.alternativa}
+                                {r.maisFacil} {item.alternativa}
                               </span>
                             )}
                           </span>
@@ -967,21 +984,21 @@ function Resultado({
             </details>
 
             <p className="mt-7 border-t border-linha pt-6 text-sm leading-relaxed text-grafite sm:pt-7">
-              <span className="t-eyebrow block text-ouro-profundo">No último dia do bloco</span>
+              <span className="t-eyebrow block text-ouro-profundo">{r.ultimoDia}</span>
               <span className="mt-2 block">{b.marco}</span>
             </p>
           </article>
         ))}
       </div>
 
-      <Oferta plano={plano} vendaAberta={vendaAberta} />
+      <Oferta plano={plano} vendaAberta={vendaAberta} idioma={idioma} t={t} />
 
       <button
         type="button"
         onClick={onVoltar}
         className="-m-2 p-2 text-sm text-grafite underline decoration-ouro underline-offset-4"
       >
-        Ajustar as respostas
+        {r.ajustar}
       </button>
     </div>
   );
@@ -996,7 +1013,17 @@ function Resultado({
  * própria pessoa seria um antes/depois fabricado — barrado nos anúncios de
  * saúde e peso, e indefensável como promessa.
  */
-function Comparacao({ plano, disponivel }: { plano: Plano; disponivel: Set<string> }) {
+function Comparacao({
+  plano,
+  disponivel,
+  idioma,
+  t,
+}: {
+  plano: Plano;
+  disponivel: Set<string>;
+  idioma: Idioma;
+  t: TextoPrograma;
+}) {
   const { perfil } = plano;
   const atual = ESCALA[perfil.sexo].find((n) => n.id === perfil.shapeAtual);
   const alvo = ESCALA[perfil.sexo].find((n) => n.id === perfil.shapeAlvo);
@@ -1004,11 +1031,18 @@ function Comparacao({ plano, disponivel }: { plano: Plano; disponivel: Set<strin
 
   return (
     <div className="mt-7 grid grid-cols-[1fr_auto_1fr] items-center gap-3 sm:mt-9 sm:gap-8">
-      <Lado nivel={atual} rotulo="Hoje" disponivel={disponivel} />
+      <Lado nivel={atual} rotulo={t.resultado.hoje} disponivel={disponivel} idioma={idioma} t={t} />
       <span aria-hidden className="font-display text-2xl text-ouro-profundo sm:text-4xl">
         →
       </span>
-      <Lado nivel={alvo} rotulo={`Dia ${plano.duracao}`} disponivel={disponivel} destaque />
+      <Lado
+        nivel={alvo}
+        rotulo={t.resultado.dia(plano.duracao)}
+        disponivel={disponivel}
+        idioma={idioma}
+        t={t}
+        destaque
+      />
     </div>
   );
 }
@@ -1017,11 +1051,15 @@ function Lado({
   nivel,
   rotulo,
   disponivel,
+  idioma,
+  t,
   destaque = false,
 }: {
   nivel: Nivel;
   rotulo: string;
   disponivel: Set<string>;
+  idioma: Idioma;
+  t: TextoPrograma;
   destaque?: boolean;
 }) {
   const src = caminhoDaFigura(nivel.id);
@@ -1044,9 +1082,9 @@ function Lado({
       <figcaption className="mt-3 sm:mt-4">
         <span className="t-eyebrow block text-ouro-profundo">{rotulo}</span>
         <span className="mt-1 block font-display text-base text-grafite sm:text-lg">
-          {nivel.rotulo}
+          {rotuloNivel(nivel, idioma)}
         </span>
-        <span className="text-xs text-grafite/80">~{nivel.gordura}% de gordura</span>
+        <span className="text-xs text-grafite/80">{t.resultado.gorduraAprox(nivel.gordura)}</span>
       </figcaption>
     </figure>
   );
@@ -1095,7 +1133,18 @@ function Metrica({
  * pagamento, exatamente o plano que esta pessoa viu nesta tela — e não um
  * plano genérico que ela teria de reconstruir respondendo tudo outra vez.
  */
-function Oferta({ plano, vendaAberta }: { plano: Plano; vendaAberta: boolean }) {
+function Oferta({
+  plano,
+  vendaAberta,
+  idioma,
+  t,
+}: {
+  plano: Plano;
+  vendaAberta: boolean;
+  idioma: Idioma;
+  t: TextoPrograma;
+}) {
+  const o = t.oferta;
   const diasAfericao = plano.blocos
     .map((b) => b.etapa.bloco * Math.round(plano.duracao / plano.blocos.length))
     .join(", ");
@@ -1105,11 +1154,11 @@ function Oferta({ plano, vendaAberta }: { plano: Plano; vendaAberta: boolean }) 
       <div className="h-1.5 bg-linear-to-r from-[#00ff66] via-[#4be283] to-ouro" />
       <div className="p-6 sm:p-10 lg:p-12">
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <p className="t-eyebrow text-[#00ff66]">Liberação Imediata · Reset Metabólico {plano.duracao} Dias</p>
+          <p className="t-eyebrow text-[#00ff66]">{o.eyebrow(plano.duracao)}</p>
           <div className="flex flex-wrap items-center gap-2.5">
-            <SeletorMoeda />
+            <SeletorMoeda idioma={idioma} />
             <span className="rounded-full border border-[#00ff66]/50 bg-[#00ff66]/15 px-3.5 py-1 text-xs font-extrabold tracking-wider uppercase text-[#00ff66]">
-              Oferta de Entrada · <PrecoDinamico />
+              {o.entrada} <PrecoDinamico />
             </span>
           </div>
         </div>
@@ -1117,7 +1166,7 @@ function Oferta({ plano, vendaAberta }: { plano: Plano; vendaAberta: boolean }) 
         <div className="mt-5 max-w-sm overflow-hidden rounded-xl border border-[#39ff14]/35 bg-[#030b05] p-1.5 shadow-[0_0_30px_rgba(57,255,20,0.18)]">
           <Image
             src="/brand/reset-metabolico-21d.jpg"
-            alt="Reset Metabólico 21D — Emagrecimento com Método"
+            alt={o.alt}
             width={1024}
             height={512}
             sizes="(max-width: 640px) 85vw, 380px"
@@ -1126,36 +1175,38 @@ function Oferta({ plano, vendaAberta }: { plano: Plano; vendaAberta: boolean }) 
         </div>
 
         <h3 className="mt-5 font-display text-2xl leading-tight text-balance text-grafite sm:mt-6 sm:text-4xl">
-          Você acabou de ver o plano. O programa é cumpri-lo.
+          {o.titulo}
         </h3>
         <p className="mt-4 max-w-2xl text-sm leading-relaxed text-grafite/85 sm:mt-5 sm:text-base">
-          Os {plano.duracao} dias divididos em {plano.blocos.length} blocos semanais, com as sessões
-          numeradas, o guia alimentar de substituições sem balança, o registro de cargas e a aferição nos
-          dias {diasAfericao}. O plano acima, por escrito, em PDF e com data.
+          {o.texto(plano.duracao, plano.blocos.length, diasAfericao)}
         </p>
 
         <ul className="mt-6 grid gap-2.5 text-sm text-grafite/90 sm:grid-cols-2">
           <li className="flex items-center gap-2.5">
             <span className="font-bold text-[#00ff66]">✓</span>
-            Prescrição dos {plano.duracao} dias salva na sua conta
+            {o.itemPrescricao(plano.duracao)}
           </li>
           <li className="flex items-center gap-2.5">
             <span className="font-bold text-[#00ff66]">✓</span>
-            Protocolo de Nutrição em Comida Real (PDF)
+            {o.itemNutricao}
           </li>
           <li className="flex items-center gap-2.5">
             <span className="font-bold text-[#00ff66]">✓</span>
-            Protocolo de Treino ({plano.perfil.local === "casa" ? "Em Casa" : "Academia"}) (PDF)
+            {o.itemTreino(plano.perfil.local === "casa")}
           </li>
           <li className="flex items-center gap-2.5">
             <span className="font-bold text-[#00ff66]">✓</span>
-            Guia dos Primeiros 7 Dias + Aferição (PDF)
+            {o.itemGuia}
           </li>
         </ul>
 
         <div className="mt-8 border-t border-white/12 pt-7">
           {vendaAberta ? (
-            <Comprar plano={{ perfil: plano.perfil, duracao: plano.duracao, modo: plano.modo }} preco={precoEmReais()} />
+            <Comprar
+              plano={{ perfil: plano.perfil, duracao: plano.duracao, modo: plano.modo }}
+              preco={precoEmReais()}
+              idioma={idioma}
+            />
           ) : (
             /* Sem checkout configurado, o botão de compra só daria erro.
                Quem chegou até aqui é lead quente: vai para a consultoria. */
@@ -1163,7 +1214,7 @@ function Oferta({ plano, vendaAberta }: { plano: Plano; vendaAberta: boolean }) 
               href="/consultoria?de=programa-90-dias"
               className="group inline-flex items-center justify-center gap-2.5 rounded-lg bg-[#00ff66] px-8 py-4 text-xs font-extrabold uppercase tracking-[0.14em] text-[#041208] shadow-[0_0_30px_rgba(0,255,102,0.45)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#4be283] hover:shadow-[0_0_45px_rgba(0,255,102,0.65)]"
             >
-              Começar consultoria
+              {o.consultoria}
               <Arrow />
             </a>
           )}
@@ -1171,11 +1222,11 @@ function Oferta({ plano, vendaAberta }: { plano: Plano; vendaAberta: boolean }) 
 
         <div className="mt-6 flex flex-wrap items-center gap-4 border-t border-white/12 pt-5 text-xs leading-relaxed text-grafite/75">
           <span className="inline-flex items-center gap-1.5 font-semibold text-[#00ff66]">
-            🛡️ Garantia incondicional de 7 dias
+            {o.garantia}
           </span>
           <span>·</span>
           <span>
-            Assinado por Carlos Seiti (MSc, PhD Cand.). O plano que você viu nesta tela é salvo automaticamente com o seu pedido.
+            {o.assinatura}
           </span>
         </div>
       </div>

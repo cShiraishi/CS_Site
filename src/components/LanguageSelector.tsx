@@ -2,9 +2,9 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { DropdownMenu } from "radix-ui";
-import { marca } from "@/lib/content";
 import { IDIOMAS_DISPONIVEIS, obterConteudo, type Idioma } from "@/lib/i18n";
 import { gravarPreferenciaIdioma, useIdioma } from "@/lib/useIdioma";
+import { caminhoBase, rotaIdioma, temTraducao } from "@/lib/rotas-idioma";
 
 export function LanguageSelector({
   escuro = false,
@@ -26,39 +26,27 @@ export function LanguageSelector({
 
   function selecionarIdioma(codigo: Idioma) {
     gravarPreferenciaIdioma(codigo);
-
-    const destinoHome =
-      IDIOMAS_DISPONIVEIS.find((i) => i.codigo === codigo)?.rotaHome ?? "/";
-    const hash = typeof window !== "undefined" ? window.location.hash : "";
-
-    // Na home (/, /es ou /en) existe página nativa: navega para ela.
-    if (pathname === "/" || pathname === "/es" || pathname === "/en") {
-      router.push(`${destinoHome}${hash}`);
-      return;
-    }
+    if (codigo === idiomaAtual) return;
 
     /*
-     * Nas outras páginas só o dock e o menu têm texto traduzido; o corpo
-     * está em português. Sem isto, escolher ES/EN parecia não fazer nada.
-     * A página abre então na tradução automática do Google — e, de dentro
-     * dela, escolher português volta ao endereço original.
+     * Todas as páginas públicas têm versão nativa nos três idiomas, no
+     * mesmo caminho com prefixo (/receitas → /es/receitas). Cada idioma
+     * tem o seu root layout, então a navegação recarrega a página inteira
+     * — e o <html lang> chega certo do servidor.
      */
-    const pagina = new URL(
-      `${pathname}${window.location.search}${hash}`,
-      marca.site,
-    ).toString();
-    const naTraducao = window.location.hostname.endsWith(".translate.goog");
-
-    if (codigo === "pt") {
-      if (naTraducao) window.location.assign(pagina);
+    const base = caminhoBase(pathname);
+    if (temTraducao(base)) {
+      const extra =
+        typeof window !== "undefined" ? `${window.location.search}${window.location.hash}` : "";
+      router.push(`${rotaIdioma(codigo, base)}${extra}`);
       return;
     }
 
-    const traducao = new URL("https://translate.google.com/translate");
-    traducao.searchParams.set("sl", "pt");
-    traducao.searchParams.set("tl", codigo);
-    traducao.searchParams.set("u", pagina);
-    window.location.assign(traducao.toString());
+    /* Conta, painel e área do aluno só existem em português: leva à home
+       do idioma escolhido. */
+    const destinoHome =
+      IDIOMAS_DISPONIVEIS.find((i) => i.codigo === codigo)?.rotaHome ?? "/";
+    router.push(destinoHome);
   }
 
   return (

@@ -1,9 +1,17 @@
 "use client";
 
+import { TEXTO_PROGRAMA } from "@/lib/i18n/programa";
 import { EUR_ATIVO, type Moeda } from "@/lib/produto";
+import type { Idioma } from "@/lib/rotas-idioma";
 import { useMoeda } from "@/lib/useMoeda";
 
-export function SeletorMoeda({ moedaServidor }: { moedaServidor?: Moeda | null }) {
+export function SeletorMoeda({
+  moedaServidor,
+  idioma = "pt",
+}: {
+  moedaServidor?: Moeda | null;
+  idioma?: Idioma;
+}) {
   const { moeda, alternarMoeda } = useMoeda(moedaServidor);
 
   // Sem cobrança em euro, não há o que escolher.
@@ -12,7 +20,7 @@ export function SeletorMoeda({ moedaServidor }: { moedaServidor?: Moeda | null }
   return (
     <div
       role="group"
-      aria-label="Moeda de exibição"
+      aria-label={TEXTO_PROGRAMA[idioma].moeda.grupo}
       className="inline-flex items-center gap-1 rounded-full border border-[#00ff66]/40 bg-[#0b0a09]/90 p-1 text-xs"
     >
       <button

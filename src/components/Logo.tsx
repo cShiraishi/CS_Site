@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { marca } from "@/lib/content";
+import { obterConteudo, type Idioma } from "@/lib/i18n";
 
 /**
  * 03 / LOGOTIPO PRINCIPAL — versão preferencial.
@@ -13,9 +14,11 @@ export function Logo({
   size = 48,
   className = "",
   priority = false,
+  idioma = "pt",
 }: {
   size?: number;
   className?: string;
+  idioma?: Idioma;
   /** Só o logotipo acima da dobra deve pré-carregar; o resto entra em lazy. */
   priority?: boolean;
 }) {
@@ -26,7 +29,7 @@ export function Logo({
     >
       <Image
         src="/brand/cs-mark.jpg"
-        alt={`Monograma ${marca.monograma}`}
+        alt={`${idioma === "en" ? "Monogram" : "Monograma"} ${marca.monograma}`}
         width={1024}
         height={1024}
         sizes={`${size}px`}
@@ -46,14 +49,17 @@ export function Assinatura({
   size = 44,
   tone = "grafite",
   priority = false,
+  idioma = "pt",
 }: {
   size?: number;
   tone?: "grafite" | "porcelana";
   priority?: boolean;
+  /** O descritor ("Nutrição Avançada") acompanha o idioma da página. */
+  idioma?: Idioma;
 }) {
   return (
     <span className="flex items-center gap-3.5">
-      <Logo size={size} priority={priority} />
+      <Logo size={size} priority={priority} idioma={idioma} />
       <span className="flex flex-col leading-none">
         <span
           className={`font-display text-[0.98rem] tracking-[0.16em] ${
@@ -63,7 +69,7 @@ export function Assinatura({
           {marca.nome.toUpperCase()}
         </span>
         <span className="mt-1.5 text-[0.6rem] uppercase tracking-[0.2em] text-ouro-profundo">
-          {marca.descritor}
+          {obterConteudo(idioma).marca.descritor}
         </span>
       </span>
     </span>

@@ -4,6 +4,8 @@ import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { gravarArmazenado, lerArmazenado, lerJson, useArmazenado } from "@/lib/useArmazenado";
 import type { Trilha, Video } from "@/lib/csflix";
+import { UI_CSFLIX, type UiCSFlix } from "@/lib/i18n/csflix";
+import { rotaIdioma, type Idioma } from "@/lib/rotas-idioma";
 
 const STORAGE_ASSISTIDOS = "csflix_episodios_assistidos_v1";
 const STORAGE_ULTIMO = "csflix_ultimo_episodio_v1";
@@ -17,12 +19,14 @@ type SelecaoAtiva = {
    Destaque — Série Principal estilo Netflix (Começar pelo EP. 01)
    ============================================================ */
 function Destaque({
+  ui,
   trilhaPrincipal,
   totalEpisodios,
   ultimoAssistido,
   aoComecarSerie,
   aoContinuar,
 }: {
+  ui: UiCSFlix;
   trilhaPrincipal: Trilha;
   totalEpisodios: number;
   ultimoAssistido: { trilhaId: string; indice: number; titulo: string } | null;
@@ -63,8 +67,11 @@ function Destaque({
               className="h-auto w-36 drop-shadow-[0_4px_18px_rgba(0,0,0,0.7)] sm:w-44"
             />
             <span className="rounded border border-[#E00513]/60 bg-[#E00513]/20 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.2em] text-white backdrop-blur-sm">
-              Série Original · 5 Temporadas
+              {ui.seloOriginal}
             </span>
+            {ui.notaVideosPt && (
+              <span className="text-[11px] font-medium text-white/60">{ui.notaVideosPt}</span>
+            )}
           </div>
 
           <div className="mt-6 flex flex-wrap items-center gap-2.5">
@@ -82,15 +89,15 @@ function Destaque({
 
           <div className="mt-4 flex flex-wrap items-center gap-3 text-sm">
             <span className="font-semibold text-emerald-400">
-              98% relevante para quem busca resultado
+              {ui.relevancia}
             </span>
             <span className="rounded border border-white/35 px-1.5 py-0.5 text-[10px] text-white/80">
               HD
             </span>
             <span className="text-white/70">
-              {trilhaPrincipal.videos.length} Episódios nesta temporada
+              {ui.episodiosNaTemporada(trilhaPrincipal.videos.length)}
             </span>
-            <span className="text-white/55">· {totalEpisodios} no catálogo</span>
+            <span className="text-white/55">{ui.noCatalogo(totalEpisodios)}</span>
           </div>
 
           <p className="mt-4 max-w-xl text-base leading-relaxed text-white/80 sm:text-lg">
@@ -107,7 +114,7 @@ function Destaque({
               onClick={aoComecarSerie}
               className="inline-flex items-center gap-3 rounded-md bg-white px-7 py-3.5 text-sm font-bold text-black shadow-lg transition hover:bg-white/85"
             >
-              <span className="text-lg">▶</span> Assistir Episódio 01
+              <span className="text-lg">▶</span> {ui.assistirEp01}
             </button>
 
             {ultimoAssistido && (
@@ -116,7 +123,7 @@ function Destaque({
                 onClick={aoContinuar}
                 className="inline-flex items-center gap-2.5 rounded-md border border-ouro/60 bg-ouro/20 px-6 py-3.5 text-sm font-semibold text-ouro backdrop-blur-md transition hover:bg-ouro/30"
               >
-                <span>⏯</span> Continuar EP. {String(ultimoAssistido.indice + 1).padStart(2, "0")}
+                <span>⏯</span> {ui.continuarEp(ultimoAssistido.indice + 1)}
               </button>
             )}
 
@@ -124,7 +131,7 @@ function Destaque({
               href="#temporadas-csflix"
               className="inline-flex items-center gap-2 rounded-md bg-white/15 px-6 py-3.5 text-sm font-medium text-white backdrop-blur-md transition hover:bg-white/25"
             >
-              ⓘ Ver todas as temporadas
+              {ui.verTemporadas}
             </a>
           </div>
         </div>
@@ -137,12 +144,14 @@ function Destaque({
    Cartão de Episódio — com numeração sequencial, sinopse e barra de progresso
    ============================================================ */
 function CartaoEpisodio({
+  ui,
   video,
   indice,
   totalNaTemporada,
   assistido,
   aoAbrir,
 }: {
+  ui: UiCSFlix;
   video: Video;
   indice: number;
   totalNaTemporada: number;
@@ -156,7 +165,7 @@ function CartaoEpisodio({
       <button
         type="button"
         onClick={aoAbrir}
-        aria-label={`Assistir Episódio ${numFormatado}: ${video.titulo}`}
+        aria-label={ui.assistirEpisodioAria(indice + 1, video.titulo)}
         className="group flex h-full w-full flex-col justify-between rounded-2xl border border-white/10 bg-[#121110] p-3 text-left transition-all duration-300 hover:-translate-y-1.5 hover:border-ouro/55 hover:bg-[#181614] hover:shadow-[0_24px_60px_rgba(0,0,0,0.65)]"
       >
         <div>
@@ -184,7 +193,7 @@ function CartaoEpisodio({
             <span className="absolute right-2.5 top-2.5 flex items-center gap-1.5">
               {assistido && (
                 <span className="rounded-md bg-emerald-500/90 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-black">
-                  ✓ Visto
+                  {ui.visto}
                 </span>
               )}
               {video.duracao && (
@@ -229,10 +238,10 @@ function CartaoEpisodio({
         {/* Rodapé do Card: Indicador de Continuação */}
         <span className="mt-3.5 flex items-center justify-between border-t border-white/8 pt-2.5 text-[10px] font-semibold uppercase tracking-[0.14em]">
           <span className="text-ouro">
-            {assistido ? "Assistir novamente" : `Assistir Episódio ${numFormatado}`}
+            {assistido ? ui.assistirNovamente : ui.assistirEpisodio(indice + 1)}
           </span>
           <span className="text-white/45 group-hover:translate-x-0.5 group-hover:text-white transition-transform">
-            {indice + 1 < totalNaTemporada ? `Segue p/ EP. ${String(indice + 2).padStart(2, "0")} →` : "Season Finale ★"}
+            {indice + 1 < totalNaTemporada ? ui.segueParaEp(indice + 2) : ui.seasonFinale}
           </span>
         </span>
       </button>
@@ -244,10 +253,12 @@ function CartaoEpisodio({
    Faixa de Temporada — carrossel horizontal com cabeçalho de série
    ============================================================ */
 function FaixaTemporada({
+  ui,
   trilha,
   assistidos,
   aoAbrirEpisodio,
 }: {
+  ui: UiCSFlix;
   trilha: Trilha;
   assistidos: Record<string, boolean>;
   aoAbrirEpisodio: (trilha: Trilha, indice: number) => void;
@@ -294,7 +305,7 @@ function FaixaTemporada({
             </span>
             {vistosNaTemporada > 0 && (
               <span className="rounded-full bg-emerald-500/15 border border-emerald-500/40 px-2.5 py-0.5 text-[10px] font-bold text-emerald-400">
-                {vistosNaTemporada}/{trilha.videos.length} vistos
+                {ui.vistosNaTemporada(vistosNaTemporada, trilha.videos.length)}
               </span>
             )}
           </div>
@@ -311,7 +322,7 @@ function FaixaTemporada({
             onClick={() => aoAbrirEpisodio(trilha, 0)}
             className="inline-flex items-center gap-2 rounded-full border border-ouro/50 bg-ouro/15 px-4 py-2 text-xs font-bold uppercase tracking-wider text-ouro transition hover:bg-ouro hover:text-black"
           >
-            ▶ Começar pelo EP. 01
+            {ui.comecarPeloEp01}
           </button>
 
           <div className="hidden gap-1.5 lg:flex">
@@ -321,7 +332,7 @@ function FaixaTemporada({
                 type="button"
                 onClick={() => deslizar(dir)}
                 disabled={dir === -1 ? !pode.antes : !pode.depois}
-                aria-label={dir === -1 ? `${trilha.nome}: voltar` : `${trilha.nome}: avançar`}
+                aria-label={dir === -1 ? ui.voltar(trilha.nome) : ui.avancar(trilha.nome)}
                 className="flex h-9 w-9 items-center justify-center rounded-full border border-white/20 text-white/70 transition-all duration-300 hover:border-[#E00513] hover:text-white disabled:pointer-events-none disabled:opacity-25"
               >
                 <svg
@@ -349,6 +360,7 @@ function FaixaTemporada({
       >
         {trilha.videos.map((v, i) => (
           <CartaoEpisodio
+            ui={ui}
             key={`${trilha.id}-${v.id}`}
             video={v}
             indice={i}
@@ -367,11 +379,15 @@ function FaixaTemporada({
    Player Modal em Modo Maratona (Com "Próximo Episódio" e Lista da Temporada)
    ============================================================ */
 function PlayerMaratona({
+  ui,
+  idioma,
   selecao,
   assistidos,
   aoTrocarEpisodio,
   aoFechar,
 }: {
+  ui: UiCSFlix;
+  idioma: Idioma;
   selecao: SelecaoAtiva | null;
   assistidos: Record<string, boolean>;
   aoTrocarEpisodio: (trilha: Trilha, novoIndice: number) => void;
@@ -413,8 +429,7 @@ function PlayerMaratona({
                 {trilha.temporada}
               </span>
               <span className="font-semibold text-ouro">
-                Episódio {String(indice + 1).padStart(2, "0")} de{" "}
-                {String(trilha.videos.length).padStart(2, "0")}
+                {ui.episodioDe(indice + 1, trilha.videos.length)}
               </span>
               <span className="hidden text-white/45 sm:inline">· {trilha.nome}</span>
             </div>
@@ -422,7 +437,7 @@ function PlayerMaratona({
             <button
               type="button"
               onClick={aoFechar}
-              aria-label="Fechar"
+              aria-label={ui.fechar}
               className="flex h-8 w-8 items-center justify-center rounded-full border border-white/15 text-white/70 transition hover:bg-white/10 hover:text-white"
             >
               ✕
@@ -459,7 +474,7 @@ function PlayerMaratona({
                   rel="noopener noreferrer"
                   className="font-semibold uppercase tracking-[0.14em] text-[#E00513] hover:underline"
                 >
-                  Abrir no YouTube ↗
+                  {ui.abrirNoYoutube}
                 </a>
                 {anterior && (
                   <button
@@ -467,7 +482,7 @@ function PlayerMaratona({
                     onClick={() => aoTrocarEpisodio(trilha, indice - 1)}
                     className="text-white/60 hover:text-white"
                   >
-                    ← Voltar ao EP. {String(indice).padStart(2, "0")}
+                    {ui.voltarAoEp(indice)}
                   </button>
                 )}
               </div>
@@ -477,7 +492,7 @@ function PlayerMaratona({
             {proximo ? (
               <div className="rounded-xl border border-ouro/45 bg-ouro/10 p-4">
                 <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-ouro">
-                  ⏭ Próximo na Maratona · EP. {String(indice + 2).padStart(2, "0")}
+                  {ui.proximoNaMaratona(indice + 2)}
                 </p>
                 <p className="mt-1 line-clamp-1 font-display text-base text-white">
                   {proximo.titulo}
@@ -487,22 +502,22 @@ function PlayerMaratona({
                   onClick={() => aoTrocarEpisodio(trilha, indice + 1)}
                   className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-white px-4 py-2.5 text-xs font-extrabold uppercase tracking-wider text-black transition hover:bg-ouro"
                 >
-                  ▶ Assistir Próximo Episódio Agora
+                  {ui.assistirProximo}
                 </button>
               </div>
             ) : (
               <div className="rounded-xl border border-emerald-500/40 bg-emerald-500/10 p-4">
                 <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-emerald-400">
-                  ★ Você chegou ao fim desta temporada!
+                  {ui.fimDaTemporada}
                 </p>
                 <p className="mt-1 text-xs text-white/75">
-                  Quer aplicar esse método no seu corpo com acompanhamento individual?
+                  {ui.aplicarMetodo}
                 </p>
                 <a
-                  href="/consultoria?de=csflix_maratona"
+                  href={rotaIdioma(idioma, "/consultoria?de=csflix_maratona")}
                   className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#1fc15b] px-4 py-2.5 text-xs font-extrabold uppercase tracking-wider text-[#06140b] transition hover:opacity-90"
                 >
-                  Começar minha consultoria →
+                  {ui.comecarMinhaConsultoria}
                 </a>
               </div>
             )}
@@ -511,7 +526,7 @@ function PlayerMaratona({
           {/* Lista de Todos os Episódios da Temporada dentro do Modal */}
           <div className="p-6">
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/55">
-              Todos os episódios de {trilha.temporada} · {trilha.nome}
+              {ui.todosEpisodiosDe(trilha.temporada, trilha.nome)}
             </p>
             <div className="mt-4 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
               {trilha.videos.map((ep, idx) => {
@@ -544,7 +559,7 @@ function PlayerMaratona({
                         {ep.titulo}
                       </span>
                       <span className="mt-0.5 block text-[10px] text-white/50">
-                        {ep.duracao ?? "HD"} {ehAtual ? "· Reproduzindo agora" : jaViu ? "· ✓ Assistido" : ""}
+                        {ep.duracao ?? "HD"} {ehAtual ? ui.reproduzindoAgora : jaViu ? ui.assistido : ""}
                       </span>
                     </span>
                   </button>
@@ -561,7 +576,16 @@ function PlayerMaratona({
 /* ============================================================
    Componente Principal CSFlix — Série & Maratona
    ============================================================ */
-export function CSFlix({ trilhas, total }: { trilhas: Trilha[]; total: number }) {
+export function CSFlix({
+  trilhas,
+  total,
+  idioma = "pt",
+}: {
+  trilhas: Trilha[];
+  total: number;
+  idioma?: Idioma;
+}) {
+  const ui = UI_CSFLIX[idioma];
   const [selecao, setSelecao] = useState<SelecaoAtiva | null>(null);
   const [temporadaFiltro, setTemporadaFiltro] = useState<string>("todas");
   type Ultimo = { trilhaId: string; indice: number; titulo: string };
@@ -598,6 +622,7 @@ export function CSFlix({ trilhas, total }: { trilhas: Trilha[]; total: number })
     <>
       {trilhaDestaque && (
         <Destaque
+          ui={ui}
           trilhaPrincipal={trilhaDestaque}
           totalEpisodios={total}
           ultimoAssistido={ultimoAssistido}
@@ -624,7 +649,7 @@ export function CSFlix({ trilhas, total }: { trilhas: Trilha[]; total: number })
                     : "border border-white/15 bg-white/5 text-white/75 hover:border-ouro/50 hover:text-white"
                 }`}
               >
-                🎬 Todas as 5 Temporadas ({total} EPs)
+                {ui.todasTemporadas(total)}
               </button>
 
               {trilhas.map((t, i) => (
@@ -638,15 +663,15 @@ export function CSFlix({ trilhas, total }: { trilhas: Trilha[]; total: number })
                       : "border border-white/12 bg-white/5 text-white/75 hover:border-ouro/50 hover:text-ouro"
                   }`}
                 >
-                  {t.icone} T{i + 1} · {t.nome.split("·")[0].trim()}
+                  {t.icone} {ui.abreviaturaTemporada}{i + 1} · {t.nome.split("·")[0].trim()}
                 </button>
               ))}
             </div>
 
             <div className="shrink-0 text-xs text-white/65">
-              Progresso da sua maratona:{" "}
+              {ui.progresso}{" "}
               <strong className="text-emerald-400">
-                {totalAssistidos}/{total} episódios vistos
+                {ui.episodiosVistos(totalAssistidos, total)}
               </strong>
             </div>
           </div>
@@ -655,6 +680,7 @@ export function CSFlix({ trilhas, total }: { trilhas: Trilha[]; total: number })
         {/* Faixas de Temporadas */}
         {trilhasVisiveis.map((t) => (
           <FaixaTemporada
+            ui={ui}
             key={t.id}
             trilha={t}
             assistidos={assistidos}
@@ -664,6 +690,8 @@ export function CSFlix({ trilhas, total }: { trilhas: Trilha[]; total: number })
       </div>
 
       <PlayerMaratona
+        ui={ui}
+        idioma={idioma}
         selecao={selecao}
         assistidos={assistidos}
         aoTrocarEpisodio={abrirEpisodio}

@@ -19,11 +19,18 @@ import {
   planejar,
 } from "@/lib/calorias";
 import { hrefConsultoria } from "@/lib/campanha";
-import { gordura as copy } from "@/lib/content";
+import { gordura as conteudo } from "@/lib/content";
+import {
+  TEXTOS_GORDURA,
+  type TextosGordura,
+  listarCampos,
+  numIdioma,
+  pctIdioma,
+} from "@/lib/i18n/gordura";
+import type { Idioma } from "@/lib/rotas-idioma";
 import {
   type Campo,
   NIVEIS,
-  NOME_DO_CAMPO,
   type Metodo,
   type Nivel,
   classificar,
@@ -40,21 +47,37 @@ import { Arrow } from "./ui";
 
 const dec = (s: string) => Number(s.replace(",", "."));
 
-/** "o peso", "o peso e a idade", "o peso, a idade e a altura" */
-function listar(campos: Campo[]): string {
-  const nomes = campos.map((c) => NOME_DO_CAMPO[c]);
-  if (nomes.length <= 1) return nomes[0] ?? "";
-  return `${nomes.slice(0, -1).join(", ")} e ${nomes[nomes.length - 1]}`;
-}
-
-const num = (n: number) => n.toLocaleString("pt-BR");
-const pct = (n: number) =>
-  `${n.toLocaleString("pt-BR", { maximumFractionDigits: 1 })} %`;
-
 /** Fim visual da régua, por sexo — acima disso a barra não diz mais nada. */
 const TETO = { masculino: 45, feminino: 50 } as const;
 
-export function CalculadoraGordura({ figuras = [] }: { figuras?: string[] }) {
+/** A categoria do ACE com nome e nota no idioma da página. */
+function categoriaLocal(t: TextosGordura, bf: number, sexo: Sexo) {
+  const c = classificar(bf, sexo);
+  return t.categorias[sexo][c.id] ?? { nome: c.nome, nota: c.nota };
+}
+
+export function CalculadoraGordura({
+  figuras = [],
+  idioma = "pt",
+}: {
+  figuras?: string[];
+  idioma?: Idioma;
+}) {
+  const t = TEXTOS_GORDURA[idioma];
+  const ui = t.ui;
+  const num = (n: number) => numIdioma(idioma, n);
+  const pct = (n: number) => pctIdioma(idioma, n);
+  const listar = (campos: Campo[]) => listarCampos(idioma, campos);
+  const categoria = (bf: number) => categoriaLocal(t, bf, sexo);
+  const nomeNivel = (n: Nivel) => t.niveis[n.id]?.nome ?? n.nome;
+  const descricaoNivel = (n: Nivel) => t.niveis[n.id]?.descricao ?? n.descricao;
+  /* Em PT o texto é o mesmo de antes ("14.5–17.5 %"); nos outros idiomas o
+     número segue o separador decimal do idioma. */
+  const faixaNivel = (n: Nivel) =>
+    idioma === "pt"
+      ? `${n.de}–${n.ate} %`
+      : `${num(n.de)}–${num(n.ate)}${idioma === "en" ? "%" : " %"}`;
+  const pctCurto = (v: number) => (idioma === "pt" ? `${v}%` : `${num(v)}%`);
   const id = useId();
   const disponivel = useMemo(() => new Set(figuras), [figuras]);
 
@@ -198,12 +221,12 @@ export function CalculadoraGordura({ figuras = [] }: { figuras?: string[] }) {
       <form
         id="bf-medidas"
         onSubmit={(e) => e.preventDefault()}
-        aria-label="Suas medidas"
+        aria-label={ui.formAria}
         className="surface-card scroll-mt-24 p-5 sm:p-8 lg:p-10"
       >
         <h2 className="t-eyebrow flex items-center gap-3 text-ouro-profundo">
           <span aria-hidden className="rule-gold inline-block h-px w-8" />
-          01 / Suas medidas
+          {ui.passo1}
         </h2>
 
         {/* `role="radio"` em botões, e não `<input type="radio">`.
@@ -214,10 +237,10 @@ export function CalculadoraGordura({ figuras = [] }: { figuras?: string[] }) {
             desce com a seta vê a seleção andar sozinha até a última opção
             sem ter pedido nada. */}
         <fieldset className="mt-7">
-          <legend className="t-eyebrow text-grafite">Sexo biológico</legend>
+          <legend className="t-eyebrow text-grafite">{ui.sexo}</legend>
           <div
             role="radiogroup"
-            aria-label="Sexo biologico"
+            aria-label={ui.sexo}
             className="mt-3 grid grid-cols-2 gap-2 sm:inline-flex sm:gap-0 sm:rounded-full sm:border sm:border-linha sm:p-1"
           >
             {(["masculino", "feminino"] as const).map((s) => (
@@ -236,23 +259,23 @@ export function CalculadoraGordura({ figuras = [] }: { figuras?: string[] }) {
                     : "border-linha text-grafite/80 hover:border-ouro/60 hover:bg-ouro/8 hover:text-grafite"
                 }`}
               >
-                {s}
+                {t.sexos[s]}
               </button>
             ))}
           </div>
           <p className="mt-2.5 text-xs leading-relaxed text-grafite/80">
-            As equações usam esta variável — não é sobre identidade.
+            {ui.sexoNota}
           </p>
         </fieldset>
 
         <fieldset className="mt-8">
-          <legend className="t-eyebrow text-grafite">Como vamos medir</legend>
+          <legend className="t-eyebrow text-grafite">{ui.metodo}</legend>
           <div
             role="radiogroup"
-            aria-label="Como vamos medir"
+            aria-label={ui.metodo}
             className="mt-3 grid gap-2 sm:grid-cols-2"
           >
-            {copy.metodos.map(({ id: mid, titulo, nota }) => (
+            {t.metodos.map(({ id: mid, titulo, nota }) => (
               <button
                 key={mid}
                 type="button"
@@ -299,70 +322,76 @@ export function CalculadoraGordura({ figuras = [] }: { figuras?: string[] }) {
 
         <div className="mt-8 grid grid-cols-2 gap-x-6 gap-y-7 sm:grid-cols-3">
           <Numero
+            idioma={idioma}
             id={`${id}-idade`}
-            rotulo="Idade"
-            unidade="anos"
+            rotulo={ui.rotulos.idade}
+            unidade={ui.unidadeAnos}
             dica="32"
             valor={idade}
             set={setIdade}
-            erro={invalido("idade") ? "Entre 14 e 100 anos." : undefined}
+            erro={invalido("idade") ? ui.erros.idade : undefined}
           />
           <Numero
+            idioma={idioma}
             id={`${id}-peso`}
-            rotulo="Peso"
+            rotulo={ui.rotulos.peso}
             unidade="kg"
             dica="78"
             valor={peso}
             set={setPeso}
-            erro={invalido("peso") ? "Entre 30 e 300 kg." : undefined}
+            erro={invalido("peso") ? ui.erros.peso : undefined}
           />
           <Numero
+            idioma={idioma}
             id={`${id}-altura`}
-            rotulo="Altura"
+            rotulo={ui.rotulos.altura}
             unidade="cm"
             dica="176"
             valor={altura}
             set={setAltura}
             erro={
-              invalido("altura") ? "Em centímetros: 176, não 1,76." : undefined
+              invalido("altura") ? ui.erros.altura : undefined
             }
           />
         </div>
 
         {metodo === "fita" && (
           <div className="mt-8 border-t border-linha pt-8">
-            <p className="t-eyebrow text-grafite/80">Com a fita métrica</p>
+            <p className="t-eyebrow text-grafite/80">{ui.comFita}</p>
             <div className="mt-5 grid grid-cols-2 gap-x-6 gap-y-7 sm:grid-cols-3">
               <Numero
+                idioma={idioma}
                 id={`${id}-pescoco`}
-                rotulo="Pescoço"
+                rotulo={ui.rotulos.pescoco}
                 unidade="cm"
                 dica="38"
                 valor={pescoco}
                 set={setPescoco}
-                erro={invalido("pescoco") ? "Entre 20 e 70 cm." : undefined}
-                ajuda={copy.comoMedir.pescoco}
+                erro={invalido("pescoco") ? ui.erros.pescoco : undefined}
+                ajuda={t.comoMedir.pescoco}
               />
               <Numero
+                idioma={idioma}
                 id={`${id}-cintura`}
-                rotulo="Cintura"
+                rotulo={ui.rotulos.cintura}
                 unidade="cm"
                 dica="88"
                 valor={cintura}
                 set={setCintura}
-                erro={invalido("cintura") ? "Entre 40 e 200 cm." : undefined}
-                ajuda={copy.comoMedir.cintura}
+                erro={invalido("cintura") ? ui.erros.cintura : undefined}
+                ajuda={t.comoMedir.cintura}
               />
               {sexo === "feminino" && (
                 <Numero
+                  idioma={idioma}
                   id={`${id}-quadril`}
-                  rotulo="Quadril"
+                  rotulo={ui.rotulos.quadril}
                   unidade="cm"
                   dica="98"
                   valor={quadril}
                   set={setQuadril}
-                  erro={invalido("quadril") ? "Entre 50 e 220 cm." : undefined}
-                  ajuda={copy.comoMedir.quadril}
+                  erro={invalido("quadril") ? ui.erros.quadril : undefined}
+                  ajuda={t.comoMedir.quadril}
                 />
               )}
             </div>
@@ -378,11 +407,11 @@ export function CalculadoraGordura({ figuras = [] }: { figuras?: string[] }) {
         <div className="mt-8 border-t border-linha pt-7">
           <fieldset>
             <legend className="t-eyebrow text-grafite">
-              Nível de atividade
+              {ui.atividade}
             </legend>
             <div
               role="radiogroup"
-              aria-label="Nivel de atividade"
+              aria-label={ui.atividade}
               className="mt-3 grid gap-2 sm:grid-cols-2"
             >
               {ATIVIDADES.map((a) => {
@@ -418,10 +447,10 @@ export function CalculadoraGordura({ figuras = [] }: { figuras?: string[] }) {
                     </span>
                     <span>
                       <span className="block text-[0.95rem] font-medium text-grafite">
-                        {a.nome}
+                        {t.atividades[a.id].nome}
                       </span>
                       <span className="block text-xs leading-snug text-grafite/80">
-                        {a.nota}
+                        {t.atividades[a.id].nota}
                       </span>
                     </span>
                   </button>
@@ -437,19 +466,11 @@ export function CalculadoraGordura({ figuras = [] }: { figuras?: string[] }) {
             className="mt-7 border-l-2 border-ouro pl-4 text-[0.9rem] leading-relaxed text-grafite/80"
           >
             {impedimento.tipo === "cintura-menor-que-pescoco" ? (
-              <>
-                A cintura ficou menor que o pescoço, e isso é sempre erro de
-                medição. A cintura é na altura do umbigo, em pé e relaxado — sem
-                prender a barriga.
-              </>
+              <>{ui.cinturaMenor}</>
             ) : impedimento.tipo === "fora-da-faixa" ? (
-              <>
-                Confira {listar(impedimento.campos)}: o valor está fora do que a
-                equação consegue usar. Altura e circunferências vão em
-                centímetros — 176, não 1,76.
-              </>
+              <>{ui.foraDaFaixa(listar(impedimento.campos))}</>
             ) : (
-              <>Falta {listar(impedimento.campos)} para ver o resultado.</>
+              <>{ui.faltam(listar(impedimento.campos), impedimento.campos.length)}</>
             )}
           </p>
         )}
@@ -460,25 +481,25 @@ export function CalculadoraGordura({ figuras = [] }: { figuras?: string[] }) {
         <section id="bf-resultado" aria-live="polite" className="scroll-mt-24">
           <div className="overflow-hidden rounded-sm border border-grafite bg-grafite text-porcelana shadow-(--shadow-floating)">
             <div className="p-6 sm:p-10">
-              <p className="t-eyebrow text-ouro">Seu percentual estimado</p>
+              <p className="t-eyebrow text-ouro">{ui.resultadoEyebrow}</p>
 
               <p className="mt-5 font-display text-6xl leading-none sm:text-7xl">
                 {pct(valeu.valor)}
               </p>
 
               <p className="mt-4 text-[0.95rem] text-porcelana/75">
-                Faixa provável:{" "}
+                {ui.faixaProvavel}{" "}
                 <strong className="font-medium text-porcelana">
-                  {pct(valeu.min)} a {pct(valeu.max)}
+                  {pct(valeu.min)} {ui.faixaA} {pct(valeu.max)}
                 </strong>
-                {valeu.metodo === "imc" && " — estimativa fraca, pelo IMC"}
+                {valeu.metodo === "imc" && ui.estimativaImc}
               </p>
 
               <p className="mt-6 inline-flex items-center gap-2.5 rounded-full border border-ouro/40 px-4 py-2 text-sm text-ouro">
-                {classificar(valeu.valor, sexo).nome}
+                {categoria(valeu.valor).nome}
               </p>
               <p className="mt-4 max-w-xl text-[0.92rem] leading-relaxed text-porcelana/70">
-                {classificar(valeu.valor, sexo).nota}
+                {categoria(valeu.valor).nota}
               </p>
             </div>
 
@@ -487,11 +508,12 @@ export function CalculadoraGordura({ figuras = [] }: { figuras?: string[] }) {
               min={valeu.min}
               max={valeu.max}
               sexo={sexo}
+              idioma={idioma}
             />
           </div>
 
           <p className="mt-5 border-l-2 border-ouro pl-4 text-[0.86rem] leading-relaxed text-grafite/80">
-            {copy.avisos[metodo]}
+            {t.avisos[metodo]}
           </p>
         </section>
       )}
@@ -501,15 +523,15 @@ export function CalculadoraGordura({ figuras = [] }: { figuras?: string[] }) {
         <section id="bf-alvo" className="scroll-mt-24">
           <h2 className="t-eyebrow flex items-center gap-3 text-ouro-profundo">
             <span aria-hidden className="rule-gold inline-block h-px w-8" />
-            02 / {copy.alvo.titulo}
+            02 / {t.alvo.titulo}
           </h2>
           <p className="mt-5 max-w-2xl text-[0.95rem] leading-relaxed text-grafite/75">
-            {copy.alvo.texto}
+            {t.alvo.texto}
           </p>
 
           <div
             role="radiogroup"
-            aria-label="Percentual desejado"
+            aria-label={ui.percentualDesejado}
             className="-mx-6 mt-7 flex snap-x snap-mandatory gap-3 overflow-x-auto px-6 pb-2 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 lg:grid-cols-4 [&::-webkit-scrollbar]:hidden"
           >
             {escala.map((n) => {
@@ -542,26 +564,26 @@ export function CalculadoraGordura({ figuras = [] }: { figuras?: string[] }) {
                     ) : (
                       <span className="flex h-full flex-col items-center justify-center">
                         <span className="font-display text-3xl text-ouro-profundo">
-                          {n.bf}%
+                          {pctCurto(n.bf)}
                         </span>
                         <span className="mt-1 text-[0.6rem] uppercase tracking-[0.14em] text-grafite/80">
-                          {n.de}–{n.ate} %
+                          {faixaNivel(n)}
                         </span>
                       </span>
                     )}
                     {aqui && (
                       <span className="absolute inset-x-0 top-0 bg-grafite/85 px-2 py-1 text-center text-[0.6rem] uppercase tracking-[0.14em] text-porcelana">
-                        Você está aqui
+                        {ui.voceEstaAqui}
                       </span>
                     )}
                   </span>
 
                   <span className="flex flex-1 flex-col p-3.5">
                     <span className="text-[0.6rem] uppercase tracking-[0.14em] text-ouro-profundo">
-                      {n.de}–{n.ate} %
+                      {faixaNivel(n)}
                     </span>
                     <span className="mt-1 font-display text-lg leading-tight text-grafite">
-                      {n.nome}
+                      {nomeNivel(n)}
                     </span>
                   </span>
                 </button>
@@ -572,9 +594,9 @@ export function CalculadoraGordura({ figuras = [] }: { figuras?: string[] }) {
           {/* Uma descrição só, a do degrau escolhido: repetida nos oito
               cartões ela empilhava seis telas de leitura no celular. */}
           <p className="mt-5 text-[0.95rem] leading-relaxed text-grafite">
-            <strong className="font-medium">{alvo?.nome}:</strong>{" "}
-            {alvo?.descricao}{" "}
-            <span className="text-grafite/80">{copy.alvo.nota}</span>
+            <strong className="font-medium">{alvo && nomeNivel(alvo)}:</strong>{" "}
+            {alvo && descricaoNivel(alvo)}{" "}
+            <span className="text-grafite/80">{t.alvo.nota}</span>
           </p>
 
           {/* Sem isto o plano simplesmente não nasce, e a página termina
@@ -584,12 +606,12 @@ export function CalculadoraGordura({ figuras = [] }: { figuras?: string[] }) {
               aria-live="polite"
               className="mt-7 border-l-2 border-ouro pl-4 text-[0.9rem] leading-relaxed text-grafite/80"
             >
-              Falta {listar(faltaPlano)} para montar o plano —{" "}
+              {ui.faltaPlano(listar(faltaPlano), faltaPlano.length)}
               <a
                 href="#bf-medidas"
                 className="border-b border-linha-ouro pb-0.5 text-ouro-profundo"
               >
-                voltar às medidas
+                {ui.voltarMedidas}
               </a>
               .
             </p>
@@ -605,75 +627,76 @@ export function CalculadoraGordura({ figuras = [] }: { figuras?: string[] }) {
         >
           <h2 className="t-eyebrow flex items-center gap-3 text-ouro-profundo">
             <span aria-hidden className="rule-gold inline-block h-px w-8" />
-            03 / {copy.plano.titulo}
+            03 / {t.plano.titulo}
           </h2>
 
           {plano.p.direcao === "manter" ? (
             <p className="mt-6 max-w-2xl text-[0.95rem] leading-relaxed text-grafite/80">
-              Você já está onde escolheu estar. O plano aqui não é perder — é
-              manter enquanto se treina para mudar a composição por dentro:
-              mesma balança, outra proporção entre músculo e gordura.
+              {ui.manter}
             </p>
           ) : (
             <p className="mt-6 max-w-2xl text-[0.95rem] leading-relaxed text-grafite/80">
-              De <strong className="font-medium">{pct(valeu.valor)}</strong>{" "}
-              para <strong className="font-medium">{pct(alvo.bf)}</strong> são{" "}
+              {ui.planoDe}{" "}
+              <strong className="font-medium">{pct(valeu.valor)}</strong>{" "}
+              {ui.planoPara}{" "}
+              <strong className="font-medium">{pct(alvo.bf)}</strong>{" "}
+              {ui.planoSao}{" "}
               <strong className="font-medium">
                 {num(Math.abs(plano.kg))} kg
               </strong>{" "}
-              {plano.p.direcao === "perder" ? "a perder" : "a ganhar"} —
-              chegando a{" "}
+              {plano.p.direcao === "perder" ? ui.aPerder : ui.aGanhar} —{" "}
+              {ui.chegandoA}{" "}
               <strong className="font-medium">{num(plano.pesoAlvo)} kg</strong>{" "}
-              com a massa magra preservada.
+              {ui.massaPreservada}
             </p>
           )}
 
           <dl className="mt-9 grid grid-cols-2 gap-px overflow-hidden rounded-sm bg-linha sm:grid-cols-3">
             <Tile
-              rotulo="Calorias por dia"
+              rotulo={ui.caloriasDia}
               valor={num(plano.p.alvo)}
               unidade="kcal"
-              nota={`Gasto estimado: ${num(plano.base.get)} kcal`}
+              nota={ui.gastoEstimado(num(plano.base.get))}
             />
             <Tile
-              rotulo={plano.p.direcao === "manter" ? "Ritmo" : "Tempo estimado"}
+              rotulo={plano.p.direcao === "manter" ? ui.ritmo : ui.tempoEstimado}
               valor={plano.p.direcao === "manter" ? "—" : String(prazo.semanas)}
-              unidade={plano.p.direcao === "manter" ? "" : "semanas"}
+              unidade={plano.p.direcao === "manter" ? "" : ui.semanas}
               nota={
                 plano.p.direcao === "manter"
-                  ? "Sem prazo: é rotina, não projeto"
-                  : `${num(prazo.ritmo)} kg por semana`
+                  ? ui.semRotina
+                  : ui.kgPorSemana(num(prazo.ritmo))
               }
             />
             <Tile
-              rotulo="Peso alvo"
+              rotulo={ui.pesoAlvo}
               valor={num(plano.pesoAlvo)}
               unidade="kg"
-              nota={`Massa magra mantida em ${num(Math.round(plano.pesoAlvo * (1 - alvo.bf / 100) * 10) / 10)} kg`}
+              nota={ui.massaMantida(num(Math.round(plano.pesoAlvo * (1 - alvo.bf / 100) * 10) / 10))}
             />
           </dl>
 
           <h3 className="t-eyebrow mt-10 text-grafite/80">
-            A distribuição dos macros
+            {ui.macrosTitulo}
           </h3>
           <dl className="mt-4 grid grid-cols-3 gap-px overflow-hidden rounded-sm bg-linha">
             <Tile
-              rotulo="Proteína"
+              rotulo={ui.proteina}
               valor={num(plano.macros.proteina.g)}
               unidade="g"
-              nota={`${plano.macros.proteina.pct} % das calorias`}
+              nota={ui.pctCalorias(plano.macros.proteina.pct)}
             />
             <Tile
-              rotulo="Carboidrato"
+              rotulo={ui.carboidrato}
               valor={num(plano.macros.carboidrato.g)}
               unidade="g"
-              nota={`${plano.macros.carboidrato.pct} % das calorias`}
+              nota={ui.pctCalorias(plano.macros.carboidrato.pct)}
             />
             <Tile
-              rotulo="Gordura"
+              rotulo={ui.gordura}
               valor={num(plano.macros.gordura.g)}
               unidade="g"
-              nota={`${plano.macros.gordura.pct} % das calorias`}
+              nota={ui.pctCalorias(plano.macros.gordura.pct)}
             />
           </dl>
 
@@ -682,32 +705,25 @@ export function CalculadoraGordura({ figuras = [] }: { figuras?: string[] }) {
             {alvo.temporario && (
               <Aviso>
                 <strong className="font-medium">
-                  {alvo.nome} é condição de palco.
+                  {ui.palcoTitulo(nomeNivel(alvo))}
                 </strong>{" "}
-                Atletas chegam lá por algumas semanas, com acompanhamento, e
-                saem depois. Como meta para o ano inteiro, cobra libido, humor,
-                sono e treino. Se o objetivo é uma foto, faz sentido; se é viver
-                assim, escolha um degrau acima.
+                {ui.palcoTexto}
               </Aviso>
             )}
             {plano.p.limitado && (
               <Aviso>
                 <strong className="font-medium">
-                  O ritmo foi reduzido de propósito.
+                  {ui.limitadoTitulo}
                 </strong>{" "}
-                O déficit que essa meta pediria passaria de 25 % do seu gasto,
-                ou cairia abaixo do seu metabolismo basal. O prazo acima já é o
-                caminho mais rápido que ainda protege massa magra.
+                {ui.limitadoTexto}
               </Aviso>
             )}
             {plano.macros.apertado && (
               <Aviso>
                 <strong className="font-medium">
-                  Sobrou pouco carboidrato.
+                  {ui.apertadoTitulo}
                 </strong>{" "}
-                Com proteína e gordura nos mínimos, o que resta de energia é
-                pequeno — sinal de que a meta é agressiva para o seu gasto
-                atual. Treinar pesado com esse valor é difícil.
+                {ui.apertadoTexto}
               </Aviso>
             )}
           </div>
@@ -727,11 +743,11 @@ export function CalculadoraGordura({ figuras = [] }: { figuras?: string[] }) {
                     aria-hidden
                     className="rule-gold inline-block h-px w-8"
                   />
-                  {copy.plano.fecho.eyebrow}
+                  {t.plano.fecho.eyebrow}
                 </p>
 
                 <h3 className="t-title mt-6 text-balance text-porcelana">
-                  {copy.plano.fecho.titulo}
+                  {t.plano.fecho.titulo}
                 </h3>
 
                 {/* O número que a pessoa acabou de gerar, dito de volta: um
@@ -739,24 +755,24 @@ export function CalculadoraGordura({ figuras = [] }: { figuras?: string[] }) {
                   como anúncio. */}
                 {plano.p.direcao !== "manter" && (
                   <p className="mt-6 max-w-xl text-pretty text-lg leading-relaxed text-porcelana sm:text-xl">
-                    Entre você e {pct(alvo.bf)} estão{" "}
+                    {ui.fechoEntre(pct(alvo.bf))}{" "}
                     <strong className="font-medium text-ouro">
                       {num(Math.abs(plano.kg))} kg
                     </strong>{" "}
-                    e{" "}
+                    {ui.fechoE}{" "}
                     <strong className="font-medium text-ouro">
-                      {prazo.semanas} semanas
+                      {ui.fechoSemanas(prazo.semanas)}
                     </strong>
-                    . O plano existe para que essas semanas não virem dois anos.
+                    {ui.fechoFim}
                   </p>
                 )}
 
                 <p className="mt-6 max-w-xl text-[0.95rem] leading-relaxed text-porcelana/75">
-                  {copy.plano.fecho.texto}
+                  {t.plano.fecho.texto}
                 </p>
 
                 <ul className="mt-8 space-y-3">
-                  {copy.plano.fecho.itens.map((item) => (
+                  {t.plano.fecho.itens.map((item) => (
                     <li
                       key={item}
                       className="flex items-start gap-3.5 text-[0.95rem] leading-relaxed text-porcelana/90"
@@ -773,10 +789,10 @@ export function CalculadoraGordura({ figuras = [] }: { figuras?: string[] }) {
                 um objeto posto ali, e não sangrando no fundo do card. */}
               <figure>
                 <Image
-                  src={copy.plano.fecho.prova.imagem}
-                  alt={copy.plano.fecho.prova.alt}
-                  width={copy.plano.fecho.prova.largura}
-                  height={copy.plano.fecho.prova.altura}
+                  src={conteudo.plano.fecho.prova.imagem}
+                  alt={t.plano.fecho.prova.alt}
+                  width={conteudo.plano.fecho.prova.largura}
+                  height={conteudo.plano.fecho.prova.altura}
                   sizes="(max-width: 1024px) 92vw, 420px"
                   loading="eager"
                   className="w-full rounded-sm border border-ouro/25 shadow-[0_18px_50px_-20px_rgba(0,0,0,0.6)]"
@@ -786,7 +802,7 @@ export function CalculadoraGordura({ figuras = [] }: { figuras?: string[] }) {
                     aria-hidden
                     className="rule-gold mt-2 h-px w-5 shrink-0"
                   />
-                  {copy.plano.fecho.prova.legenda}
+                  {t.plano.fecho.prova.legenda}
                 </figcaption>
               </figure>
 
@@ -797,22 +813,22 @@ export function CalculadoraGordura({ figuras = [] }: { figuras?: string[] }) {
                   href={href("final")}
                   className="group flex min-h-14 w-full items-center justify-center gap-3 rounded-md bg-verde px-8 text-[0.85rem] font-bold uppercase tracking-[0.14em] text-[#06140b] shadow-[0_10px_30px_rgba(31,193,91,0.3)] transition-colors duration-300 hover:bg-verde-claro sm:w-auto sm:self-start"
                 >
-                  {copy.plano.fecho.cta}
+                  {t.plano.fecho.cta}
                   <Arrow />
                 </a>
 
                 <p className="mt-5 flex items-center gap-2.5 text-sm text-ouro">
                   <span aria-hidden className="rule-gold h-px w-6 shrink-0" />
-                  {copy.plano.fecho.urgencia}
+                  {t.plano.fecho.urgencia}
                 </p>
 
                 <p className="mt-4 text-xs leading-relaxed text-porcelana/70">
-                  {copy.plano.fecho.nota}
+                  {t.plano.fecho.nota}
                   <br />
                   {/* Verdade verificável — a página não faz uma requisição
                     sequer — e é o medo de quem digita peso e cintura vindo
                     de um anúncio. */}
-                  {copy.plano.fecho.privacidade}
+                  {t.plano.fecho.privacidade}
                 </p>
               </div>
             </div>
@@ -828,13 +844,13 @@ export function CalculadoraGordura({ figuras = [] }: { figuras?: string[] }) {
               <strong className="block font-display text-lg text-grafite">
                 {num(plano.p.alvo)} kcal
               </strong>
-              {alvo ? `meta de ${pct(alvo.bf)}` : ""}
+              {alvo ? ui.metaDe(pct(alvo.bf)) : ""}
             </p>
             <a
               href={href("barra")}
               className="inline-flex min-h-12 items-center justify-center rounded-full bg-grafite px-5 text-sm font-medium text-porcelana"
             >
-              Quero o plano
+              {ui.quero}
             </a>
           </div>
         </div>
@@ -853,10 +869,10 @@ export function CalculadoraGordura({ figuras = [] }: { figuras?: string[] }) {
  * disso a página inteira salta de escala.
  */
 /** Deixa passar um separador decimal só — "1,2,3" viraria NaN silencioso. */
-function soNumero(bruto: string): string {
-  const limpo = bruto.replace(/[^\d.,]/g, "").replace(/\./g, ",");
-  const [inteira, ...resto] = limpo.split(",");
-  return resto.length ? `${inteira},${resto.join("")}` : inteira;
+function soNumero(bruto: string, sep: "," | "." = ","): string {
+  const limpo = bruto.replace(/[^\d.,]/g, "").replace(/[.,]/g, sep);
+  const [inteira, ...resto] = limpo.split(sep);
+  return resto.length ? `${inteira}${sep}${resto.join("")}` : inteira;
 }
 
 function Numero({
@@ -868,6 +884,7 @@ function Numero({
   set,
   ajuda,
   erro,
+  idioma = "pt",
 }: {
   id: string;
   rotulo: string;
@@ -878,6 +895,7 @@ function Numero({
   ajuda?: string;
   /** faixa plausível violada — o número foi digitado, mas não serve */
   erro?: string;
+  idioma?: Idioma;
 }) {
   const descrito = [ajuda && `${id}-ajuda`, erro && `${id}-erro`]
     .filter(Boolean)
@@ -890,7 +908,7 @@ function Numero({
         {/* A unidade só existe no adorno à direita, que é decorativo: sem
             isto, quem usa leitor de tela não sabe se o campo é em cm ou em
             polegadas — num formulário que depende disso. */}
-        <span className="sr-only"> em {unidade}</span>
+        <span className="sr-only">{TEXTOS_GORDURA[idioma].ui.unidadeSr(unidade)}</span>
       </label>
       {/* Campo com fundo, e não só a linha inferior do resto do site.
           Aqui a página inteira depende de a pessoa digitar: uma linha
@@ -912,7 +930,7 @@ function Numero({
           value={valor}
           aria-invalid={erro ? true : undefined}
           aria-describedby={descrito || undefined}
-          onChange={(e) => set(soNumero(e.target.value))}
+          onChange={(e) => set(soNumero(e.target.value, idioma === "en" ? "." : ","))}
           className="w-full bg-transparent py-3 text-base text-grafite placeholder:text-grafite/35 focus:outline-none"
         />
         <span aria-hidden className="shrink-0 text-xs text-grafite/80">
@@ -986,12 +1004,16 @@ function Regua({
   min,
   max,
   sexo,
+  idioma = "pt",
 }: {
   bf: number;
   min: number;
   max: number;
   sexo: Sexo;
+  idioma?: Idioma;
 }) {
+  const t = TEXTOS_GORDURA[idioma];
+  const pct = (n: number) => pctIdioma(idioma, n);
   const teto = TETO[sexo];
   const faixas = faixasDe(sexo);
   const posicao = (v: number) => Math.max(0, Math.min(100, (v / teto) * 100));
@@ -1015,7 +1037,7 @@ function Regua({
           rótulo, quem usa leitor de tela perde a posição na escala. */}
       <div
         role="img"
-        aria-label={`${pct(bf)} de gordura corporal, faixa provável de ${pct(min)} a ${pct(max)}, classificado como ${classificar(bf, sexo).nome}.`}
+        aria-label={t.ui.reguaAria(pct(bf), pct(min), pct(max), categoriaLocal(t, bf, sexo).nome)}
         className="relative h-2.5 w-full overflow-hidden rounded-full bg-porcelana/10"
       >
         {segmentos.map((s) => (
@@ -1049,12 +1071,12 @@ function Regua({
       </div>
 
       <ul className="mt-3 flex justify-between text-[0.6rem] uppercase tracking-[0.1em] text-porcelana/70">
-        <li>0 %</li>
-        <li>{teto} %</li>
+        <li>{pct(0)}</li>
+        <li>{pct(teto)}</li>
       </ul>
 
       <p className="mt-4 text-xs leading-relaxed text-porcelana/70">
-        A barra clara é a sua faixa provável; o traço, o valor central.
+        {t.ui.reguaLegenda}
       </p>
     </div>
   );

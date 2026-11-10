@@ -17,16 +17,33 @@ import {
   macros as calcularMacros,
   planejar,
 } from "@/lib/calorias";
-import { calculadora, rotas } from "@/lib/content";
+import { rotas } from "@/lib/content";
+import { TEXTOS_CALORIAS, type TextosCalorias } from "@/lib/i18n/calorias";
+import { type Idioma, LANG_HTML, rotaIdioma } from "@/lib/rotas-idioma";
 import { criarSupabaseBrowser } from "@/lib/supabase/client";
 import { CapturaPlano, type Parametros } from "./CapturaPlano";
 import { Arrow, Rotulo, buttonClass, campoBase } from "./ui";
 
-const num = (n: number) => n.toLocaleString("pt-BR");
 const dec = (s: string) => Number(s.replace(",", "."));
 
-export function Calculadora() {
+type Fmt = {
+  num: (n: number) => string;
+  /** casas fixas — "1,5" em pt/es, "1.5" em en */
+  fixo: (n: number, casas: number) => string;
+};
+
+function formatadores(idioma: Idioma): Fmt {
+  const lang = LANG_HTML[idioma];
+  return {
+    num: (n) => n.toLocaleString(lang),
+    fixo: (n, casas) =>
+      n.toLocaleString(lang, { minimumFractionDigits: casas, maximumFractionDigits: casas }),
+  };
+}
+
+export function Calculadora({ idioma = "pt" }: { idioma?: Idioma } = {}) {
   const id = useId();
+  const t = TEXTOS_CALORIAS[idioma].calc;
 
   const [sexo, setSexo] = useState<Sexo>("masculino");
   const [idade, setIdade] = useState("");
@@ -101,20 +118,24 @@ export function Calculadora() {
       base,
       plano,
       macros: m,
-      pratos: distribuir(plano.alvo, m, refeicoes),
+      // Os nomes vêm do dicionário; a conta, de `distribuir`.
+      pratos: distribuir(plano.alvo, m, refeicoes).map((r, i, todas) => ({
+        ...r,
+        nome: (t.nomesRefeicoes[todas.length] ?? t.nomesRefeicoes[3])[i] ?? r.nome,
+      })),
       parametros,
     };
-  }, [sexo, idade, peso, altura, gordura, pesoAlvo, formula, atividade, refeicoes]);
+  }, [sexo, idade, peso, altura, gordura, pesoAlvo, formula, atividade, refeicoes, t]);
 
   const faltaGordura = formula === "katch" && !gordura;
 
   return (
     <div className="space-y-20" ref={(node) => { if (node) node.dataset.interactive = "true"; }}>
-      <nav aria-label="Etapas da calculadora" className="surface-card grid overflow-hidden sm:grid-cols-3">
+      <nav aria-label={t.etapasAria} className="surface-card grid overflow-hidden sm:grid-cols-3">
         {[
-          ["01", "Seus dados", "#calc-dados"],
-          ["02", "Seu objetivo", "#calc-objetivo"],
-          ["03", "Seu plano", "#calc-resultado"],
+          ["01", t.etapas[0], "#calc-dados"],
+          ["02", t.etapas[1], "#calc-objetivo"],
+          ["03", t.etapas[2], "#calc-resultado"],
         ].map(([numero, rotulo, href], i) => (
           <a
             key={numero}
@@ -136,18 +157,18 @@ export function Calculadora() {
       <form
         id="calc-dados"
         onSubmit={(e) => e.preventDefault()}
-        aria-label="Seus dados"
+        aria-label={t.dadosAria}
         className="surface-card scroll-mt-28 bg-white p-6 sm:p-10 lg:p-12"
       >
         <p className="t-eyebrow flex items-center gap-3 text-ouro-profundo">
           <span aria-hidden className="rule-gold inline-block h-px w-8" />
           <Icone tipo="pessoa" />
-          01 / Seus dados
+          {t.dadosEyebrow}
         </p>
 
         <div className="mt-9 grid gap-x-12 gap-y-9 lg:grid-cols-3">
           <fieldset className="lg:col-span-3">
-            <legend className="t-eyebrow text-grafite">Sexo biológico</legend>
+            <legend className="t-eyebrow text-grafite">{t.sexoLegenda}</legend>
             <div className="mt-3 inline-flex rounded-full border border-linha bg-white p-1 shadow-sm">
               {(["masculino", "feminino"] as const).map((s) => (
                 <button
@@ -161,22 +182,21 @@ export function Calculadora() {
                       : "text-grafite hover:text-grafite"
                   }`}
                 >
-                  {s}
+                  {t.sexos[s]}
                 </button>
               ))}
             </div>
             <p className="mt-2.5 text-xs text-grafite">
-              As equações foram derivadas com esta variável — não é uma pergunta
-              sobre identidade.
+              {t.sexoNota}
             </p>
           </fieldset>
 
-          <Numero id={`${id}-idade`} rotulo="Idade" unidade="anos" dica="32" valor={idade} set={setIdade} />
-          <Numero id={`${id}-peso`} rotulo="Peso atual" unidade="kg" dica="78" valor={peso} set={setPeso} />
-          <Numero id={`${id}-altura`} rotulo="Altura" unidade="cm" dica="176" valor={altura} set={setAltura} />
+          <Numero id={`${id}-idade`} rotulo={t.idade} unidade={t.anos} dica="32" valor={idade} set={setIdade} />
+          <Numero id={`${id}-peso`} rotulo={t.peso} unidade="kg" dica="78" valor={peso} set={setPeso} />
+          <Numero id={`${id}-altura`} rotulo={t.altura} unidade="cm" dica="176" valor={altura} set={setAltura} />
 
           <div className="lg:col-span-2">
-            <Rotulo htmlFor={`${id}-atividade`}>Nível de atividade</Rotulo>
+            <Rotulo htmlFor={`${id}-atividade`}>{t.atividade}</Rotulo>
             <select
               id={`${id}-atividade`}
               value={atividade}
@@ -185,7 +205,7 @@ export function Calculadora() {
             >
               {ATIVIDADES.map((a) => (
                 <option key={a.id} value={a.id}>
-                  {a.nome} — {a.nota}
+                  {t.atividades[a.id].nome} — {t.atividades[a.id].nota}
                 </option>
               ))}
             </select>
@@ -193,10 +213,10 @@ export function Calculadora() {
 
           <fieldset className="lg:col-span-3">
             <legend className="t-eyebrow text-grafite">
-              Como calcular seu metabolismo?
+              {t.formulaLegenda}
             </legend>
             <p className="mt-2 text-sm text-grafite">
-              Se estiver em dúvida, mantenha a opção recomendada.
+              {t.formulaDica}
             </p>
             <div className="mt-4 grid gap-3 md:grid-cols-3">
               {FORMULAS.map((f) => {
@@ -241,11 +261,11 @@ export function Calculadora() {
                     </span>
                     {f.id === "mifflin" && (
                       <span className="mt-3 inline-block bg-grafite px-2 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-porcelana">
-                        Recomendado
+                        {t.recomendado}
                       </span>
                     )}
                     <span className="mt-3 block text-sm leading-relaxed text-grafite">
-                      {f.nota}
+                      {t.formulas[f.id]}
                     </span>
                   </button>
                 );
@@ -258,7 +278,7 @@ export function Calculadora() {
               <div className="max-w-xs">
                 <Numero
                   id={`${id}-gordura`}
-                  rotulo="Gordura corporal"
+                  rotulo={t.gordura}
                   unidade="%"
                   dica="18"
                   valor={gordura}
@@ -266,8 +286,7 @@ export function Calculadora() {
                 />
               </div>
               <p className="mt-2.5 text-xs text-grafite">
-                Use um valor medido (bioimpedância, adipômetro ou DEXA). Chute
-                não melhora o resultado — piora.
+                {t.gorduraNota}
               </p>
             </div>
           )}
@@ -278,19 +297,19 @@ export function Calculadora() {
       <form
         id="calc-objetivo"
         onSubmit={(e) => e.preventDefault()}
-        aria-label="Seu objetivo"
+        aria-label={t.objetivoAria}
         className="surface-card scroll-mt-28 bg-white p-6 sm:p-10 lg:p-12"
       >
         <p className="t-eyebrow flex items-center gap-3 text-ouro-profundo">
           <span aria-hidden className="rule-gold inline-block h-px w-8" />
           <Icone tipo="alvo" />
-          02 / Onde você quer chegar
+          {t.objetivoEyebrow}
         </p>
 
         <div className="mt-9 grid gap-x-12 gap-y-9 lg:grid-cols-3">
           <Numero
             id={`${id}-alvo`}
-            rotulo="Peso desejado"
+            rotulo={t.pesoAlvo}
             unidade="kg"
             dica="72"
             valor={pesoAlvo}
@@ -298,11 +317,11 @@ export function Calculadora() {
           />
 
           <div className="lg:col-span-2">
-            <Rotulo htmlFor={`${id}-refeicoes`}>Refeições por dia</Rotulo>
+            <Rotulo htmlFor={`${id}-refeicoes`}>{t.refeicoes}</Rotulo>
             <div
               id={`${id}-refeicoes`}
               role="radiogroup"
-              aria-label="Refeições por dia"
+              aria-label={t.refeicoes}
               className="mt-3 inline-flex rounded-full border border-linha p-1"
             >
               {[2, 3, 4, 5, 6].map((n) => (
@@ -323,8 +342,7 @@ export function Calculadora() {
               ))}
             </div>
             <p className="mt-2.5 text-xs text-grafite">
-              O número de refeições não muda o resultado — muda a sua adesão.
-              Escolha o que cabe na rotina.
+              {t.refeicoesNota}
             </p>
           </div>
         </div>
@@ -341,7 +359,7 @@ export function Calculadora() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.35 }}
             >
-              <Resultado {...dados} />
+              <Resultado {...dados} idioma={idioma} t={t} />
             </motion.div>
           ) : (
           <motion.div
@@ -353,9 +371,7 @@ export function Calculadora() {
           >
             <span aria-hidden className="rule-gold h-px w-16" />
             <p className="mt-7 max-w-sm font-display text-2xl leading-snug text-grafite">
-              {faltaGordura
-                ? "Informe também o percentual de gordura para usar a Katch-McArdle."
-                : "Preencha idade, peso e altura para ver o plano."}
+              {faltaGordura ? t.faltaGordura : t.vazio}
             </p>
           </motion.div>
           )}
@@ -375,7 +391,16 @@ type DadosCalculados = {
   parametros: Parametros;
 };
 
-function Resultado({ base, plano, macros, pratos, parametros }: DadosCalculados) {
+function Resultado({
+  base,
+  plano,
+  macros,
+  pratos,
+  parametros,
+  idioma,
+  t,
+}: DadosCalculados & { idioma: Idioma; t: TextosCalorias["calc"] }) {
+  const { num, fixo } = formatadores(idioma);
   const [liberado, setLiberado] = useState(false);
   const salvo = useRef(false);
   const liberar = useCallback(async () => {
@@ -397,40 +422,35 @@ function Resultado({ base, plano, macros, pratos, parametros }: DadosCalculados)
       }),
     ]);
   }, [base, plano, macros, parametros]);
-  const rumo =
-    plano.direcao === "perder"
-      ? "Emagrecimento"
-      : plano.direcao === "ganhar"
-        ? "Ganho de massa"
-        : "Manutenção";
+  const rumo = t.rumo[plano.direcao];
 
   return (
     <div className="border-t border-linha-ouro pt-12">
       <p className="t-eyebrow flex items-center gap-3 text-ouro-profundo">
         <span aria-hidden className="rule-gold inline-block h-px w-8" />
         <Icone tipo="grafico" />
-        03 / Seu plano
+        {t.planoEyebrow}
       </p>
 
       {!liberado && (
         <>
           <div aria-hidden className="relative mt-10 overflow-hidden rounded-xl border border-linha bg-white p-6 sm:p-8">
             <div className="grid gap-4 blur-[7px] select-none sm:grid-cols-3">
-              {["Metabolismo basal", "Seu alvo diário", "Macronutrientes"].map((item) => (
+              {t.borrao.map((item) => (
                 <div key={item} className="bg-porcelana p-6">
                   <p className="text-xs uppercase tracking-wider">{item}</p>
-                  <p className="mt-4 font-display text-4xl">2.000</p>
+                  <p className="mt-4 font-display text-4xl">{num(2000)}</p>
                   <span className="mt-5 block h-1 w-3/4 bg-ouro/40" />
                 </div>
               ))}
             </div>
             <div className="absolute inset-0 flex items-center justify-center bg-white/20">
               <span className="rounded-full border border-white/80 bg-white/80 px-4 py-2 text-xs font-medium text-grafite shadow-lg backdrop-blur-xl">
-                Resultado reservado para você
+                {t.reservado}
               </span>
             </div>
           </div>
-          <CapturaPlano parametros={parametros} onLiberar={liberar} />
+          <CapturaPlano parametros={parametros} onLiberar={liberar} idioma={idioma} />
         </>
       )}
 
@@ -440,23 +460,26 @@ function Resultado({ base, plano, macros, pratos, parametros }: DadosCalculados)
       {/* Números principais */}
       <dl className="mt-10 grid gap-px overflow-hidden rounded-sm bg-linha sm:grid-cols-3">
         <Numeral
-          rotulo="Metabolismo basal"
+          rotulo={t.tmb}
           valor={base.tmb}
-          nota={calculadora.explicaTmb}
+          nota={t.explicaTmb}
+          num={num}
         />
         <Numeral
-          rotulo="Gasto total no dia"
+          rotulo={t.get}
           valor={base.get}
-          nota="Basal multiplicado pelo seu nível de atividade."
+          nota={t.getNota}
+          num={num}
         />
         <Numeral
-          rotulo={`Alvo — ${rumo.toLowerCase()}`}
+          rotulo={t.alvo(rumo)}
           valor={plano.alvo}
           nota={
             plano.direcao === "manter"
-              ? "Peso estável no gasto atual."
-              : `${plano.ajuste > 0 ? "+" : ""}${num(plano.ajuste)} kcal por dia.`
+              ? t.alvoManter
+              : t.ajustePorDia(`${plano.ajuste > 0 ? "+" : ""}${num(plano.ajuste)}`)
           }
+          num={num}
           destaque
         />
       </dl>
@@ -464,45 +487,41 @@ function Resultado({ base, plano, macros, pratos, parametros }: DadosCalculados)
       {/* Trajetória */}
       {plano.direcao !== "manter" && (
         <div className="mt-10 flex flex-wrap items-baseline gap-x-10 gap-y-4 border-l border-linha-ouro pl-7">
-          <Traco rotulo="Diferença" valor={`${plano.diferenca.toFixed(1).replace(".", ",")} kg`} />
+          <Traco rotulo={t.diferenca} valor={`${fixo(plano.diferenca, 1)} kg`} />
           <Traco
-            rotulo="Ritmo seguro"
-            valor={`${plano.ritmoSemanal.toFixed(2).replace(".", ",")} kg por semana`}
+            rotulo={t.ritmo}
+            valor={t.porSemana(fixo(plano.ritmoSemanal, 2))}
           />
           <Traco
-            rotulo="Prazo estimado"
-            valor={`${plano.semanas} semanas`}
+            rotulo={t.prazo}
+            valor={t.semanas(plano.semanas)}
           />
         </div>
       )}
 
       {plano.limitado && (
         <p className="mt-7 max-w-2xl border-l-2 border-ouro pl-5 text-sm leading-relaxed text-grafite">
-          O ritmo foi reduzido de propósito. Chegar mais rápido exigiria um
-          déficit que cai abaixo do seu metabolismo basal — exatamente a dieta
-          extrema que não se sustenta e que devolve o peso depois.
+          {t.limitado}
         </p>
       )}
 
       {/* Macros */}
-      <h3 className="t-eyebrow mt-16 text-grafite">Macronutrientes no alvo</h3>
+      <h3 className="t-eyebrow mt-16 text-grafite">{t.macrosTitulo}</h3>
       <dl className="mt-6 grid gap-px overflow-hidden rounded-sm bg-linha sm:grid-cols-3">
-        <Macro rotulo="Proteína" dados={macros.proteina} />
-        <Macro rotulo="Gordura" dados={macros.gordura} />
-        <Macro rotulo="Carboidrato" dados={macros.carboidrato} />
+        <Macro rotulo={t.proteina} dados={macros.proteina} num={num} pct={t.pctCalorias} />
+        <Macro rotulo={t.gorduraMacro} dados={macros.gordura} num={num} pct={t.pctCalorias} />
+        <Macro rotulo={t.carboidrato} dados={macros.carboidrato} num={num} pct={t.pctCalorias} />
       </dl>
 
       {macros.apertado && (
         <p className="mt-6 max-w-2xl text-sm leading-relaxed text-grafite">
-          Sobrou pouco espaço para carboidrato. Num alvo assim, ou o déficit é
-          agressivo demais, ou o gasto precisa subir — treinar mais rende melhor
-          que comer menos.
+          {t.apertado}
         </p>
       )}
 
       {/* Distribuição */}
       <h3 className="t-eyebrow mt-16 text-grafite">
-        Distribuição em {pratos.length} refeições
+        {t.distribuicao(pratos.length)}
       </h3>
 
       <div className="mt-6 overflow-x-auto">
@@ -510,19 +529,19 @@ function Resultado({ base, plano, macros, pratos, parametros }: DadosCalculados)
           <thead>
             <tr className="border-b border-linha text-left">
               <th scope="col" className="py-3 pr-4 font-normal text-grafite">
-                Refeição
+                {t.refeicao}
               </th>
               <th scope="col" className="py-3 px-4 text-right font-normal text-grafite">
                 kcal
               </th>
               <th scope="col" className="py-3 px-4 text-right font-normal text-grafite">
-                Proteína
+                {t.proteina}
               </th>
               <th scope="col" className="py-3 px-4 text-right font-normal text-grafite">
-                Carboidrato
+                {t.carboidrato}
               </th>
               <th scope="col" className="py-3 pl-4 text-right font-normal text-grafite">
-                Gordura
+                {t.gorduraMacro}
               </th>
             </tr>
           </thead>
@@ -544,7 +563,7 @@ function Resultado({ base, plano, macros, pratos, parametros }: DadosCalculados)
           <tfoot>
             <tr>
               <th scope="row" className="py-3.5 pr-4 text-left text-xs uppercase tracking-[0.13em] text-grafite">
-                Total
+                {t.total}
               </th>
               <td className="py-3.5 px-4 text-right font-display text-lg text-grafite">
                 {num(plano.alvo)}
@@ -558,20 +577,17 @@ function Resultado({ base, plano, macros, pratos, parametros }: DadosCalculados)
       </div>
 
       <p className="mt-6 max-w-2xl text-sm leading-relaxed text-grafite">
-        A proteína foi dividida por igual de propósito: o estímulo de síntese
-        responde à dose por refeição, não ao total jogado de uma vez. Já os
-        carboidratos você pode concentrar em volta do treino — é aí que rendem
-        mais.
+        {t.proteinaNota}
       </p>
 
       {/* Ponte para a consultoria */}
       <div className="mt-14 border-t border-linha pt-9">
-        <p className="max-w-xl leading-relaxed text-grafite">{calculadora.ponte}</p>
+        <p className="max-w-xl leading-relaxed text-grafite">{t.ponte}</p>
         <a
-          href={`${rotas.consultoria}?de=calculadora`}
+          href={rotaIdioma(idioma, `${rotas.consultoria}?de=calculadora`)}
           className={`mt-7 ${buttonClass("consultoria")}`}
         >
-          Começar consultoria
+          {t.comecar}
           <Arrow />
         </a>
       </div>
@@ -587,11 +603,13 @@ function Numeral({
   rotulo,
   valor,
   nota,
+  num,
   destaque = false,
 }: {
   rotulo: string;
   valor: number;
   nota: string;
+  num: Fmt["num"];
   destaque?: boolean;
 }) {
   return (
@@ -638,9 +656,13 @@ function Numeral({
 function Macro({
   rotulo,
   dados,
+  num,
+  pct,
 }: {
   rotulo: string;
   dados: { g: number; kcal: number; pct: number };
+  num: Fmt["num"];
+  pct: TextosCalorias["calc"]["pctCalorias"];
 }) {
   return (
     <div className="bg-porcelana p-6">
@@ -658,7 +680,7 @@ function Macro({
           />
         </span>
         <span className="mt-2.5 block text-xs text-grafite">
-          {dados.pct}% das calorias · {num(dados.kcal)} kcal
+          {pct(dados.pct, num(dados.kcal))}
         </span>
       </dd>
     </div>

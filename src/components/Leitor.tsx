@@ -3,7 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { TEXTOS_BIBLIOTECA } from "@/lib/i18n/biblioteca";
 import type { Leitura } from "@/lib/leituras";
+import type { Idioma } from "@/lib/rotas-idioma";
 import { Arrow } from "./ui";
 
 /**
@@ -15,7 +17,8 @@ import { Arrow } from "./ui";
  */
 const JANELA = 2;
 
-export function Leitor({ livro }: { livro: Leitura }) {
+export function Leitor({ livro, idioma = "pt" }: { livro: Leitura; idioma?: Idioma }) {
+  const t = TEXTOS_BIBLIOTECA[idioma];
   const palco = useRef<HTMLDivElement>(null);
   const [estreito, setEstreito] = useState(false);
   const [cheia, setCheia] = useState(false);
@@ -94,11 +97,13 @@ export function Leitor({ livro }: { livro: Leitura }) {
   // Rótulo do que está à vista, para o leitor de tela e para o rodapé.
   const rotulo = duplo
     ? pos === 0
-      ? `Capa — página 1 de ${livro.total}`
-      : `Páginas ${Math.min(2 * pos, livro.total)}${
-          2 * pos + 1 <= livro.total ? ` e ${2 * pos + 1}` : ""
-        } de ${livro.total}`
-    : `Página ${pos + 1} de ${livro.total}`;
+      ? t.rotuloCapa(livro.total)
+      : t.rotuloPaginas(
+          Math.min(2 * pos, livro.total),
+          2 * pos + 1 <= livro.total ? 2 * pos + 1 : null,
+          livro.total,
+        )
+    : t.rotuloPagina(pos + 1, livro.total);
 
   return (
     <div>
@@ -116,14 +121,14 @@ export function Leitor({ livro }: { livro: Leitura }) {
           type="button"
           onClick={() => ir(-1)}
           disabled={pos === 0}
-          aria-label="Página anterior"
+          aria-label={t.paginaAnterior}
           className="absolute inset-y-0 left-0 z-30 w-1/5 cursor-w-resize disabled:cursor-default"
         />
         <button
           type="button"
           onClick={() => ir(1)}
           disabled={pos >= passos}
-          aria-label="Próxima página"
+          aria-label={t.proximaPagina}
           className="absolute inset-y-0 right-0 z-30 w-1/5 cursor-e-resize disabled:cursor-default"
         />
 
@@ -148,18 +153,18 @@ export function Leitor({ livro }: { livro: Leitura }) {
       {/* ── Controles ─────────────────────────────────────────── */}
       <div className="mt-8 flex flex-wrap items-center justify-between gap-x-8 gap-y-5">
         <div className="flex items-center gap-3">
-          <Botao aoClicar={() => ir(-1)} desativado={pos === 0} rotulo="Página anterior">
+          <Botao aoClicar={() => ir(-1)} desativado={pos === 0} rotulo={t.paginaAnterior}>
             <Seta direcao="tras" />
           </Botao>
-          <Botao aoClicar={() => ir(1)} desativado={pos >= passos} rotulo="Próxima página">
+          <Botao aoClicar={() => ir(1)} desativado={pos >= passos} rotulo={t.proximaPagina}>
             <Seta direcao="frente" />
           </Botao>
           <span className="ml-2 text-sm text-porcelana/70 tabular-nums">{rotulo}</span>
         </div>
 
-        <div className="flex items-center gap-5">
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
           <label className="flex min-w-40 flex-1 items-center gap-3">
-            <span className="sr-only">Ir para a página</span>
+            <span className="sr-only">{t.irParaPagina}</span>
             <input
               type="range"
               min={0}
@@ -170,7 +175,7 @@ export function Leitor({ livro }: { livro: Leitura }) {
             />
           </label>
 
-          <Botao aoClicar={telaCheia} rotulo={cheia ? "Sair da tela cheia" : "Tela cheia"}>
+          <Botao aoClicar={telaCheia} rotulo={cheia ? t.sairTelaCheia : t.telaCheia}>
             <svg
               viewBox="0 0 16 16"
               aria-hidden
@@ -195,7 +200,7 @@ export function Leitor({ livro }: { livro: Leitura }) {
               download
               className="group inline-flex items-center gap-2 whitespace-nowrap border-b border-ouro/40 pb-1 text-sm text-ouro transition-colors hover:border-ouro"
             >
-              Baixar o PDF
+              {t.baixarPdf}
               <Arrow />
             </Link>
           )}
@@ -203,7 +208,7 @@ export function Leitor({ livro }: { livro: Leitura }) {
       </div>
 
       <p className="mt-6 text-xs text-porcelana/70">
-        Use as setas do teclado, clique nas laterais da página ou arraste a barra.
+        {t.dica}
       </p>
     </div>
   );
