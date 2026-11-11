@@ -35,6 +35,7 @@ const TRADUZIDOS = [
   "/csflix",
   "/links",
   "/ela",
+  "/cursos",
 ] as const;
 
 /** O caminho (sem prefixo de idioma, sem query/hash) tem versão nativa? */
@@ -42,6 +43,7 @@ export function temTraducao(caminho: string): boolean {
   if (caminho === "/" || caminho === "") return true;
   if (/^\/leitura\/[a-z0-9-]+$/.test(caminho)) return true;
   if (/^\/ela\/[a-z0-9-]+$/.test(caminho)) return true;
+  if (/^\/cursos\/[a-z0-9-]+$/.test(caminho)) return true;
   return (TRADUZIDOS as readonly string[]).includes(caminho);
 }
 

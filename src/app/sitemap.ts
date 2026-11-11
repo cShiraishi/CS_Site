@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { marca, rotas } from "@/lib/content";
 import { listarLeituras } from "@/lib/leituras";
 import { APPS_ELA, rotaEla } from "@/lib/canal-ela";
+import { CURSOS } from "@/lib/cursos";
 import { IDIOMAS, alternativasIdioma, rotaIdioma } from "@/lib/rotas-idioma";
 
 type Frequencia = NonNullable<MetadataRoute.Sitemap[number]["changeFrequency"]>;
@@ -25,6 +26,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { caminho: "/", frequencia: "monthly", prioridade: 1 },
     /* O funil é a porta do produto: prioridade acima das ferramentas. */
     { caminho: rotas.programa, frequencia: "monthly", prioridade: 0.95 },
+    { caminho: rotas.cursos, frequencia: "monthly", prioridade: 0.85 },
+    ...CURSOS.filter((c) => c.modulos).map((c) => ({
+      caminho: `${rotas.cursos}/${c.slug}`,
+      frequencia: "monthly" as const,
+      prioridade: 0.85,
+    })),
     { caminho: rotas.calculadora, frequencia: "yearly", prioridade: 0.8 },
     { caminho: rotas.gordura, frequencia: "yearly", prioridade: 0.9 },
     { caminho: rotas.prato, frequencia: "yearly", prioridade: 0.8 },

@@ -51,6 +51,7 @@ export const marca = {
 export const nav = [
   { label: "Como funciona", href: "/#metodo", topo: true },
   { label: "Reset Metabólico", href: "/programa-90-dias", topo: true },
+  { label: "Cursos", href: "/cursos", topo: true },
   { label: "Biblioteca", href: "/biblioteca", topo: true },
   { label: "CSFlix", href: "/csflix", topo: true },
   { label: "Receitas Fit", href: "/receitas", topo: true },
@@ -79,6 +80,7 @@ export const rotas = {
   raioX: "/raio-x-postural",
   postura: "/postura",
   csflix: "/csflix",
+  cursos: "/cursos",
   links: "/links",
 } as const;
 

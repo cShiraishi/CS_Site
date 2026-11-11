@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { rotas } from "@/lib/content";
 import { temAcesso } from "@/lib/pedidos";
 import { PROGRAMA } from "@/lib/produto";
+import { CURSOS, UI_CURSOS } from "@/lib/cursos";
+import { CapaCurso } from "@/components/CapaCurso";
 import { criarSupabaseServer } from "@/lib/supabase/server";
 import { atualizarPerfil, sair } from "./actions";
 
@@ -18,6 +20,9 @@ export default async function MinhaContaPage() {
     supabase.from("calculator_results").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(5),
     temAcesso(PROGRAMA.slug),
   ]);
+  /* Produtos comprados que liberam cursos da vitrine. Hoje só existe o
+     Reset; um curso novo entra com o seu `produto` em lib/cursos.ts. */
+  const liberados = new Set<string>(comprou ? [PROGRAMA.slug] : []);
 
   return (
     <main className="min-h-screen bg-porcelana px-5 py-24 sm:py-32">
@@ -30,20 +35,42 @@ export default async function MinhaContaPage() {
         {/* O que a pessoa comprou vem antes do que ela pode editar: quem
             entra aqui depois de pagar está à procura do produto, não do
             formulário de perfil. */}
-        {comprou && (
-          <Link
-            href={`${rotas.programa}/area`}
-            className="mt-10 flex flex-wrap items-center justify-between gap-5 rounded-sm border border-grafite bg-grafite p-7 text-porcelana shadow-(--shadow-floating) transition-colors hover:border-ouro sm:p-9"
-          >
-            <div>
-              <p className="t-eyebrow text-ouro">{PROGRAMA.nome}</p>
-              <p className="mt-3 font-display text-2xl leading-snug sm:text-3xl">
-                Abrir os seus protocolos
-              </p>
-            </div>
-            <span className="text-sm font-medium tracking-wide text-ouro">Entrar →</span>
-          </Link>
-        )}
+        <section className="mt-10">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <p className="t-eyebrow text-ouro-profundo">{UI_CURSOS.pt.meusCursos}</p>
+            <Link href={rotas.cursos} className="text-sm text-grafite underline decoration-ouro/60 underline-offset-4">
+              {UI_CURSOS.pt.verNaVitrine}
+            </Link>
+          </div>
+          <ol className="-mx-5 mt-5 flex snap-x gap-4 overflow-x-auto px-5 pb-3 [scrollbar-width:none] lg:mx-0 lg:grid lg:grid-cols-5 lg:px-0">
+            {CURSOS.map((c) => {
+              const meu = c.produto ? liberados.has(c.produto) : false;
+              const aVenda = c.status === "disponivel";
+              const href = meu
+                ? `${rotas.programa}/area`
+                : c.modulos
+                  ? `${rotas.cursos}/${c.slug}`
+                  : rotas.cursos;
+              return (
+                <li key={c.slug} className="w-[60%] shrink-0 snap-start sm:w-[34%] lg:w-auto">
+                  <Link href={href} className="group block h-full rounded-2xl outline-none">
+                    <CapaCurso
+                      tom={c.tom}
+                      icone={c.icone}
+                      selo={`${UI_CURSOS.pt.modulo} ${c.numero}`}
+                      titulo={c.titulo.pt}
+                      chip={c.duracao?.pt}
+                      texto={c.resultado.pt}
+                      bloqueado={!meu}
+                      status={meu ? UI_CURSOS.pt.liberado : aVenda ? UI_CURSOS.pt.disponivel : UI_CURSOS.pt.emBreve}
+                      acao={meu ? UI_CURSOS.pt.abrir : UI_CURSOS.pt.verDetalhes}
+                    />
+                  </Link>
+                </li>
+              );
+            })}
+          </ol>
+        </section>
 
         <div className="mt-12 grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
           <section className="surface-card bg-white p-7 sm:p-9">

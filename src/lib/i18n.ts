@@ -251,6 +251,7 @@ const es: ConteudoTraduzido = {
   nav: [
     { label: "Cómo funciona", href: "/es#metodo", topo: true },
     { label: "Reset Metabólico", href: "/programa-90-dias", topo: true },
+    { label: "Cursos", href: "/cursos", topo: true },
     { label: "Biblioteca", href: "/biblioteca", topo: true },
     { label: "CSFlix", href: "/csflix", topo: true },
     { label: "Recetas Fit", href: "/receitas", topo: true },
@@ -454,6 +455,7 @@ const en: ConteudoTraduzido = {
   nav: [
     { label: "How it works", href: "/en#metodo", topo: true },
     { label: "Metabolic Reset", href: "/programa-90-dias", topo: true },
+    { label: "Courses", href: "/cursos", topo: true },
     { label: "Library", href: "/biblioteca", topo: true },
     { label: "CSFlix", href: "/csflix", topo: true },
     { label: "Fit Recipes", href: "/receitas", topo: true },

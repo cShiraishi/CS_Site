@@ -9,6 +9,7 @@ import { obterConteudo, type Idioma } from "@/lib/i18n";
 import { useIdioma } from "@/lib/useIdioma";
 import { useModo } from "@/lib/useModo";
 import { rotaEla } from "@/lib/modo";
+import { UI_CURSOS } from "@/lib/cursos";
 import { rotaIdioma } from "@/lib/rotas-idioma";
 import { SeletorModo } from "./SeletorModo";
 
@@ -431,6 +432,37 @@ export function Dock({ idioma: idiomaForcado }: { idioma?: Idioma } = {}) {
               </span>
               <span className="shrink-0 rounded-full bg-[#ff5e3a] px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider text-white shadow-sm">
                 TOP VIEWS
+              </span>
+            </Link>
+
+            {/* CURSOS: a vitrine da trilha (Reset 21D → Nível A). */}
+            <Link
+              href={rotaIdioma(idioma, rotas.cursos)}
+              onClick={() => setAberto(false)}
+              aria-current={ehAtual(rotaIdioma(idioma, rotas.cursos)) ? "page" : undefined}
+              className={`mb-1.5 flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-left ring-1 ring-inset transition-all duration-150 ${
+                ehAtual(rotaIdioma(idioma, rotas.cursos))
+                  ? "bg-verde/25 text-verde ring-verde/70"
+                  : "bg-gradient-to-r from-verde/20 via-verde/10 to-ouro/15 text-[#f2ede5] ring-verde/45 hover:from-verde/30 hover:to-ouro/25"
+              }`}
+            >
+              <span className="flex items-center gap-3">
+                <span
+                  aria-hidden
+                  className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-verde/60 bg-verde/20 text-verde"
+                >
+                  <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M7 4h10v5a5 5 0 0 1-10 0V4Z" />
+                    <path d="M7 6H4v1a4 4 0 0 0 4 4M17 6h3v1a4 4 0 0 1-4 4M12 14v4M8 21h8" />
+                  </svg>
+                </span>
+                <span>
+                  <span className="block text-sm font-bold leading-tight">{UI_CURSOS[idioma].dockTitulo}</span>
+                  <span className="mt-0.5 block text-[11px] text-[#f2ede5]/60">{UI_CURSOS[idioma].dockResumo}</span>
+                </span>
+              </span>
+              <span className="shrink-0 rounded-full bg-verde px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider text-[#0b0a09]">
+                5
               </span>
             </Link>
 
