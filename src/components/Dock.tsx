@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
@@ -224,11 +225,16 @@ export function Dock({ idioma: idiomaForcado }: { idioma?: Idioma } = {}) {
     {
       href: rotaIdioma(idioma, rotas.programa),
       label: t.dockConteudos.resetMetabolico,
+      // O emblema do programa no lugar do ícone genérico (2:1).
       icone: (
-        <svg viewBox="0 0 24 24" {...s}>
-          <rect x="4" y="5" width="16" height="15" rx="2" />
-          <path d="M4 10h16M9 3v4M15 3v4" />
-        </svg>
+        <Image
+          src="/brand/reset-metabolico-21d.jpg"
+          alt=""
+          width={1024}
+          height={512}
+          sizes="64px"
+          className="h-8 w-auto rounded-md"
+        />
       ),
     },
     {
