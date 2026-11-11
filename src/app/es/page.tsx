@@ -8,7 +8,7 @@ import { jsonLd } from "@/lib/jsonld";
 
 const titulo = `${marca.nome} | Asesoría online de entrenamiento y nutrición`;
 const descricao =
-  "Asesoría online de entrenamiento y dieta con base científica. Protocolo individual de nutrición y entrenamiento, ajustes quincenales y soporte directo con Carlos Seiti.";
+  "Asesoría online de entrenamiento y dieta con base científica: protocolo individual, ajustes quincenales y soporte directo con Carlos Seiti.";
 
 export const metadata: Metadata = {
   title: {
@@ -62,7 +62,7 @@ export default function HomeEs() {
       <Footer idioma="es" />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd()) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd("es")) }}
       />
     </>
   );

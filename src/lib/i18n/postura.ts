@@ -1067,7 +1067,7 @@ export const UI_POSTURA: Record<
   }
 > = {
   pt: {
-    seoTitulo: "Postura do dia a dia — o ajuste de cada situação",
+    seoTitulo: "Postura no dia a dia: ajustes e exercícios",
     seoDescricao:
       "Computador, celular, em pé, bolsa, pegar peso e dormir: o que acontece com o corpo em cada situação, como ajustar e os exercícios que compensam.",
     ogDescricao:
@@ -1098,7 +1098,7 @@ export const UI_POSTURA: Record<
     sinaisTitulo: "Quando não é postura: sinais para procurar avaliação",
   },
   es: {
-    seoTitulo: "Postura del día a día: el ajuste de cada situación",
+    seoTitulo: "Postura diaria: ajustes y ejercicios",
     seoDescricao:
       "Computadora, celular, de pie, bolso, levantar peso y dormir: qué le pasa al cuerpo en cada situación, cómo ajustarlo y los ejercicios que lo compensan.",
     ogDescricao:
@@ -1231,7 +1231,7 @@ export const UI_RAIOX_PAGINA: Record<
   }
 > = {
   pt: {
-    seoTitulo: "Raio-X Postural — descubra seu padrão em 5 minutos",
+    seoTitulo: "Raio-X Postural: seu padrão em 5 minutos",
     seoDescricao:
       "Identifique seu padrão postural pelo teste da parede e receba os exercícios certos, com dose e ponto de falha. Gratuito, sem cadastro, baseado em evidência.",
     ogDescricao:
@@ -1255,7 +1255,7 @@ export const UI_RAIOX_PAGINA: Record<
     ],
   },
   es: {
-    seoTitulo: "Rayos-X Postural: descubre tu patrón en 5 minutos",
+    seoTitulo: "Rayos-X Postural: tu patrón en 5 minutos",
     seoDescricao:
       "Identifica tu patrón postural con el test de la pared y recibe los ejercicios correctos, con dosis y punto de falla. Gratis, sin registro, basado en evidencia.",
     ogDescricao:
@@ -1279,7 +1279,7 @@ export const UI_RAIOX_PAGINA: Record<
     ],
   },
   en: {
-    seoTitulo: "Posture X-Ray — find your pattern in 5 minutes",
+    seoTitulo: "Posture X-Ray: your pattern in 5 minutes",
     seoDescricao:
       "Identify your postural pattern with the wall test and get the right exercises, with dosage and failure point. Free, no sign-up, evidence-based.",
     ogDescricao:

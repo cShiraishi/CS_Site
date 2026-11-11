@@ -7,8 +7,10 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        // Rotas internas do Next não têm valor de indexação.
-        disallow: ["/_next/", "/api/"],
+        // Só a API fica de fora. /_next/ NÃO pode ser bloqueado: é de lá
+        // que vêm o CSS, o JS e as imagens (next/image) que o Googlebot
+        // precisa baixar para renderizar a página.
+        disallow: ["/api/"],
       },
     ],
     sitemap: `${marca.site}/sitemap.xml`,

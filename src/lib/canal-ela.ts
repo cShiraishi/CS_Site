@@ -75,9 +75,9 @@ export const APPS_ELA: AppEla[] = [
     },
     seo: {
       titulo: {
-        pt: "Ciclo menstrual e TPM — vídeos para entender o seu corpo",
-        es: "Ciclo menstrual y SPM — vídeos para entender tu cuerpo",
-        en: "Menstrual cycle and PMS — videos to understand your body",
+        pt: "Ciclo menstrual e TPM: entenda seu corpo",
+        es: "Ciclo menstrual y SPM: entiende tu cuerpo",
+        en: "Menstrual cycle and PMS: know your body",
       },
       descricao: {
         pt: "Fases do ciclo, TPM, cólica, SOP, treino e alimentação no ciclo menstrual: trilhas de vídeos curadas de Drauzio Varella, Tua Saúde, Paulo Muzy e mais.",
@@ -237,7 +237,7 @@ export const APPS_ELA: AppEla[] = [
     },
     seo: {
       titulo: {
-        pt: "Treino em casa para mulheres — sem equipamento",
+        pt: "Treino em casa feminino sem equipamento",
         es: "Entreno en casa para mujeres — sin material",
         en: "Home workouts for women — no equipment",
       },
@@ -397,14 +397,14 @@ export const APPS_ELA: AppEla[] = [
     },
     seo: {
       titulo: {
-        pt: "Gestação — vídeos sobre gravidez, alimentação e treino seguro",
-        es: "Embarazo — vídeos sobre gestación, alimentación y ejercicio seguro",
-        en: "Pregnancy — videos on nutrition, safe exercise and recovery",
+        pt: "Gestação semana a semana: guia em vídeos",
+        es: "Embarazo semana a semana: guía en vídeos",
+        en: "Pregnancy week by week: video guide",
       },
       descricao: {
-        pt: "Primeiro trimestre, alimentação na gravidez, diabetes gestacional, exercício seguro e diástase no pós-parto: vídeos de Drauzio Varella, Tua Saúde e Carol Borba.",
-        es: "Primer trimestre, alimentación en el embarazo, ejercicio seguro y diástasis posparto: vídeos de la Dra. Pau Zúñiga, Alimmenta, Susana Ares y más.",
-        en: "First trimester, pregnancy nutrition, safe prenatal exercise and postpartum diastasis: videos from Today's Parent, Natalie Crawford MD, MadFit and more.",
+        pt: "Gestação semana a semana: o que acontece com o bebê e com o seu corpo, cuidados e exames de cada fase e um vídeo para cada uma das 40 semanas.",
+        es: "Embarazo semana a semana: qué pasa con el bebé y con tu cuerpo, cuidados y pruebas de cada etapa y un vídeo para cada una de las 40 semanas.",
+        en: "Pregnancy week by week: what's happening with your baby and your body, care and tests for each stage, and a video for each of the 40 weeks.",
       },
     },
     trilhas: {

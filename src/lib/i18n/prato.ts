@@ -75,7 +75,7 @@ export type TextosPrato = {
 
 const pt: TextosPrato = {
   seo: {
-    titulo: "Calculadora do Prato — quantas calorias tem o que você vai comer",
+    titulo: "Calculadora do Prato: calorias da refeição",
     descricao:
       "Monte o prato do restaurante e veja calorias, proteína, carboidrato e gordura. Medida pela mão, sem balança e sem cadastro. Alimentos brasileiros.",
     ogTitulo: "Calculadora do Prato",
@@ -163,7 +163,7 @@ const pt: TextosPrato = {
 
 const es: TextosPrato = {
   seo: {
-    titulo: "Calculadora del Plato — cuántas calorías tiene lo que vas a comer",
+    titulo: "Calculadora del Plato: calorías de tu comida",
     descricao:
       "Arma el plato del restaurante y ve calorías, proteína, carbohidratos y grasa. Medido con la mano, sin báscula y sin registro. Comida de restaurante brasileño.",
     ogTitulo: "Calculadora del Plato",
@@ -388,7 +388,7 @@ const es: TextosPrato = {
 
 const en: TextosPrato = {
   seo: {
-    titulo: "Plate Calorie Calculator — how many calories are in what you're about to eat",
+    titulo: "Plate Calorie Calculator for your meal",
     descricao:
       "Build your restaurant plate and see calories, protein, carbs and fat. Measured by hand, no scale and no sign-up. Brazilian restaurant foods.",
     ogTitulo: "Plate Calorie Calculator",

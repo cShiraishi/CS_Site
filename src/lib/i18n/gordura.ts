@@ -175,9 +175,9 @@ const atividadesPt = Object.fromEntries(
 
 const pt: TextosGordura = {
   seo: {
-    titulo: "Calculadora de gordura corporal — com fita métrica, em 2 minutos",
+    titulo: "Calculadora de % de gordura com fita métrica",
     descricao:
-      "Calcule seu percentual de gordura corporal com uma fita métrica, escolha onde quer chegar e receba as calorias, os macros e o prazo estimado. Grátis, sem cadastro.",
+      "Calcule seu % de gordura corporal com uma fita métrica, escolha onde quer chegar e receba calorias, macros e prazo estimado. Grátis, sem cadastro.",
     ogTitulo: "Calculadora de gordura corporal",
     ogDescricao:
       "Seu percentual de gordura, o corpo que você quer e quantas semanas separam um do outro.",
@@ -309,9 +309,9 @@ const pt: TextosGordura = {
 
 const es: TextosGordura = {
   seo: {
-    titulo: "Calculadora de grasa corporal — con cinta métrica, en 2 minutos",
+    titulo: "Calculadora de % de grasa con cinta métrica",
     descricao:
-      "Calcula tu porcentaje de grasa corporal con una cinta métrica, elige a dónde quieres llegar y recibe las calorías, los macros y el plazo estimado. Gratis y sin registro.",
+      "Calcula tu % de grasa corporal con una cinta métrica, elige a dónde quieres llegar y recibe calorías, macros y plazo estimado. Gratis y sin registro.",
     ogTitulo: "Calculadora de grasa corporal",
     ogDescricao:
       "Tu porcentaje de grasa, el cuerpo que quieres y cuántas semanas hay entre uno y otro.",
@@ -552,7 +552,7 @@ const es: TextosGordura = {
 
 const en: TextosGordura = {
   seo: {
-    titulo: "Body Fat Calculator — with a tape measure, in 2 minutes",
+    titulo: "Body Fat Calculator with a tape measure",
     descricao:
       "Calculate your body fat percentage with a tape measure, pick where you want to get to and get your calories, macros and estimated timeline. Free, no sign-up.",
     ogTitulo: "Body Fat Calculator",

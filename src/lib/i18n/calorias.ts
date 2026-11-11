@@ -140,9 +140,9 @@ const atividadesPt = Object.fromEntries(
 
 const pt: TextosCalorias = {
   seo: {
-    titulo: "Calculadora de calorias basais (TMB e gasto diário)",
+    titulo: "Calculadora de calorias: TMB e gasto diário",
     descricao:
-      "Calcule sua taxa metabólica basal e o gasto energético diário por Mifflin-St Jeor, Harris-Benedict ou Katch-McArdle. Gratuito, sem cadastro, com faixas de proteína.",
+      "Calcule sua taxa metabólica basal e o gasto diário por Mifflin-St Jeor, Harris-Benedict ou Katch-McArdle. Grátis, sem cadastro, com faixas de proteína.",
     ogDescricao:
       "Taxa metabólica basal, gasto total e alvos de emagrecimento, manutenção e ganho. Três equações validadas, sem cadastro.",
     ogAlt: "Calculadora de calorias",
@@ -286,9 +286,9 @@ const pt: TextosCalorias = {
 
 const es: TextosCalorias = {
   seo: {
-    titulo: "Calculadora de calorías basales (TMB y gasto diario)",
+    titulo: "Calculadora de calorías: TMB y gasto diario",
     descricao:
-      "Calcula tu tasa metabólica basal y tu gasto energético diario con Mifflin-St Jeor, Harris-Benedict o Katch-McArdle. Gratis, sin registro, con rangos de proteína.",
+      "Calcula tu tasa metabólica basal y tu gasto diario con Mifflin-St Jeor, Harris-Benedict o Katch-McArdle. Gratis, sin registro, con rangos de proteína.",
     ogDescricao:
       "Tasa metabólica basal, gasto total y objetivos para adelgazar, mantener o ganar. Tres ecuaciones validadas, sin registro.",
     ogAlt: "Calculadora de calorías",
@@ -465,9 +465,9 @@ const es: TextosCalorias = {
 
 const en: TextosCalorias = {
   seo: {
-    titulo: "BMR & Calorie Calculator (basal metabolic rate and daily burn)",
+    titulo: "BMR & Calorie Calculator: daily burn",
     descricao:
-      "Calculate your basal metabolic rate and total daily energy expenditure with Mifflin-St Jeor, Harris-Benedict or Katch-McArdle. Free, no sign-up, with protein ranges.",
+      "Calculate your basal metabolic rate and daily energy expenditure with Mifflin-St Jeor, Harris-Benedict or Katch-McArdle. Free, no sign-up, protein ranges.",
     ogDescricao:
       "Basal metabolic rate, total daily burn, and targets to lose, maintain or gain. Three validated equations, no sign-up.",
     ogAlt: "Calorie calculator",

@@ -193,7 +193,7 @@ export const TEXTOS_RECEITAS: Record<Idioma, TextosReceitas> = {
       calculadora: "Calcular minhas calorias",
     },
     meta: {
-      titulo: "Receitas Fit — Panquecas de Aveia e mais | CSFlix",
+      titulo: "Receitas Fit com calorias e macros",
       descricao:
         "Receitas fit práticas com calorias, proteínas, carboidratos, gorduras e fibras calculadas — começando pela série de Panquecas de Aveia.",
       ogTitulo: "Receitas Fit",
@@ -257,7 +257,7 @@ export const TEXTOS_RECEITAS: Record<Idioma, TextosReceitas> = {
       calculadora: "Calcular mis calorías",
     },
     meta: {
-      titulo: "Recetas Fit — Panqueques de Avena y más | CSFlix",
+      titulo: "Recetas Fit con calorías y macros",
       descricao:
         "Recetas fit prácticas con calorías, proteínas, carbohidratos, grasas y fibra calculadas, empezando por la serie de Panqueques de Avena.",
       ogTitulo: "Recetas Fit",

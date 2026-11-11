@@ -565,9 +565,9 @@ export type PaginaTextosCSFlix = {
 
 export const PAGINA_CSFLIX: Record<Idioma, PaginaTextosCSFlix> = {
   pt: {
-    seoTitulo: "CSFlix — As Séries e Temporadas do Canal Carlos Seiti TV",
+    seoTitulo: "CSFlix — séries do canal Carlos Seiti TV",
     seoDescricao:
-      "29 episódios em 5 temporadas sequenciais: Projeto True Shape, Sessões Brutas, Nutrição no Mundo Real, Laboratório PhD e Mentes Fora da Curva. Assista como uma série.",
+      "29 episódios em 5 temporadas: Projeto True Shape, Sessões Brutas, Nutrição no Mundo Real, Laboratório PhD e Mentes Fora da Curva. Assista como uma série.",
     ogTitulo: "CSFlix — Séries & Temporadas",
     ogDescricao:
       "5 temporadas sequenciais de treino, preparação de palco, ciência de alimentos e inteligência artificial para maratonar.",
@@ -583,9 +583,9 @@ export const PAGINA_CSFLIX: Record<Idioma, PaginaTextosCSFlix> = {
     breadcrumbInicio: "Início",
   },
   es: {
-    seoTitulo: "CSFlix — Las Series y Temporadas del Canal Carlos Seiti TV",
+    seoTitulo: "CSFlix — series del canal Carlos Seiti TV",
     seoDescricao:
-      "29 episodios en 5 temporadas secuenciales: Proyecto True Shape, Sesiones Brutas, Nutrición en el Mundo Real, Laboratorio PhD y Mentes Fuera de Serie. Míralo como una serie (videos en portugués).",
+      "29 episodios en 5 temporadas: Proyecto True Shape, Sesiones Brutas, Nutrición en el Mundo Real, Laboratorio PhD y más. Míralo como una serie (en portugués).",
     ogTitulo: "CSFlix — Series y Temporadas",
     ogDescricao:
       "5 temporadas secuenciales de entrenamiento, preparación para tarima, ciencia de los alimentos e inteligencia artificial para maratonear.",
@@ -601,9 +601,9 @@ export const PAGINA_CSFLIX: Record<Idioma, PaginaTextosCSFlix> = {
     breadcrumbInicio: "Inicio",
   },
   en: {
-    seoTitulo: "CSFlix — Series & Seasons from the Carlos Seiti TV Channel",
+    seoTitulo: "CSFlix — series from Carlos Seiti TV",
     seoDescricao:
-      "29 episodes across 5 sequential seasons: Project True Shape, Raw Sessions, Real-World Nutrition, PhD Lab and Outlier Minds. Watch it like a series (videos in Portuguese).",
+      "29 episodes across 5 seasons: Project True Shape, Raw Sessions, Real-World Nutrition, PhD Lab and Outlier Minds. Watch it like a series (in Portuguese).",
     ogTitulo: "CSFlix — Series & Seasons",
     ogDescricao:
       "5 sequential seasons of training, stage prep, food science and artificial intelligence to binge-watch.",

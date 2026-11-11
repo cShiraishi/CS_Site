@@ -27,9 +27,9 @@ type Item = { titulo: string; texto: string };
 const pt = {
   meta: {
     titulo:
-      "Reset Metabólico 21 Dias — Desinche, controle a fome e destrave a queima de gordura com ciência",
+      "Reset Metabólico 21 Dias: desinche e emagreça",
     descricao:
-      "O protocolo científico de 21 dias dividido em 3 semanas para desinflamar, estabilizar a glicemia e acelerar a perda de gordura sem cortar carboidratos. Simule seu plano em 7 passos.",
+      "Protocolo científico de 21 dias em 3 semanas para desinflamar, estabilizar a glicemia e perder gordura sem cortar carboidratos. Simule seu plano em 7 passos.",
     ogTitulo: "Reset Metabólico 21 Dias",
     ogDescricao:
       "3 semanas estruturadas pela Ciência de Alimentos para tirar o seu metabolismo da inércia — calculado para o seu corpo.",
@@ -465,9 +465,9 @@ export type TextoPrograma = typeof pt;
 const es: TextoPrograma = {
   meta: {
     titulo:
-      "Reset Metabólico 21 Días — Deshincha, controla el hambre y desbloquea la quema de grasa con ciencia",
+      "Reset Metabólico 21 Días: menos hinchazón",
     descricao:
-      "El protocolo científico de 21 días dividido en 3 semanas para desinflamar, estabilizar la glucemia y acelerar la pérdida de grasa sin eliminar carbohidratos. Simula tu plan en 7 pasos.",
+      "Protocolo científico de 21 días en 3 semanas para desinflamar, estabilizar la glucemia y perder grasa sin eliminar carbohidratos. Simula tu plan en 7 pasos.",
     ogTitulo: "Reset Metabólico 21 Días",
     ogDescricao:
       "3 semanas estructuradas por la Ciencia de los Alimentos para sacar tu metabolismo de la inercia — calculado para tu cuerpo.",
@@ -911,9 +911,9 @@ const es: TextoPrograma = {
 const en: TextoPrograma = {
   meta: {
     titulo:
-      "21-Day Metabolic Reset — Beat the bloat, control hunger and unlock fat loss with science",
+      "21-Day Metabolic Reset: beat the bloat",
     descricao:
-      "The science-based 21-day protocol split into 3 weeks to reduce inflammation, stabilize blood sugar and speed up fat loss without cutting carbs. Simulate your plan in 7 steps.",
+      "A science-based 21-day protocol in 3 weeks to reduce inflammation, stabilize blood sugar and lose fat without cutting carbs. Simulate your plan in 7 steps.",
     ogTitulo: "21-Day Metabolic Reset",
     ogDescricao:
       "3 weeks structured by Food Science to pull your metabolism out of inertia — calculated for your body.",

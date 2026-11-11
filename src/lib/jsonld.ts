@@ -1,21 +1,74 @@
-import { calculadora, duvidas, marca, metodo, programa, rotas } from "./content";
+import { calculadora, marca, rotas } from "./content";
+import { obterConteudo, type Idioma } from "./i18n";
 import type { Leitura } from "./leituras";
 
+/** Textos do JSON-LD da home que não vêm do conteúdo traduzido. */
+const SEO_HOME: Record<
+  Idioma,
+  {
+    inLanguage: string;
+    jobTitle: string;
+    pessoa: string;
+    conhecimentos: string[];
+    servico: string;
+    tipoServico: string;
+    descricaoServico: string;
+    canal: string;
+    catalogo: string;
+  }
+> = {
+  pt: {
+    inLanguage: "pt-BR",
+    jobTitle: "Consultor em treino e nutrição esportiva",
+    pessoa: "Pesquisador em Ciência de Alimentos e quimioinformática. Consultoria online de treino e dieta com base científica.",
+    conhecimentos: ["Nutrição esportiva", "Emagrecimento", "Ciência de Alimentos", "Treinamento de força"],
+    servico: "Consultoria online de treino e dieta",
+    tipoServico: "Consultoria em treino e nutrição esportiva",
+    descricaoServico: "Protocolo individual de nutrição e treino, com diagnóstico, ajustes quinzenais e suporte direto.",
+    canal: "Solicitação de avaliação online",
+    catalogo: "O que está incluso",
+  },
+  es: {
+    inLanguage: "es",
+    jobTitle: "Asesor en entrenamiento y nutrición deportiva",
+    pessoa: "Investigador en Ciencia de los Alimentos y quimioinformática. Asesoría online de entrenamiento y dieta con base científica.",
+    conhecimentos: ["Nutrición deportiva", "Pérdida de grasa", "Ciencia de los Alimentos", "Entrenamiento de fuerza"],
+    servico: "Asesoría online de entrenamiento y dieta",
+    tipoServico: "Asesoría en entrenamiento y nutrición deportiva",
+    descricaoServico: "Protocolo individual de nutrición y entrenamiento, con diagnóstico, ajustes quincenales y soporte directo.",
+    canal: "Solicitud de evaluación online",
+    catalogo: "Qué incluye",
+  },
+  en: {
+    inLanguage: "en",
+    jobTitle: "Training and sports nutrition coach",
+    pessoa: "Food Science and cheminformatics researcher. Evidence-based online training and nutrition coaching.",
+    conhecimentos: ["Sports nutrition", "Fat loss", "Food Science", "Strength training"],
+    servico: "Online training and nutrition coaching",
+    tipoServico: "Training and sports nutrition coaching",
+    descricaoServico: "Individual nutrition and training protocol, with assessment, biweekly adjustments and direct support.",
+    canal: "Online assessment request",
+    catalogo: "What's included",
+  },
+};
+
 /**
- * Dados estruturados. Um único bloco @graph, com os tipos que
- * realmente descrevem este site:
+ * Dados estruturados da home, no idioma da página. Um único @graph:
  *
- *  · Person        — identidade (a marca é a pessoa)
- *  · WebSite       — o site em si
- *  · Service       — a consultoria, com o catálogo do que está incluso
- *  · FAQPage       — a seção de dúvidas
+ *  · Person   — identidade (a marca é a pessoa; mesmo @id nos 3 idiomas)
+ *  · WebSite  — o site, com os três idiomas
+ *  · Service  — a consultoria, com o catálogo do que está incluso
+ *  · FAQPage  — as dúvidas VISÍVEIS na página, no idioma dela (o Google
+ *               exige que o FAQ marcado seja o mesmo que está na tela)
  *
- * Sem SearchAction (o site não tem busca) e sem BreadcrumbList
- * (página única — um breadcrumb de um nível só é ruído).
+ * Sem SearchAction (o site não tem busca) e sem areaServed: com ES/EN no
+ * ar, "Brasil" deixou de ser verdade.
  */
-export function jsonLd() {
+export function jsonLd(idioma: Idioma = "pt") {
+  const t = obterConteudo(idioma);
+  const s = SEO_HOME[idioma];
+  const pagina = idioma === "pt" ? marca.site : `${marca.site}${t.rotaHome}`;
   const pessoa = `${marca.site}/#pessoa`;
-  const servico = `${marca.site}/#servico`;
 
   return {
     "@context": "https://schema.org",
@@ -26,43 +79,36 @@ export function jsonLd() {
         name: marca.nome,
         url: marca.site,
         image: `${marca.site}/brand/cs-mark.jpg`,
-        jobTitle: "Consultor em treino e nutrição esportiva",
-        description:
-          "Pesquisador em Ciência de Alimentos e quimioinformática. Consultoria online de treino e dieta com base científica.",
-        knowsAbout: [
-          "Nutrição esportiva",
-          "Emagrecimento",
-          "Ciência de Alimentos",
-          "Treinamento de força",
-        ],
+        jobTitle: s.jobTitle,
+        description: s.pessoa,
+        knowsAbout: s.conhecimentos,
         sameAs: [marca.instagram, marca.youtube, marca.linkedin],
       },
       {
         "@type": "WebSite",
         "@id": `${marca.site}/#site`,
         url: marca.site,
-        name: `${marca.nome} | ${marca.descritor}`,
-        inLanguage: "pt-BR",
+        name: `${marca.nome} | ${t.marca.descritor}`,
+        inLanguage: ["pt-BR", "es", "en"],
         publisher: { "@id": pessoa },
       },
       {
         "@type": "Service",
-        "@id": servico,
-        name: "Consultoria online de treino e dieta",
-        serviceType: "Consultoria em treino e nutrição esportiva",
-        description:
-          "Protocolo individual de nutrição e treino, com diagnóstico, ajustes quinzenais e suporte direto.",
+        "@id": `${pagina}#servico`,
+        name: s.servico,
+        serviceType: s.tipoServico,
+        description: s.descricaoServico,
+        inLanguage: s.inLanguage,
         provider: { "@id": pessoa },
-        areaServed: { "@type": "Country", name: "Brasil" },
         availableChannel: {
           "@type": "ServiceChannel",
-          serviceUrl: `${marca.site}/#contato`,
-          name: "Solicitação de avaliação online",
+          serviceUrl: `${pagina}#contato`,
+          name: s.canal,
         },
         hasOfferCatalog: {
           "@type": "OfferCatalog",
-          name: "O que está incluso",
-          itemListElement: programa.itens.map((item) => ({
+          name: s.catalogo,
+          itemListElement: t.programa.itens.map((item) => ({
             "@type": "Offer",
             itemOffered: {
               "@type": "Service",
@@ -72,7 +118,7 @@ export function jsonLd() {
           })),
         },
         // As etapas do método, na ordem.
-        potentialAction: metodo.etapas.map((e, i) => ({
+        potentialAction: t.metodo.etapas.map((e, i) => ({
           "@type": "Action",
           name: e.titulo,
           description: e.texto,
@@ -81,8 +127,9 @@ export function jsonLd() {
       },
       {
         "@type": "FAQPage",
-        "@id": `${marca.site}/#faq`,
-        mainEntity: duvidas.itens.map((item) => ({
+        "@id": `${pagina}#faq`,
+        inLanguage: s.inLanguage,
+        mainEntity: t.duvidas.itens.map((item) => ({
           "@type": "Question",
           name: item.p,
           acceptedAnswer: { "@type": "Answer", text: item.r },

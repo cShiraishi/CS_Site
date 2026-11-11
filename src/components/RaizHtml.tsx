@@ -65,7 +65,7 @@ const SEO: Record<
   es: {
     titulo: `${marca.nome} | Asesoría online de entrenamiento y nutrición`,
     descricao:
-      "Asesoría online de entrenamiento y dieta con base científica. Protocolo individual de nutrición y entrenamiento, ajustes quincenales y soporte directo con Carlos Seiti.",
+      "Asesoría online de entrenamiento y dieta con base científica: protocolo individual, ajustes quincenales y soporte directo con Carlos Seiti.",
     keywords: [
       "asesoría online",
       "nutrición deportiva",
@@ -79,7 +79,7 @@ const SEO: Record<
   en: {
     titulo: `${marca.nome} | Online training & nutrition coaching`,
     descricao:
-      "Science-based online training and nutrition coaching. Custom nutrition and workout protocols, bi-weekly adjustments, and direct 1-on-1 support with Carlos Seiti.",
+      "Science-based online training and nutrition coaching: custom nutrition and workout plans, biweekly adjustments and direct 1-on-1 support with Carlos Seiti.",
     keywords: [
       "online coaching",
       "sports nutrition",
