@@ -55,7 +55,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
   ];
 
-  return paginas.flatMap(({ caminho, frequencia, prioridade }) => {
+  const traduzidas = paginas.flatMap(({ caminho, frequencia, prioridade }) => {
     const languages = Object.fromEntries(
       Object.entries(alternativasIdioma(caminho))
         .filter(([codigo]) => codigo !== "x-default")
@@ -69,4 +69,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       alternates: { languages },
     }));
   });
+
+  /* Páginas só em português: uma URL, sem hreflang. */
+  const soPt = [{ caminho: rotas.metodoCS, frequencia: "monthly" as const, prioridade: 0.9 }];
+
+  return [
+    ...traduzidas,
+    ...soPt.map(({ caminho, frequencia, prioridade }) => ({
+      url: absoluto(caminho),
+      lastModified: agora,
+      changeFrequency: frequencia,
+      priority: prioridade,
+    })),
+  ];
 }

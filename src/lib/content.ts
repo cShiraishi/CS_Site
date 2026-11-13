@@ -82,6 +82,8 @@ export const rotas = {
   csflix: "/csflix",
   cursos: "/cursos",
   links: "/links",
+  /* Só em português (fora de TRADUZIDOS). */
+  metodoCS: "/metodocs",
 } as const;
 
 export const hero = {
