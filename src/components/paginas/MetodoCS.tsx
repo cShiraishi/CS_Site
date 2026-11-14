@@ -211,6 +211,50 @@ function BotaoPlano({ cta }: { cta: Plano["cta"] }) {
   );
 }
 
+/**
+ * Faixa de antes e depois passando sozinha no hero. A lista vai duplicada
+ * (a segunda cópia escondida do leitor de tela) para o loop não ter emenda;
+ * para no hover e fica parada com movimento reduzido.
+ */
+function EsteiraResultados() {
+  const fotos = resultados.transformacoes;
+  /* Com 4 fotos, metade da esteira ficaria mais estreita que a área
+     visível e abriria um buraco: a base vai repetida antes de duplicar. */
+  const base = [...fotos, ...fotos];
+  return (
+    <div className="mt-9 max-w-xl">
+      <p className="t-eyebrow text-grafite/60">Antes e depois de alunos</p>
+      <div className="relative mt-4 overflow-hidden [mask-image:linear-gradient(90deg,transparent,black_8%,black_92%,transparent)]">
+        <ul className="esteira flex w-max gap-3">
+          {[...base, ...base].map((p, i) => {
+            const copia = i >= fotos.length;
+            return (
+              <li key={`${p.instagram}-${i}`} aria-hidden={copia || undefined} className="shrink-0">
+                <a
+                  href="#depoimentos"
+                  tabIndex={copia ? -1 : undefined}
+                  className="group relative block h-44 w-24 overflow-hidden rounded-xl border border-linha bg-branco transition-colors hover:border-ouro/60 sm:h-52 sm:w-28"
+                >
+                  <Image
+                    src={p.imagem}
+                    alt={copia ? "" : p.alt}
+                    fill
+                    sizes="112px"
+                    className="object-cover object-center"
+                  />
+                  <span className="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-black/85 to-transparent px-2 pb-1.5 pt-5 text-[0.65rem] font-semibold text-[#f2ede5]">
+                    {p.nome}
+                  </span>
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
 function CtaDuvida() {
   return (
     <div className="mt-14 flex flex-col items-center justify-between gap-5 rounded-2xl border border-linha bg-porcelana p-6 text-center sm:flex-row sm:p-8 sm:text-left">
@@ -238,7 +282,8 @@ export function PaginaMetodoCS() {
           />
           <Container className="relative">
             <div className="grid items-center gap-14 pb-16 lg:grid-cols-[1.1fr_0.9fr] lg:gap-20 lg:pb-24">
-              <div className="rise">
+              {/* min-w-0: sem ele a esteira (w-max) alarga a coluna da grid. */}
+              <div className="rise min-w-0">
                 <Eyebrow>Método CS · dieta e treino online</Eyebrow>
                 <h1 className="t-display mt-8 text-balance">
                   Um plano <span className="text-ouro">só seu.</span>
@@ -259,6 +304,7 @@ export function PaginaMetodoCS() {
                   <span aria-hidden className="size-1.5 rounded-full bg-verde" />
                   Vagas limitadas por mês: cada plano é lido e montado por mim.
                 </p>
+                <EsteiraResultados />
               </div>
 
               <figure className="rise relative mx-auto w-full max-w-sm lg:max-w-md" style={{ animationDelay: "160ms" }}>

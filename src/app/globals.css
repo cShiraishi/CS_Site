@@ -723,3 +723,23 @@ input[type="range"]::-moz-range-thumb {
 @media (prefers-reduced-motion: reduce) {
   .dock-entra, .dock-chama, .dock-apita, .selo-apita { animation: none; }
 }
+
+/* Esteira de antes e depois (/metodocs): a lista vem duplicada e anda
+   metade da largura, então o fim encontra o começo sem salto. */
+@keyframes esteira {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.esteira {
+  animation: esteira 38s linear infinite;
+}
+
+.esteira:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .esteira { animation: none; }
+}
