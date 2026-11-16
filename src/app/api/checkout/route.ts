@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 
 import { marca } from "@/lib/content";
+import { urlCheckoutCakto } from "@/lib/cakto";
 import { criarPreferencia } from "@/lib/pagamento";
 import { criarPedido } from "@/lib/pedidos";
 import { PROGRAMA } from "@/lib/produto";
@@ -72,6 +73,7 @@ export async function POST(req: NextRequest) {
     moeda: PROGRAMA.moeda,
     plano: entrada.data.plano,
     userId,
+    provedor: process.env.CAKTO_CHECKOUT_URL ? "cakto" : undefined,
   });
 
   if ("erro" in pedido) {
@@ -81,6 +83,13 @@ export async function POST(req: NextRequest) {
       { status: 500 },
     );
   }
+
+  /*
+   * Cakto: o pagamento acontece no checkout dela, e o webhook
+   * (/api/pagamentos/cakto) encontra este pedido pendente pelo e-mail.
+   */
+  const cakto = urlCheckoutCakto(entrada.data.email);
+  if (cakto) return NextResponse.json({ url: cakto, referencia: pedido.referencia });
 
   const preferencia = await criarPreferencia({
     referencia: pedido.referencia,

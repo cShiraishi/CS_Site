@@ -45,6 +45,8 @@ export async function criarPedido(dados: {
   moeda: string;
   plano?: unknown;
   userId?: string | null;
+  /** "mercadopago" (padrão da tabela) ou "cakto" */
+  provedor?: string;
 }): Promise<{ referencia: string } | { erro: string }> {
   const supabase = criarSupabaseAdmin();
   if (!supabase) return { erro: "Supabase não configurado no servidor" };
@@ -58,6 +60,7 @@ export async function criarPedido(dados: {
       moeda: dados.moeda,
       plano: dados.plano ?? null,
       user_id: dados.userId ?? null,
+      ...(dados.provedor ? { provedor: dados.provedor } : {}),
     })
     .select("referencia")
     .single();
