@@ -24,7 +24,7 @@ export const LOCALE_OG: Record<Idioma, string> = { pt: "pt_BR", es: "es_ES", en:
  * fora desta lista — conta, painel, área do aluno — só existe em português.
  */
 const TRADUZIDOS = [
-  "/programa-90-dias",
+  "/resetmetabolico",
   "/calculadora-de-calorias",
   "/calculadora-de-gordura-corporal",
   "/calculadora-do-prato",

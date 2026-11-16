@@ -1,5 +1,5 @@
 /**
- * Textos da página de vendas do Reset Metabólico 21D (/programa-90-dias)
+ * Textos da página de vendas do Reset Metabólico 21D (/resetmetabolico)
  * e do funil/simulador, nos três idiomas.
  *
  * O português é cópia literal do que a página sempre exibiu. Trechos com

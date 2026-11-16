@@ -84,7 +84,7 @@ export default async function Page({
                   </p>
                   <div className="mt-9 flex flex-wrap gap-4">
                     <Link
-                      href={`/entrar?retorno=${rotas.programa}/area`}
+                      href="/resetmetabolico/login"
                       className="inline-flex min-h-12 items-center rounded-full bg-grafite px-8 py-3.5 text-sm font-medium tracking-wide text-porcelana transition-colors hover:bg-ouro-profundo"
                     >
                       Entrar e abrir meu programa
@@ -122,7 +122,7 @@ export default async function Page({
                   </p>
                   <div className="mt-9 flex flex-wrap gap-4">
                     <Link
-                      href={`/entrar?retorno=${rotas.programa}/area`}
+                      href="/resetmetabolico/login"
                       className="inline-flex min-h-12 items-center rounded-full border border-linha px-8 py-3.5 text-sm font-medium tracking-wide text-grafite transition-colors hover:border-ouro hover:text-ouro-profundo"
                     >
                       Entrar na plataforma

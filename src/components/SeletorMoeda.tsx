@@ -33,7 +33,7 @@ export function SeletorMoeda({
             : "text-grafite/75 hover:text-grafite"
         }`}
       >
-        🇧🇷 R$ 47
+        🇧🇷 R$ 297
       </button>
       <button
         type="button"

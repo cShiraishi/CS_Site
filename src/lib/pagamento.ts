@@ -49,7 +49,8 @@ export async function criarPreferencia(dados: {
   const chave = token();
   if (!chave) return { erro: "MERCADOPAGO_ACCESS_TOKEN não configurado" };
 
-  const retorno = `${dados.urlBase}/${dados.slug}/obrigado`;
+  // A página de venda mora em /resetmetabolico (o slug do produto continua programa-90-dias nos pedidos).
+  const retorno = `${dados.urlBase}/resetmetabolico/obrigado`;
 
   const corpo = {
     items: [

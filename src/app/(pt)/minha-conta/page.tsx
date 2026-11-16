@@ -47,7 +47,7 @@ export default async function MinhaContaPage() {
               const meu = c.produto ? liberados.has(c.produto) : false;
               const aVenda = c.status === "disponivel";
               const href = meu
-                ? `${rotas.programa}/area`
+                ? "/resetmetabolico/programa"
                 : c.modulos
                   ? `${rotas.cursos}/${c.slug}`
                   : rotas.cursos;
