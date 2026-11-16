@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { CSSProperties, ReactNode } from "react";
 import type { Curso, IconeCurso } from "@/lib/cursos";
 
@@ -139,6 +140,7 @@ function Cadeado({ className = "" }: { className?: string }) {
 export function CapaCurso({
   tom,
   icone,
+  imagem,
   selo,
   titulo,
   chip,
@@ -150,11 +152,13 @@ export function CapaCurso({
 }: {
   tom: Curso["tom"];
   icone: IconeCurso;
+  /** capa de fundo; com ela o ícone some e a imagem dá o clima do card */
+  imagem?: string;
   selo: string;
   titulo: string;
   chip?: string;
   texto: string;
-  /** pílula do rodapé ("Disponível · R$ 47", "Em breve", "Liberado") */
+  /** pílula do rodapé ("Disponível · R$ 297", "Em breve", "Liberado") */
   status?: ReactNode;
   bloqueado?: boolean;
   /** texto que aparece no hover ("Ver detalhes →") */
@@ -169,6 +173,17 @@ export function CapaCurso({
         poster ? "min-h-[23rem]" : "min-h-[19rem]"
       }`}
     >
+      {imagem && (
+        <Image
+          src={imagem}
+          alt=""
+          fill
+          sizes="(min-width: 1024px) 20vw, (min-width: 640px) 42vw, 68vw"
+          className={`object-cover transition-transform duration-500 ease-out group-hover:scale-105 motion-reduce:transition-none ${
+            bloqueado ? "opacity-60 grayscale-[35%]" : ""
+          }`}
+        />
+      )}
       {/* Brilho de fundo na cor do módulo; cresce no hover. */}
       <div
         aria-hidden
@@ -180,12 +195,16 @@ export function CapaCurso({
         {selo}
       </span>
 
+      {imagem ? (
+        <div className="flex-1" />
+      ) : (
       <IconeDoCurso
         icone={icone}
         className={`relative mx-auto my-4 shrink-0 text-(--tom) drop-shadow-[0_0_18px_color-mix(in_srgb,var(--tom)_60%,transparent)] transition-transform duration-300 ease-out group-hover:scale-110 motion-reduce:transition-none ${
           poster ? "size-20 sm:size-24" : "size-16"
         } ${bloqueado ? "opacity-55" : ""}`}
       />
+      )}
 
       <div className="relative mt-auto">
         <p

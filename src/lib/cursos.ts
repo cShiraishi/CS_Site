@@ -40,6 +40,8 @@ export type Curso = {
   /** verde nos módulos de base, ouro nos avançados (segue a arte da trilha) */
   tom: "verde" | "lima" | "ouro";
   icone: IconeCurso;
+  /** capa (imagem de IA) em /public — sem ela, o card mostra o ícone */
+  capa?: string;
   status: "disponivel" | "em-breve";
   /** página de venda — só para os disponíveis */
   href?: string;
@@ -66,7 +68,14 @@ export const CURSOS: Curso[] = [
     produto: "programa-90-dias",
     titulo: { pt: "Reset Metabólico", es: "Reset Metabólico", en: "Metabolic Reset" },
     duracao: { pt: "21 dias", es: "21 días", en: "21 days" },
-    resultado: { pt: "−5 a 12 kg", es: "−5 a 12 kg", en: "−5 to 12 kg" },
+    /* Sem número de quilos de propósito: com déficit ≤ 25 % do gasto, 21 dias
+       rendem ~1,5–2 kg de gordura; o resto da balança é água e glicogênio.
+       "−5 a 12 kg" prometia o impossível e contradizia o motor. */
+    resultado: {
+      pt: "Desinchar e firmar a rotina",
+      es: "Deshinchar y afianzar la rutina",
+      en: "Less bloat, a routine that sticks",
+    },
     descricao: {
       pt: "A porta de entrada. Três semanas para desinchar, estabilizar a glicemia e destravar a queima de gordura sem cortar carboidratos.",
       es: "La puerta de entrada. Tres semanas para deshinchar, estabilizar la glucemia y desbloquear la quema de grasa sin eliminar carbohidratos.",

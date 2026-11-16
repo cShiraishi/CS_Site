@@ -47,7 +47,7 @@ export default async function MinhaContaPage() {
               const meu = c.produto ? liberados.has(c.produto) : false;
               const aVenda = c.status === "disponivel";
               const href = meu
-                ? `${rotas.programa}/area`
+                ? "/resetmetabolico/programa"
                 : c.modulos
                   ? `${rotas.cursos}/${c.slug}`
                   : rotas.cursos;
@@ -57,6 +57,7 @@ export default async function MinhaContaPage() {
                     <CapaCurso
                       tom={c.tom}
                       icone={c.icone}
+                      imagem={c.capa}
                       selo={`${UI_CURSOS.pt.modulo} ${c.numero}`}
                       titulo={c.titulo.pt}
                       chip={c.duracao?.pt}

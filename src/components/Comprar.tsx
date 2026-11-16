@@ -21,7 +21,7 @@ import { Arrow } from "./ui";
  */
 export function Comprar({
   plano,
-  preco = "R$ 47",
+  preco = "R$ 297",
   moedaServidor,
   rotulo,
   idioma = "pt",

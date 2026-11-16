@@ -50,7 +50,7 @@ export const marca = {
 /** Hrefs absolutos: os mesmos links funcionam na home e nas outras páginas. */
 export const nav = [
   { label: "Como funciona", href: "/#metodo", topo: true },
-  { label: "Reset Metabólico", href: "/programa-90-dias", topo: true },
+  { label: "Reset Metabólico", href: "/resetmetabolico", topo: true },
   { label: "Cursos", href: "/cursos", topo: true },
   { label: "Biblioteca", href: "/biblioteca", topo: true },
   { label: "CSFlix", href: "/csflix", topo: true },
@@ -73,7 +73,7 @@ export const rotas = {
   consultoria: "/consultoria",
   calculadora: "/calculadora-de-calorias",
   gordura: "/calculadora-de-gordura-corporal",
-  programa: "/programa-90-dias",
+  programa: "/resetmetabolico",
   prato: "/calculadora-do-prato",
   biblioteca: "/biblioteca",
   receitas: "/receitas",

@@ -8,13 +8,11 @@ import { Footer } from "@/components/Footer";
 import { GaleriaTransformacoes } from "@/components/GaleriaTransformacoes";
 import { Header } from "@/components/Header";
 import { Logo } from "@/components/Logo";
-import { Programa } from "@/components/Programa";
 import { PrecoDinamico, SeletorMoeda } from "@/components/SeletorMoeda";
 import { Arrow, Container, Eyebrow, Section } from "@/components/ui";
 import { marca, rotas } from "@/lib/content";
 import { TEXTO_PROGRAMA, type TextoPrograma } from "@/lib/i18n/programa";
 import { moedaPorPais, type Moeda } from "@/lib/produto";
-import { listarFigurasDeShape } from "@/lib/programa-figuras";
 import { LOCALE_OG, metadataPagina, rotaIdioma, type Idioma } from "@/lib/rotas-idioma";
 
 /**
@@ -70,7 +68,6 @@ const btnNeon =
 const btnOutlineNeon =
   "group inline-flex items-center justify-center gap-2.5 rounded-lg border border-[#00ff66]/55 bg-[#00ff66]/10 px-7 py-4 text-[0.82rem] font-bold uppercase tracking-[0.14em] text-[#00ff66] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#00ff66] hover:bg-[#00ff66]/20 text-center sm:whitespace-nowrap";
 
-const PROGRESSO_FASE = ["33%", "66%", "100%"] as const;
 
 /**
  * Hero de vendas de alto impacto visual com estética Verde Neon — aparece
@@ -170,11 +167,7 @@ function Abertura({
             </div>
 
             <div className="mt-9 flex flex-wrap items-center gap-4">
-              <a href="#simulador" className={btnNeon}>
-                {a.ctaSimular}
-                <span aria-hidden>↓</span>
-              </a>
-              <a href="#oferta-direta" className={btnOutlineNeon}>
+              <a href="#oferta-direta" className={btnNeon}>
                 {a.ctaDireto} <PrecoDinamico moedaServidor={moedaServidor} />
                 <Arrow />
               </a>
@@ -263,14 +256,6 @@ function EyebrowNeon({ children }: { children: ReactNode }) {
   );
 }
 
-function Check() {
-  return (
-    <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-[#00ff66] text-xs font-extrabold text-[#041208]">
-      ✓
-    </span>
-  );
-}
-
 /**
  * Todas as seções persuasivas e visuais da página de vendas do Reset Metabólico 21 Dias.
  */
@@ -321,158 +306,6 @@ function PaginaDeVendas({
               <p className="mt-3 text-sm leading-relaxed text-grafite/80">{item.texto}</p>
             </div>
           ))}
-        </div>
-      </Section>
-
-      {/* ============================================================
-         2. CRONOGRAMA CIENTÍFICO — AS 3 SEMANAS DO RESET
-         ============================================================ */}
-      <Section tone="branco" denso className="border-t border-linha">
-        <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
-          <div className="max-w-2xl">
-            <EyebrowNeon>{v.cronoEyebrow}</EyebrowNeon>
-            <h2 className="t-title mt-5 text-balance">{v.cronoTitulo}</h2>
-          </div>
-          <p className="max-w-md text-sm leading-relaxed text-grafite/75">{v.cronoTexto}</p>
-        </div>
-
-        <div className="mt-12 grid gap-6 lg:grid-cols-3">
-          {t.semanas.map((fase, i) => (
-            <article
-              key={fase.semana}
-              className="surface-elevated relative flex flex-col justify-between overflow-hidden rounded-xl border border-[#00ff66]/30 bg-porcelana p-7 transition-all duration-300 hover:-translate-y-1 hover:border-[#00ff66] hover:shadow-[0_0_40px_rgba(0,255,102,0.14)]"
-            >
-              <div>
-                <div className="flex items-center justify-between gap-3">
-                  <span className="t-eyebrow text-[#00ff66]">
-                    {fase.semana} · {fase.dias}
-                  </span>
-                  <span className="font-display text-3xl text-[#00ff66]/45">0{i + 1}</span>
-                </div>
-
-                <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-branco">
-                  <div
-                    className="h-full bg-linear-to-r from-[#00ff66] to-[#4be283] shadow-[0_0_12px_#00ff66]"
-                    style={{ width: PROGRESSO_FASE[i] }}
-                  />
-                </div>
-
-                <h3 className="mt-6 font-display text-2xl text-grafite">{fase.titulo}</h3>
-                <p className="mt-2 text-xs font-bold uppercase tracking-wider text-[#00ff66]">
-                  {fase.subtitulo}
-                </p>
-                <p className="mt-4 text-sm leading-relaxed text-grafite/80">{fase.mecanismo}</p>
-              </div>
-
-              <div className="mt-7 rounded-lg border border-[#00ff66]/35 bg-[#00ff66]/10 p-4">
-                <p className="text-xs leading-relaxed text-grafite">
-                  <strong className="block font-extrabold uppercase tracking-wider text-[#00ff66]">
-                    {v.resultadoEsperado}
-                  </strong>
-                  <span className="mt-1 block">{fase.entregavel}</span>
-                </p>
-              </div>
-            </article>
-          ))}
-        </div>
-      </Section>
-
-      {/* ============================================================
-         3. POR DENTRO DA PLATAFORMA INTERATIVA CS PERFORMANCE 21D
-         ============================================================ */}
-      <Section tone="porcelana" denso className="border-t border-linha">
-        <div className="grid items-center gap-10 lg:grid-cols-[1fr_1.05fr] lg:gap-14">
-          <div>
-            <EyebrowNeon>{v.plataformaEyebrow}</EyebrowNeon>
-            <h2 className="t-title mt-5 text-balance">{v.plataformaTitulo}</h2>
-            <p className="mt-4 leading-relaxed text-grafite/80">
-              <Rico
-                partes={v.plataformaTexto}
-                destaque={(x) => <strong className="text-[#00ff66]">{x}</strong>}
-              />
-            </p>
-
-            <ul className="mt-6 space-y-3.5 text-sm text-grafite">
-              {v.plataformaItens.map((item) => (
-                <li key={item.titulo} className="flex items-start gap-3">
-                  <Check />
-                  <span>
-                    <strong>{item.titulo}</strong> {item.texto}
-                  </span>
-                </li>
-              ))}
-            </ul>
-
-            <div className="mt-8 flex flex-wrap items-center gap-4">
-              {/* A área do aluno só existe em português. */}
-              <Link href={`${rotas.programa}/area?demo=1`} className={btnNeon}>
-                {v.testarPlataforma}
-              </Link>
-              <a href="#oferta-direta" className={btnOutlineNeon}>
-                {v.garantirAcesso} <PrecoDinamico moedaServidor={moedaServidor} />
-              </a>
-            </div>
-          </div>
-
-          <div className="relative overflow-hidden rounded-2xl border-2 border-[#00ff66]/55 bg-[#070b09] p-2.5 shadow-[0_0_70px_rgba(0,255,102,0.2)]">
-            <Image
-              src="/brand/plataforma-reset-21d.jpg"
-              alt={v.altPlataforma}
-              width={935}
-              height={1024}
-              sizes="(max-width: 1024px) 95vw, 540px"
-              className="h-auto w-full rounded-xl object-cover"
-            />
-          </div>
-        </div>
-      </Section>
-
-      {/* ============================================================
-         4. COMPARATIVO VISUAL — DESAFIOS COMUNS VS. RESET METABÓLICO CS
-         ============================================================ */}
-      <Section tone="branco" denso className="border-t border-linha">
-        <div className="mx-auto max-w-3xl text-center">
-          <div className="flex justify-center">
-            <EyebrowNeon>{v.difEyebrow}</EyebrowNeon>
-          </div>
-          <h2 className="t-title mt-5 text-balance">{v.difTitulo}</h2>
-        </div>
-
-        <div className="mt-12 grid gap-6 lg:grid-cols-2">
-          {/* Coluna Negativa */}
-          <div className="rounded-xl border border-linha bg-porcelana/70 p-7 sm:p-9">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-grafite/60">
-              {v.mercadoEyebrow}
-            </p>
-            <h3 className="mt-3 font-display text-2xl text-grafite/80">{v.mercadoTitulo}</h3>
-            <ul className="mt-6 space-y-4 text-sm leading-relaxed text-grafite/75">
-              {v.mercadoItens.map((item) => (
-                <li key={item} className="flex items-start gap-3">
-                  <span className="mt-0.5 font-bold text-grafite/50">✕</span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Coluna Positiva em Verde Neon */}
-          <div className="relative overflow-hidden rounded-xl border-2 border-[#00ff66]/65 bg-[#0c140f] p-7 shadow-[0_0_50px_rgba(0,255,102,0.14)] sm:p-9">
-            <div className="absolute inset-x-0 top-0 h-1.5 bg-linear-to-r from-[#00ff66] via-[#4be283] to-ouro" />
-            <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-[#00ff66]">
-              {v.metodoEyebrow}
-            </p>
-            <h3 className="mt-3 font-display text-2xl text-grafite">{v.metodoTitulo}</h3>
-            <ul className="mt-6 space-y-4 text-sm leading-relaxed text-grafite">
-              {v.metodoItens.map((item) => (
-                <li key={item.titulo} className="flex items-start gap-3">
-                  <span className="mt-0.5 font-extrabold text-[#00ff66]">✓</span>
-                  <span>
-                    <strong>{item.titulo}</strong> {item.texto}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
         </div>
       </Section>
 
@@ -654,12 +487,6 @@ function PaginaDeVendas({
                       </span>
                     </p>
                   </div>
-                  <a
-                    href="#simulador"
-                    className="text-xs font-extrabold uppercase tracking-wider text-[#00ff66] underline decoration-[#00ff66] underline-offset-4 hover:text-[#4be283]"
-                  >
-                    {v.subirSimulador}
-                  </a>
                 </div>
               </div>
 
@@ -745,7 +572,6 @@ function PaginaDeVendas({
 
 export async function PaginaPrograma90({ idioma }: { idioma: Idioma }) {
   const t = TEXTO_PROGRAMA[idioma];
-  const figuras = await listarFigurasDeShape();
 
   /* Detecta o país pelo cabeçalho de IP (Vercel / Cloudflare / Proxy) quando
      presente; no cliente, o hook useMoeda também verifica fuso horário Europe/Lisbon
@@ -772,19 +598,14 @@ export async function PaginaPrograma90({ idioma }: { idioma: Idioma }) {
       <Header idioma={idioma} />
 
       <main>
-        <Programa
-          figuras={figuras}
-          idioma={idioma}
-          abertura={<Abertura moedaServidor={moedaServidor} idioma={idioma} t={t} />}
-          rodape={
-            <PaginaDeVendas
-              vendaAberta={vendaAberta}
-              moedaServidor={moedaServidor}
-              idioma={idioma}
-              t={t}
-            />
-          }
+        {/* Página direta: promessa, para quem é, o que recebe, prova,
+            oferta e dúvidas. O simulador de 7 passos saiu (nov/2026). */}
+        <Abertura moedaServidor={moedaServidor} idioma={idioma} t={t} />
+        <PaginaDeVendas
           vendaAberta={vendaAberta}
+          moedaServidor={moedaServidor}
+          idioma={idioma}
+          t={t}
         />
       </main>
 

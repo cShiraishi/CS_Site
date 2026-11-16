@@ -54,6 +54,19 @@ const nextConfig: NextConfig = {
     ];
   },
 
+  /*
+   * O app do Reset Metabólico 21D é outro projeto Vercel (reset-metabolico-21d),
+   * com basePath /resetmetabolico. O rewrite o serve debaixo do domínio: mesma
+   * origem, mesmo cookie de sessão do Supabase — uma conta só.
+   */
+  async rewrites() {
+    const app = "https://reset-metabolico-21d.vercel.app";
+    return [
+      { source: "/resetmetabolico", destination: `${app}/resetmetabolico` },
+      { source: "/resetmetabolico/:caminho*", destination: `${app}/resetmetabolico/:caminho*` },
+    ];
+  },
+
   async redirects() {
     return [
       // Um endereço canônico só: www e o *.vercel.app caem no domínio.
@@ -80,6 +93,13 @@ const nextConfig: NextConfig = {
       { source: "/link", destination: "/links", permanent: false },
       { source: "/linktree", destination: "/links", permanent: false },
       { source: "/bio", destination: "/links", permanent: false },
+      // A venda do Reset 21D saiu de /programa-90-dias para /resetmetabolico.
+      // A área antiga (/area) agora é o app, servido pelo rewrite abaixo.
+      { source: "/programa-90-dias/area", destination: "/resetmetabolico/programa", permanent: false },
+      { source: "/programa-90-dias", destination: "/resetmetabolico", permanent: true },
+      { source: "/programa-90-dias/:resto+", destination: "/resetmetabolico/:resto+", permanent: true },
+      { source: "/:idioma(es|en)/programa-90-dias", destination: "/:idioma/resetmetabolico", permanent: true },
+      { source: "/:idioma(es|en)/programa-90-dias/:resto+", destination: "/:idioma/resetmetabolico/:resto+", permanent: true },
     ];
   },
 };

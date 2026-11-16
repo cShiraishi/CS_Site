@@ -2,7 +2,7 @@
  * O que está à venda — definido no servidor, de propósito.
  *
  * Suporta exibição adaptativa por geolocalização/VPN:
- * - Brasil (BRL): R$ 47 (ancorado em R$ 197)
+ * - Brasil (BRL): R$ 297 (ancorado em R$ 197)
  * - Portugal / Europa (EUR): 19 € (ancorado em 67 €)
  */
 
@@ -12,7 +12,7 @@ export type Moeda = "BRL" | "EUR";
  * O preço em euro só pode aparecer quando houver como cobrá-lo.
  *
  * O checkout é Mercado Pago Brasil e cobra sempre em reais. Mostrar "19 €"
- * e cobrar R$ 47 seria anunciar um preço e praticar outro. Enquanto não
+ * e cobrar R$ 297 seria anunciar um preço e praticar outro. Enquanto não
  * existir um meio de pagamento em euro, todo mundo vê e paga em reais;
  * ligar isto sem esse meio reabre o problema.
  */
@@ -33,10 +33,10 @@ export const TABELA_PRECOS: Record<
 > = {
   BRL: {
     moeda: "BRL",
-    precoCentavos: 4700,
-    precoFormatado: "R$ 47",
+    precoCentavos: 29700,
+    precoFormatado: "R$ 297",
     precoAncora: "R$ 197",
-    stack: ["R$ 147", "R$ 67", "R$ 67", "R$ 47"],
+    stack: ["R$ 147", "R$ 67", "R$ 67", "R$ 297"],
     meiosPagamento: "Pix, cartão ou boleto",
     bandeira: "🇧🇷",
     rotuloPais: "Brasil (R$)",
@@ -58,8 +58,8 @@ export const PROGRAMA = {
   nome: "Reset Metabólico 21 Dias",
   descricao:
     "Protocolo científico de treino e dieta para 21 dias, dividido em 3 fases de 7 dias, com prescrição individual, plataforma CS Performance e guias práticos em PDF.",
-  /** Em centavos. R$ 47,00 (padrão no checkout Mercado Pago Brasil). */
-  precoCentavos: 4700,
+  /** Em centavos. R$ 297,00 (padrão no checkout Mercado Pago Brasil). */
+  precoCentavos: 29700,
   /** Valor de ancoragem em reais para exibição na página de vendas. */
   precoAncora: "R$ 197",
   moeda: "BRL",
@@ -83,7 +83,7 @@ export function moedaPorPais(pais?: string | null): Moeda {
   return "BRL";
 }
 
-/** "R$ 47" ou "19 €" — sem centavos quando são zero, que é como o preço é anunciado. */
+/** "R$ 297" ou "19 €" — sem centavos quando são zero, que é como o preço é anunciado. */
 export function precoEmReais(
   centavos = PROGRAMA.precoCentavos,
   moeda: Moeda = "BRL",
