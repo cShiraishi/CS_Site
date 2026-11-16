@@ -7,7 +7,7 @@ import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { PrecoDinamico } from "@/components/SeletorMoeda";
 import { Container } from "@/components/ui";
-import { VitrineCursos } from "@/components/VitrineCursos";
+import { TrilhaReset } from "@/components/TrilhaReset";
 import { marca, rotas } from "@/lib/content";
 import { CURSOS, UI_CURSOS, type Curso } from "@/lib/cursos";
 import { LANG_HTML, metadataPagina, rotaIdioma, type Idioma } from "@/lib/rotas-idioma";
@@ -160,7 +160,7 @@ export function PaginaCursos({ idioma }: { idioma: Idioma }) {
               <p className="text-sm text-grafite/70">{t.trilhaTexto}</p>
             </div>
             <div className="mt-6">
-              <VitrineCursos idioma={idioma} />
+              <TrilhaReset idioma={idioma} />
             </div>
           </Container>
         </section>
