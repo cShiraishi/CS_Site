@@ -640,13 +640,6 @@ function PaginaDeVendas({
 
                 <div className="mt-6 flex flex-wrap items-baseline justify-between gap-4 border-t border-white/12 pt-5">
                   <div>
-                    <span className="text-xs uppercase tracking-wider text-grafite/70">
-                      {v.de}{" "}
-                      <span className="line-through">
-                        <PrecoDinamico moedaServidor={moedaServidor} tipo="ancora" />
-                      </span>{" "}
-                      {v.porApenas}
-                    </span>
                     <p className="font-display text-4xl text-[#00ff66] drop-shadow-[0_0_20px_rgba(0,255,102,0.3)] sm:text-5xl">
                       <PrecoDinamico moedaServidor={moedaServidor} />{" "}
                       <span className="font-sans text-sm font-normal text-grafite/80">
