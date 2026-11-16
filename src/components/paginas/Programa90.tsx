@@ -13,7 +13,7 @@ import { PrecoDinamico, SeletorMoeda } from "@/components/SeletorMoeda";
 import { Arrow, Container, Eyebrow, Section } from "@/components/ui";
 import { marca, rotas } from "@/lib/content";
 import { TEXTO_PROGRAMA, type TextoPrograma } from "@/lib/i18n/programa";
-import { moedaPorPais, type Moeda } from "@/lib/produto";
+import { CHECKOUT_RESET, moedaPorPais, type Moeda } from "@/lib/produto";
 import { listarFigurasDeShape } from "@/lib/programa-figuras";
 import { LOCALE_OG, metadataPagina, rotaIdioma, type Idioma } from "@/lib/rotas-idioma";
 
@@ -174,7 +174,7 @@ function Abertura({
                 {a.ctaSimular}
                 <span aria-hidden>↓</span>
               </a>
-              <a href="#oferta-direta" className={btnOutlineNeon}>
+              <a href={CHECKOUT_RESET} className={btnOutlineNeon}>
                 {a.ctaDireto} <PrecoDinamico moedaServidor={moedaServidor} />
                 <Arrow />
               </a>
@@ -408,7 +408,7 @@ function PaginaDeVendas({
               <Link href={`${rotas.programa}/area?demo=1`} className={btnNeon}>
                 {v.testarPlataforma}
               </Link>
-              <a href="#oferta-direta" className={btnOutlineNeon}>
+              <a href={CHECKOUT_RESET} className={btnOutlineNeon}>
                 {v.garantirAcesso} <PrecoDinamico moedaServidor={moedaServidor} />
               </a>
             </div>
@@ -754,11 +754,8 @@ export async function PaginaPrograma90({ idioma }: { idioma: Idioma }) {
   /* A venda só abre com as três peças do checkout no ambiente. Faltando
      qualquer uma, o pagamento falharia (sem token, sem pedido) ou nunca
      seria confirmado (sem segredo, o webhook recusa tudo). */
-  const vendaAberta = Boolean(
-    process.env.MERCADOPAGO_ACCESS_TOKEN &&
-      process.env.MERCADOPAGO_WEBHOOK_SECRET &&
-      process.env.SUPABASE_SERVICE_ROLE_KEY,
-  );
+  // A venda acontece no checkout da Cakto (CHECKOUT_RESET): sempre aberta.
+  const vendaAberta = true;
 
   return (
     <>

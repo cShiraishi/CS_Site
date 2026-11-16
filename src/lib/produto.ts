@@ -53,6 +53,9 @@ export const TABELA_PRECOS: Record<
   },
 };
 
+/** Checkout da Cakto do Reset Metabólico 21D — todo botão de compra leva aqui. */
+export const CHECKOUT_RESET = "https://pay.cakto.com.br/32qwfgp_1329725";
+
 export const PROGRAMA = {
   slug: "programa-90-dias",
   nome: "Reset MetabÃ³lico 21 Dias",
