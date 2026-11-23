@@ -29,7 +29,7 @@ const pt = {
     titulo:
       "Reset Metabólico 21 Dias: desinche e emagreça",
     descricao:
-      "Protocolo científico de 21 dias em 3 semanas para desinflamar, estabilizar a glicemia e perder gordura sem cortar carboidratos. Simule seu plano em 7 passos.",
+      "Protocolo científico de 21 dias em 3 semanas para desinflamar, estabilizar a glicemia e perder gordura sem cortar carboidratos. Plano calculado para o seu corpo, garantia de 7 dias.",
     ogTitulo: "Reset Metabólico 21 Dias",
     ogDescricao:
       "3 semanas estruturadas pela Ciência de Alimentos para tirar o seu metabolismo da inércia — calculado para o seu corpo.",
@@ -98,7 +98,7 @@ const pt = {
       titulo: "Plano Individual Calculado para as 3 Semanas",
       descricao:
         "Suas calorias exatas, gramas de proteína, carboidrato e gordura por dia e por refeição, recalculadas a cada bloco de 7 dias conforme o peso desce.",
-      destaque: "Personalizado no simulador",
+      destaque: "Feito para o seu corpo",
     },
     {
       codigo: "MÓDULO 02 · NUTRIÇÃO (PDF)",
@@ -134,11 +134,11 @@ const pt = {
     },
     {
       p: "Serve para quem treina em casa ou nunca fez academia?",
-      r: "Sim. No simulador você escolhe se vai treinar em casa (com o peso do corpo e uma cadeira) ou na academia, além do seu nível atual. O programa monta o volume exato para a sua realidade.",
+      r: "Sim. Na plataforma você escolhe se vai treinar em casa (com o peso do corpo e uma cadeira) ou na academia, além do seu nível atual. O programa monta o volume exato para a sua realidade.",
     },
     {
       p: "Como recebo o acesso após o pagamento?",
-      r: "O pagamento é processado em ambiente seguro (Pix/Cartão no Brasil ou Cartão/MB Way em Portugal e Europa). Assim que confirmado, você acessa sua plataforma CS Performance no site com o seu e-mail para abrir seu calendário de 21 dias, missões diárias, receitas e protocolos em PDF.",
+      r: "O pagamento é processado em ambiente seguro pela Stripe: Pix, cartão (em até 12x) ou boleto. Assim que confirmado, você acessa sua plataforma CS Performance no site com o seu e-mail para abrir seu calendário de 21 dias, missões diárias, receitas e protocolos em PDF.",
     },
     {
       p: "E se eu achar que o programa não é para mim?",
@@ -150,18 +150,16 @@ const pt = {
     breadcrumbAria: "Você está em",
     inicio: "Início",
     atual: "Reset Metabólico 21 Dias",
-    selo: "Emagrecimento com Método · Com Science",
+    selo: "-8 a 15 kg",
     altEmblema: "Reset Metabólico 21D — Emagrecimento com Método",
-    h1: "Destrave seu metabolismo em",
-    h1Destaque: "21 Dias.",
+    h1: "Seque a barriga em",
+    h1Destaque: "21 dias. Sem cortar o arroz.",
     texto: [
-      "Desinche o abdômen na ",
-      "Semana 1",
-      ", acelere a queima real de gordura na ",
-      "Semana 2",
-      " e elimine a fome de rebote na ",
-      "Semana 3",
-      " — com calorias, macros e treinos calculados para a sua biologia.",
+      "O método com que alunos perderam ",
+      "de 8 a 15 kg",
+      ": desinche na Semana 1, queime gordura na Semana 2 e trave o resultado na Semana 3 — com dieta e treino ",
+      "calculados para o seu corpo",
+      ".",
     ],
     selos: [
       "⚡ Sem cortar carboidratos",
@@ -170,7 +168,8 @@ const pt = {
       "💻 Plataforma Interativa + PDFs",
     ],
     ctaSimular: "Simular meu plano de 21 dias",
-    ctaDireto: "Garantir acesso direto ·",
+    ctaDireto: "Quero começar meu Reset ·",
+    ctaNota: "Pagamento único · em até 12x no cartão · 7 dias de garantia",
     autoria: ["Desenvolvido por ", "Carlos Seiti", " — 2× Mestre e Doutorando em Ciência de Alimentos."],
     painelEyebrow: "Arquitetura da Intervenção",
     painelTitulo: "O que muda em 3 semanas",
@@ -185,14 +184,20 @@ const pt = {
 
   vendas: {
     sintomasEyebrow: "Por que o seu corpo estagnou",
-    sintomasTitulo: "O problema não é a sua genética. É tentar emagrecer no escuro.",
+    sintomasTitulo: "Você faz tudo “certo” e o ponteiro não sai do lugar?",
     sintomasTexto: [
-      "Se você se reconhece em pelo menos um dos quatro sinais abaixo, o seu metabolismo não precisa de mais restrição — precisa de um ",
-      "Reset estruturado de 21 dias",
+      "Não é falta de força de vontade. É dieta de gaveta. Se você se reconhece em um destes sinais, o seu corpo não precisa de mais restrição — precisa de um ",
+      "método de 21 dias",
       ".",
     ],
     sinalAlerta: "Sinal de Alerta",
 
+    fasesEyebrow: "Como funciona",
+    fasesTitulo: "3 semanas. 3 viradas no seu corpo.",
+    metaDaSemana: "Meta",
+    finalTitulo: "Daqui a 21 dias você vai desejar ter começado hoje.",
+    finalTexto: "Risco zero: aplique a primeira semana inteira. Se a barriga não desinchar, devolvemos 100% do seu dinheiro.",
+    barraFixa: "Começar meu Reset",
     cronoEyebrow: "Ciência de Alimentos Aplicada",
     cronoTitulo: "Por que 21 dias é a janela exata para destravar o metabolismo.",
     cronoTexto:
@@ -269,7 +274,7 @@ const pt = {
     inclusoNoAcesso: "✓ Incluso no seu acesso de",
 
     provaEyebrow: "Resultados Reais da Metodologia",
-    provaTitulo: "Quem aplica direção científica muda o corpo de verdade.",
+    provaTitulo: "Gente comum. Resultado de verdade.",
     provaCta: resultados.cta as string,
     altCarlos:
       "Carlos Seiti — Engenheiro Alimentar, Mestre e Doutorando em Ciência de Alimentos",
@@ -281,7 +286,7 @@ const pt = {
 
     ofertaSelo: "Inscrição Aberta · Acesso Vitalício à Plataforma",
     altOferta: "Reset Metabólico 21D — Emagrecimento com Método",
-    ofertaTitulo: ["Comece seu ", "Reset Metabólico 21D", " agora."],
+    ofertaTitulo: ["Comece hoje. Em 21 dias, ", "o espelho responde", "."],
     ofertaTexto:
       "Menos que o valor de uma única refeição fora de casa para ter as 3 semanas calculadas, acesso à plataforma CS Performance e todos os manuais práticos assinados por Carlos Seiti.",
     resumoTitulo: "Resumo do que você leva hoje:",
@@ -294,9 +299,9 @@ const pt = {
     incluso: "Incluso",
     de: "De",
     porApenas: "por apenas:",
-    pagamentoUnico: "pagamento único · sem mensalidade",
+    pagamentoUnico: "pagamento único · em até 12x · sem mensalidade",
     subirSimulador: "Quer personalizar antes? Suba para o simulador ↑",
-    rotuloComprar: "Destravar meu Reset de 21 Dias",
+    rotuloComprar: "Quero meu Reset",
     aplicarConsultoria: "Quero aplicar para o Reset / Consultoria ·",
     verPreview: "Ver plataforma por dentro (Preview) →",
     garantiaTitulo: "Garantia Blindada de 7 Dias — Risco Zero",
@@ -588,7 +593,7 @@ const es: TextoPrograma = {
     breadcrumbAria: "Estás en",
     inicio: "Inicio",
     atual: "Reset Metabólico 21 Días",
-    selo: "Adelgazar con Método · Con Ciencia",
+    selo: "-8 a 15 kg",
     altEmblema: "Reset Metabólico 21D — Adelgazar con Método",
     h1: "Desbloquea tu metabolismo en",
     h1Destaque: "21 Días.",
@@ -609,6 +614,7 @@ const es: TextoPrograma = {
     ],
     ctaSimular: "Simular mi plan de 21 días",
     ctaDireto: "Acceso directo ·",
+    ctaNota: "Pago único · hasta 12 cuotas con tarjeta · 7 días de garantía",
     autoria: ["Creado por ", "Carlos Seiti", " — 2 maestrías y doctorando en Ciencia de los Alimentos."],
     painelEyebrow: "Arquitectura de la Intervención",
     painelTitulo: "Qué cambia en 3 semanas",
@@ -631,6 +637,12 @@ const es: TextoPrograma = {
     ],
     sinalAlerta: "Señal de Alerta",
 
+    fasesEyebrow: "Cómo funciona",
+    fasesTitulo: "3 semanas. 3 cambios en tu cuerpo.",
+    metaDaSemana: "Meta",
+    finalTitulo: "Dentro de 21 días vas a desear haber empezado hoy.",
+    finalTexto: "Riesgo cero: aplica la primera semana entera. Si el abdomen no se deshincha, te devolvemos el 100% de tu dinero.",
+    barraFixa: "Empezar mi Reset",
     cronoEyebrow: "Ciencia de los Alimentos Aplicada",
     cronoTitulo: "Por qué 21 días es la ventana exacta para desbloquear el metabolismo.",
     cronoTexto:
@@ -1034,7 +1046,7 @@ const en: TextoPrograma = {
     breadcrumbAria: "You are here",
     inicio: "Home",
     atual: "21-Day Metabolic Reset",
-    selo: "Fat Loss with a Method · Backed by Science",
+    selo: "-8 to 15 kg",
     altEmblema: "Metabolic Reset 21D — Fat Loss with a Method",
     h1: "Unlock your metabolism in",
     h1Destaque: "21 Days.",
@@ -1055,6 +1067,7 @@ const en: TextoPrograma = {
     ],
     ctaSimular: "Simulate my 21-day plan",
     ctaDireto: "Get direct access ·",
+    ctaNota: "One-time payment · up to 12 card instalments · 7-day guarantee",
     autoria: ["Developed by ", "Carlos Seiti", " — two Master's degrees and PhD candidate in Food Science."],
     painelEyebrow: "Intervention Architecture",
     painelTitulo: "What changes in 3 weeks",
@@ -1077,6 +1090,12 @@ const en: TextoPrograma = {
     ],
     sinalAlerta: "Warning Sign",
 
+    fasesEyebrow: "How it works",
+    fasesTitulo: "3 weeks. 3 shifts in your body.",
+    metaDaSemana: "Goal",
+    finalTitulo: "21 days from now you'll wish you had started today.",
+    finalTexto: "Zero risk: run the whole first week. If your belly doesn't de-bloat, you get 100% of your money back.",
+    barraFixa: "Start my Reset",
     cronoEyebrow: "Applied Food Science",
     cronoTitulo: "Why 21 days is the exact window to unlock your metabolism.",
     cronoTexto:

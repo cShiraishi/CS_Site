@@ -31,8 +31,14 @@ export function EsteiraAntesDepois({
   prioridade?: boolean;
 }) {
   const fotos = resultados.transformacoes;
-  /* Com 4 fotos, metade da esteira ficaria mais estreita que a área visível. */
-  const base = [...fotos, ...fotos];
+  /* Modo Ela: mesma fila, girada para começar na primeira aluna. É uma
+     rotação, então o loop continua sem emenda. As duas versões vão no
+     HTML e o CSS (.so-ele/.so-ela) mostra uma: nada pisca na hidratação. */
+  const inicioEla = Math.max(0, fotos.findIndex((p) => p.sexo === "f"));
+  const filas = [
+    { classe: "so-ele", lista: fotos },
+    { classe: "so-ela", lista: [...fotos.slice(inicioEla), ...fotos.slice(0, inicioEla)] },
+  ];
   const card = grande ? "h-[24rem] w-[12.5rem]" : "h-64 w-36 sm:h-72 sm:w-40";
 
   return (
@@ -42,8 +48,9 @@ export function EsteiraAntesDepois({
         {ROTULO[idioma]}
       </p>
       <div className="relative mt-4 overflow-hidden [mask-image:linear-gradient(90deg,transparent,black_7%,black_93%,transparent)]">
-        <ul className="esteira flex w-max">
-          {[...base, ...base].map((p, i) => {
+        {filas.map(({ classe, lista }) => (
+        <ul key={classe} className={`esteira flex w-max ${classe}`}>
+          {[...lista, ...lista, ...lista, ...lista].map((p, i) => {
             const copia = i >= fotos.length;
             return (
               <li key={`${p.instagram}-${i}`} aria-hidden={copia || undefined} className="shrink-0 pr-3">
@@ -69,6 +76,7 @@ export function EsteiraAntesDepois({
             );
           })}
         </ul>
+        ))}
       </div>
     </div>
   );

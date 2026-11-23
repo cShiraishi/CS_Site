@@ -12,9 +12,12 @@ type Transformacao = (typeof resultados.transformacoes)[number];
 export function GaleriaTransformacoes({
   variante = "neon",
   idioma = "pt",
+  semLinks = false,
 }: {
   variante?: "neon" | "ouro";
   idioma?: Idioma;
+  /** página de venda: nada que leve a pessoa para fora (Instagram) */
+  semLinks?: boolean;
 }) {
   const t = TEXTO_PROGRAMA[idioma].galeria;
   const alt = (p: Transformacao) => t.alts[p.instagram] ?? p.alt;
@@ -37,6 +40,7 @@ export function GaleriaTransformacoes({
         {resultados.transformacoes.map((pessoa) => (
           <article
             key={pessoa.instagram}
+            data-sexo={pessoa.sexo}
             className={`group flex flex-col overflow-hidden rounded-2xl border bg-[#0e1310] transition-all duration-300 hover:-translate-y-1.5 ${
               isNeon
                 ? "border-white/15 hover:border-[#00ff66]/70 hover:shadow-[0_0_40px_rgba(0,255,102,0.2)]"
@@ -76,6 +80,11 @@ export function GaleriaTransformacoes({
                 <p className="truncate font-display text-xl uppercase leading-tight text-[#f2ede5]">
                   {pessoa.nome}
                 </p>
+                {semLinks ? (
+                  <p className="mt-0.5 truncate text-xs font-medium text-[#f2ede5]/75">
+                    {pessoa.instagram}
+                  </p>
+                ) : (
                 <a
                   href={pessoa.link}
                   target="_blank"
@@ -88,8 +97,10 @@ export function GaleriaTransformacoes({
                 >
                   {pessoa.instagram}
                 </a>
+                )}
               </div>
 
+              {!semLinks && (
               <a
                 href={pessoa.link}
                 target="_blank"
@@ -103,6 +114,7 @@ export function GaleriaTransformacoes({
               >
                 <Arrow />
               </a>
+              )}
             </div>
           </article>
         ))}
@@ -129,6 +141,7 @@ export function GaleriaTransformacoes({
                 <p className="text-xs text-[#00ff66]">{selecionada.instagram}</p>
               </div>
               <div className="flex items-center gap-2.5">
+                {!semLinks && (
                 <a
                   href={selecionada.link}
                   target="_blank"
@@ -137,6 +150,7 @@ export function GaleriaTransformacoes({
                 >
                   {t.verInstagram} <Arrow />
                 </a>
+                )}
                 <button
                   type="button"
                   onClick={() => setSelecionada(null)}

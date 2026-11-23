@@ -234,3 +234,86 @@ export async function listarAssinaturas(): Promise<AssinaturaResumo[] | { erro: 
     };
   });
 }
+
+/* ------------------------------------------------------------------ */
+/* Venda avulsa do Reset 21D — Checkout Session + webhook              */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Abre o checkout de pagamento único.
+ *
+ * Aqui é Checkout Session, e não Payment Link: cada sessão nasce presa a um
+ * pedido nosso (`client_reference_id`), e é essa referência que o webhook
+ * usa para liberar o acesso. A expiração de 24 h não incomoda — quem clica
+ * em "comprar" paga na hora ou desiste.
+ *
+ * Os meios de pagamento (cartão, Pix, boleto) vêm do painel da Stripe
+ * (pagamentos dinâmicos), por isso não são fixados aqui. O parcelamento no
+ * cartão só aparece se a conta brasileira o tiver ativo.
+ */
+export async function criarSessaoCheckout(d: {
+  referencia: string;
+  email: string;
+  nome: string;
+  descricao: string;
+  valorCentavos: number;
+  moeda: string;
+  urlSucesso: string;
+  urlCancelar: string;
+}): Promise<{ id: string; url: string } | { erro: string }> {
+  const r = await stripe<{ id: string; url: string }>("POST", "/checkout/sessions", {
+    mode: "payment",
+    customer_email: d.email,
+    client_reference_id: d.referencia,
+    metadata: { referencia: d.referencia },
+    payment_intent_data: { metadata: { referencia: d.referencia } },
+    line_items: [
+      {
+        quantity: 1,
+        price_data: {
+          currency: d.moeda.toLowerCase(),
+          unit_amount: d.valorCentavos,
+          product_data: { name: d.nome, description: d.descricao },
+        },
+      },
+    ],
+    payment_method_options: { card: { installments: { enabled: true } } },
+    locale: "pt-BR",
+    success_url: d.urlSucesso,
+    cancel_url: d.urlCancelar,
+  });
+  if ("erro" in r) return r;
+  return { id: r.id, url: r.url };
+}
+
+/**
+ * Confere a assinatura `Stripe-Signature` (HMAC-SHA256 de `t.corpo`) com o
+ * segredo do endpoint. Sem isto, qualquer POST na rota liberaria o produto.
+ * Recusa eventos com mais de 5 minutos, para um corpo capturado não poder
+ * ser reenviado depois.
+ */
+export async function eventoStripeValido(corpo: string, cabecalho: string | null): Promise<boolean> {
+  const segredo = process.env.STRIPE_WEBHOOK_SECRET;
+  if (!segredo || !cabecalho) return false;
+
+  const partes = Object.fromEntries(
+    cabecalho.split(",").map((p) => {
+      const i = p.indexOf("=");
+      return [p.slice(0, i).trim(), p.slice(i + 1).trim()];
+    }),
+  ) as Record<string, string>;
+  const t = Number(partes.t);
+  const assinaturas = cabecalho
+    .split(",")
+    .filter((p) => p.trim().startsWith("v1="))
+    .map((p) => p.trim().slice(3));
+  if (!t || assinaturas.length === 0) return false;
+  if (Math.abs(Date.now() / 1000 - t) > 300) return false;
+
+  const { createHmac, timingSafeEqual } = await import("node:crypto");
+  const esperado = createHmac("sha256", segredo).update(`${t}.${corpo}`).digest();
+  return assinaturas.some((a) => {
+    const b = Buffer.from(a, "hex");
+    return b.length === esperado.length && timingSafeEqual(b, esperado);
+  });
+}

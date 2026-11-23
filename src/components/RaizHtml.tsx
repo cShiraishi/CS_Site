@@ -5,6 +5,7 @@ import { marca } from "@/lib/content";
 import { SCRIPT_MODO } from "@/lib/modo";
 import { GTM_ID, SCRIPT_CONSENTIMENTO } from "@/lib/consentimento";
 import { BannerCookies } from "@/components/BannerCookies";
+import { JanelaModo } from "@/components/JanelaModo";
 import { LANG_HTML, LOCALE_OG, rotaIdioma, type Idioma } from "@/lib/rotas-idioma";
 import "@/app/globals.css";
 
@@ -182,6 +183,8 @@ export function RaizHtml({
             style={{ display: "none", visibility: "hidden" }}
           />
         </noscript>
+        {/* Tela de entrada Ele / Ela: só aparece para quem nunca escolheu (CSS + data-modo-novo). */}
+        <JanelaModo idioma={idioma} />
         {children}
         <Analytics />
         <BannerCookies idioma={idioma} />

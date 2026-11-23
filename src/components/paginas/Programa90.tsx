@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Fragment, type ReactNode } from "react";
 import { Comprar } from "@/components/Comprar";
+import { EsteiraAntesDepois } from "@/components/EsteiraAntesDepois";
 import { Footer } from "@/components/Footer";
 import { GaleriaTransformacoes } from "@/components/GaleriaTransformacoes";
 import { Header } from "@/components/Header";
@@ -52,11 +53,32 @@ export function metadataPrograma90(idioma: Idioma): Metadata {
 }
 
 /** Lista alternada [texto, destaque, texto, ...]: índices ímpares em destaque. */
-function Rico({ partes, destaque }: { partes: readonly string[]; destaque: (t: string) => ReactNode }) {
+function Rico({
+  partes,
+  destaque,
+  alunas = false,
+}: {
+  partes: readonly string[];
+  destaque: (t: string) => ReactNode;
+  /** Modo Ela: "alunos" vira "alunas" (troca feita pelo CSS, .so-ele/.so-ela). */
+  alunas?: boolean;
+}) {
+  const genero = (t: string): ReactNode => {
+    if (!alunas || !t.includes("alunos")) return t;
+    const [antes, depois] = t.split("alunos");
+    return (
+      <>
+        {antes}
+        <span className="so-ele">alunos</span>
+        <span className="so-ela">alunas</span>
+        {depois}
+      </>
+    );
+  };
   return (
     <>
       {partes.map((p, i) =>
-        <Fragment key={i}>{i % 2 === 1 ? destaque(p) : p}</Fragment>,
+        <Fragment key={i}>{i % 2 === 1 ? destaque(p) : genero(p)}</Fragment>,
       )}
     </>
   );
@@ -100,19 +122,7 @@ function Abertura({
 
       <Container className="relative">
         <div className="flex flex-wrap items-center justify-between gap-4 pt-4">
-          <nav aria-label={a.breadcrumbAria}>
-            <ol className="flex flex-wrap items-center gap-2 text-xs text-grafite/75">
-              <li>
-                <Link href={rotaIdioma(idioma, "/")} className="transition-colors hover:text-[#00ff66]">
-                  {a.inicio}
-                </Link>
-              </li>
-              <li aria-hidden>·</li>
-              <li aria-current="page" className="font-semibold text-[#00ff66]">
-                {a.atual}
-              </li>
-            </ol>
-          </nav>
+          <span />
 
           {/* Seletor de Moeda Automático por Região / VPN */}
           <SeletorMoeda moedaServidor={moedaServidor} idioma={idioma} />
@@ -128,19 +138,6 @@ function Abertura({
               </span>
             </div>
 
-            {/* Emblema Oficial Reset Metabólico 21D */}
-            <div className="relative mt-6 max-w-xl overflow-hidden rounded-2xl border border-[#39ff14]/40 bg-[#030b05] p-2 shadow-[0_0_55px_rgba(57,255,20,0.22)]">
-              <Image
-                src="/brand/reset-metabolico-21d.jpg"
-                alt={a.altEmblema}
-                width={1024}
-                height={512}
-                priority
-                sizes="(max-width: 1024px) 95vw, 560px"
-                className="h-auto w-full rounded-xl object-cover"
-              />
-            </div>
-
             <h1 className="mt-6 font-display text-3xl uppercase leading-tight text-balance text-grafite sm:text-5xl">
               {a.h1}{" "}
               <span className="text-[#39ff14] drop-shadow-[0_0_24px_rgba(57,255,20,0.4)]">
@@ -152,6 +149,7 @@ function Abertura({
               <Rico
                 partes={a.texto}
                 destaque={(x) => <strong className="font-semibold text-[#39ff14]">{x}</strong>}
+                alunas={idioma === "pt"}
               />
             </p>
 
@@ -167,11 +165,12 @@ function Abertura({
             </div>
 
             <div className="mt-9 flex flex-wrap items-center gap-4">
-              <a href="#oferta-direta" className={btnNeon}>
+              <a href="#oferta-direta" className={`${btnNeon} w-full py-5 text-sm sm:w-auto`}>
                 {a.ctaDireto} <PrecoDinamico moedaServidor={moedaServidor} />
                 <Arrow />
               </a>
             </div>
+            <p className="mt-3 text-xs font-medium text-grafite/70">{a.ctaNota}</p>
 
             <p className="mt-5 flex items-center gap-2 text-xs text-grafite/75">
               <span aria-hidden className="text-[#00ff66]">★</span>
@@ -182,64 +181,9 @@ function Abertura({
             </p>
           </div>
 
-          {/* Coluna Direita: Painel Visual "Cronograma Fisiológico 21 Dias" */}
-          <div className="rise relative overflow-hidden rounded-2xl border-2 border-[#00ff66]/55 bg-[#0c140f] shadow-[0_0_65px_rgba(0,255,102,0.16)]">
-            <div className="h-1.5 bg-linear-to-r from-[#00ff66] via-[#4be283] to-ouro" />
-
-            <div className="p-6 sm:p-8">
-              <div className="flex items-center justify-between gap-4 border-b border-white/12 pb-4">
-                <div>
-                  <p className="t-eyebrow text-[#00ff66]">{a.painelEyebrow}</p>
-                  <p className="mt-1 font-display text-2xl text-grafite">{a.painelTitulo}</p>
-                </div>
-                <span className="rounded-lg border border-[#00ff66]/50 bg-[#00ff66]/15 px-3.5 py-1.5 text-right shadow-[0_0_20px_rgba(0,255,102,0.2)]">
-                  <span className="block text-[0.65rem] font-bold uppercase tracking-widest text-grafite/80">
-                    {a.acessoUnico}
-                  </span>
-                  <span className="font-display text-xl text-[#00ff66]">
-                    <PrecoDinamico moedaServidor={moedaServidor} />
-                  </span>
-                </span>
-              </div>
-
-              <ol className="mt-5 space-y-3.5">
-                {t.semanas.map((s, idx) => (
-                  <li
-                    key={s.semana}
-                    className="rounded-xl border border-[#00ff66]/25 bg-[#0b0a09]/85 p-4 transition-all hover:border-[#00ff66]/70"
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.16em] text-[#00ff66]">
-                        <span className="flex size-5 items-center justify-center rounded-full bg-[#00ff66] text-[0.68rem] font-extrabold text-[#041208]">
-                          {idx + 1}
-                        </span>
-                        {s.semana} · {s.dias}
-                      </span>
-                      <span className="rounded-full bg-[#00ff66]/15 px-2.5 py-0.5 text-[0.65rem] font-extrabold uppercase tracking-wider text-[#00ff66]">
-                        {a.fase(idx + 1)}
-                      </span>
-                    </div>
-                    <p className="mt-2 font-display text-lg text-grafite">{s.titulo}</p>
-                    <p className="mt-1 text-xs leading-relaxed text-grafite/75">{s.subtitulo}</p>
-                  </li>
-                ))}
-              </ol>
-
-              <div className="mt-6 grid grid-cols-3 gap-2 rounded-xl border border-[#00ff66]/30 bg-[#0b0a09] p-3.5 text-center">
-                <div>
-                  <p className="font-display text-xl text-[#00ff66]">{a.resumo[0].valor}</p>
-                  <p className="text-[0.68rem] text-grafite/75">{a.resumo[0].nota}</p>
-                </div>
-                <div className="border-x border-white/12">
-                  <p className="font-display text-xl text-grafite">{a.resumo[1].valor}</p>
-                  <p className="text-[0.68rem] text-grafite/75">{a.resumo[1].nota}</p>
-                </div>
-                <div>
-                  <p className="font-display text-xl text-[#00ff66]">{a.resumo[2].valor}</p>
-                  <p className="text-[0.68rem] text-grafite/75">{a.resumo[2].nota}</p>
-                </div>
-              </div>
-            </div>
+          {/* Coluna Direita: a prova na primeira dobra — antes e depois de alunos. */}
+          <div className="rise min-w-0">
+            <EsteiraAntesDepois idioma={idioma} grande prioridade />
           </div>
         </div>
       </Container>
@@ -273,6 +217,27 @@ function PaginaDeVendas({
   const v = t.vendas;
   return (
     <>
+      {/* ============================================================
+         6. PROVA SOCIAL + AUTORIDADE CIENTÍFICA CARLOS SEITI
+         ============================================================ */}
+      <Section id="resultados" tone="branco" denso className="border-t border-linha">
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <EyebrowNeon>{v.provaEyebrow}</EyebrowNeon>
+            <h2 className="t-title mt-5 text-balance">{v.provaTitulo}</h2>
+          </div>
+        </div>
+
+        <GaleriaTransformacoes variante="neon" idioma={idioma} semLinks />
+        <div className="mt-10 flex justify-center">
+          <a href="#oferta-direta" className={btnNeon}>
+            {t.abertura.ctaDireto} <PrecoDinamico moedaServidor={moedaServidor} />
+            <Arrow />
+          </a>
+        </div>
+
+      </Section>
+
       {/* ============================================================
          1. DIAGNÓSTICO DE SINTOMAS — PARA QUEM É O RESET
          ============================================================ */}
@@ -309,6 +274,34 @@ function PaginaDeVendas({
         </div>
       </Section>
 
+      {/* COMO FUNCIONA — as 3 semanas, cada uma com a sua meta */}
+      <Section tone="branco" denso className="border-t border-linha">
+        <div className="max-w-2xl">
+          <EyebrowNeon>{v.fasesEyebrow}</EyebrowNeon>
+          <h2 className="t-title mt-5 text-balance">{v.fasesTitulo}</h2>
+        </div>
+        <ol className="stagger mt-12 grid gap-5 lg:grid-cols-3">
+          {t.semanas.map((s, i) => (
+            <li
+              key={s.semana}
+              className="flex flex-col rounded-2xl border border-[#00ff66]/30 bg-[#0c140f] p-6 sm:p-8"
+            >
+              <span className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.16em] text-[#00ff66]">
+                <span className="flex size-6 items-center justify-center rounded-full bg-[#00ff66] text-[0.72rem] text-[#041208]">
+                  {i + 1}
+                </span>
+                {s.semana} · {s.dias}
+              </span>
+              <h3 className="mt-4 font-display text-2xl text-grafite">{s.titulo}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-grafite/75">{s.subtitulo}</p>
+              <p className="mt-6 border-t border-white/10 pt-4 text-sm font-semibold text-[#00ff66]">
+                {s.entregavel}
+              </p>
+            </li>
+          ))}
+        </ol>
+      </Section>
+
       {/* ============================================================
          5. O QUE VOCÊ RECEBE — VITRINE DE ENTREGÁVEIS
          ============================================================ */}
@@ -340,67 +333,6 @@ function PaginaDeVendas({
               </div>
             </div>
           ))}
-        </div>
-      </Section>
-
-      {/* ============================================================
-         6. PROVA SOCIAL + AUTORIDADE CIENTÍFICA CARLOS SEITI
-         ============================================================ */}
-      <Section tone="branco" denso className="border-t border-linha">
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <EyebrowNeon>{v.provaEyebrow}</EyebrowNeon>
-            <h2 className="t-title mt-5 text-balance">{v.provaTitulo}</h2>
-          </div>
-          <Link
-            href={marca.instagram}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group inline-flex shrink-0 items-center gap-2.5 border-b border-[#00ff66]/50 pb-1.5 text-sm font-semibold text-[#00ff66] transition-colors hover:border-[#00ff66]"
-          >
-            {v.provaCta}
-            <Arrow />
-          </Link>
-        </div>
-
-        <GaleriaTransformacoes variante="neon" idioma={idioma} />
-
-        {/* Bloco de Autoridade Carlos Seiti */}
-        <div className="mt-16 rounded-2xl border border-[#00ff66]/30 bg-porcelana p-7 sm:p-10 lg:p-12">
-          <div className="grid items-center gap-10 lg:grid-cols-[16rem_1fr] lg:gap-14">
-            <div className="relative mx-auto w-56 overflow-hidden rounded-xl border border-[#00ff66]/40 lg:mx-0 lg:w-full">
-              <Image
-                src="/sobre/carlos-seiti.png"
-                alt={v.altCarlos}
-                width={1087}
-                height={1448}
-                sizes="(max-width: 1024px) 14rem, 16rem"
-                className="h-auto w-full object-cover"
-              />
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4">
-                <p className="font-display text-lg text-[#f2ede5]">{marca.nome}</p>
-                <p className="text-[0.68rem] font-bold uppercase tracking-widest text-[#00ff66]">
-                  {v.seloCarlos}
-                </p>
-              </div>
-            </div>
-
-            <div>
-              <Eyebrow>{v.autorEyebrow}</Eyebrow>
-              <h3 className="t-title mt-4 text-balance">{v.autorTitulo}</h3>
-              <p className="mt-5 leading-relaxed text-grafite/85">{v.autorParagrafos[0]}</p>
-              <p className="mt-4 leading-relaxed text-grafite/80">{v.autorParagrafos[1]}</p>
-
-              <dl className="mt-8 grid grid-cols-2 gap-4 border-t border-linha pt-6 sm:grid-cols-4">
-                {v.credenciais.map((c) => (
-                  <div key={c.rotulo}>
-                    <dt className="font-display text-3xl text-[#00ff66]">{c.valor}</dt>
-                    <dd className="mt-1 text-xs text-grafite/75">{c.rotulo}</dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
-          </div>
         </div>
       </Section>
 
@@ -473,13 +405,6 @@ function PaginaDeVendas({
 
                 <div className="mt-6 flex flex-wrap items-baseline justify-between gap-4 border-t border-white/12 pt-5">
                   <div>
-                    <span className="text-xs uppercase tracking-wider text-grafite/70">
-                      {v.de}{" "}
-                      <span className="line-through">
-                        <PrecoDinamico moedaServidor={moedaServidor} tipo="ancora" />
-                      </span>{" "}
-                      {v.porApenas}
-                    </span>
                     <p className="font-display text-4xl text-[#00ff66] drop-shadow-[0_0_20px_rgba(0,255,102,0.3)] sm:text-5xl">
                       <PrecoDinamico moedaServidor={moedaServidor} />{" "}
                       <span className="font-sans text-sm font-normal text-grafite/80">
@@ -522,6 +447,47 @@ function PaginaDeVendas({
         </div>
       </Section>
 
+      {/* QUEM CRIOU — depois da oferta, para quem ainda hesita */}
+      <Section tone="branco" denso className="border-t border-linha">
+        {/* Bloco de Autoridade Carlos Seiti */}
+        <div className="rounded-2xl border border-[#00ff66]/30 bg-porcelana p-7 sm:p-10 lg:p-12">
+          <div className="grid items-center gap-10 lg:grid-cols-[16rem_1fr] lg:gap-14">
+            <div className="relative mx-auto w-56 overflow-hidden rounded-xl border border-[#00ff66]/40 lg:mx-0 lg:w-full">
+              <Image
+                src="/sobre/carlos-seiti.png"
+                alt={v.altCarlos}
+                width={1087}
+                height={1448}
+                sizes="(max-width: 1024px) 14rem, 16rem"
+                className="h-auto w-full object-cover"
+              />
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4">
+                <p className="font-display text-lg text-[#f2ede5]">{marca.nome}</p>
+                <p className="text-[0.68rem] font-bold uppercase tracking-widest text-[#00ff66]">
+                  {v.seloCarlos}
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <Eyebrow>{v.autorEyebrow}</Eyebrow>
+              <h3 className="t-title mt-4 text-balance">{v.autorTitulo}</h3>
+              <p className="mt-5 leading-relaxed text-grafite/85">{v.autorParagrafos[0]}</p>
+              <p className="mt-4 leading-relaxed text-grafite/80">{v.autorParagrafos[1]}</p>
+
+              <dl className="mt-8 grid grid-cols-2 gap-4 border-t border-linha pt-6 sm:grid-cols-4">
+                {v.credenciais.map((c) => (
+                  <div key={c.rotulo}>
+                    <dt className="font-display text-3xl text-[#00ff66]">{c.valor}</dt>
+                    <dd className="mt-1 text-xs text-grafite/75">{c.rotulo}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          </div>
+        </div>
+      </Section>
+
       {/* ============================================================
          8. PERGUNTAS FREQUENTES (FAQ)
          ============================================================ */}
@@ -547,25 +513,28 @@ function PaginaDeVendas({
             ))}
           </div>
 
-          <p className="mt-9 text-center text-sm text-grafite/75">
-            {v.faqRodape[0]}
-            <Link
-              href={rotaIdioma(idioma, rotas.gordura)}
-              className="underline decoration-[#00ff66] underline-offset-4 transition-colors hover:text-[#00ff66]"
-            >
-              {v.faqRodape[1]}
-            </Link>
-            {v.faqRodape[2]}
-            <Link
-              href={rotaIdioma(idioma, rotas.calculadora)}
-              className="underline decoration-[#00ff66] underline-offset-4 transition-colors hover:text-[#00ff66]"
-            >
-              {v.faqRodape[3]}
-            </Link>
-            {v.faqRodape[4]}
-          </p>
         </div>
       </Section>
+      {/* FECHO — última chamada */}
+      <Section tone="porcelana" denso className="border-t border-linha pb-28 sm:pb-20">
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="font-display text-3xl uppercase leading-tight text-balance text-grafite sm:text-5xl">
+            {v.finalTitulo}
+          </h2>
+          <p className="mx-auto mt-5 max-w-xl text-grafite/80">{v.finalTexto}</p>
+          <a href="#oferta-direta" className={`${btnNeon} mt-8 w-full py-5 text-sm sm:w-auto`}>
+            {t.abertura.ctaDireto} <PrecoDinamico moedaServidor={moedaServidor} />
+            <Arrow />
+          </a>
+        </div>
+      </Section>
+
+      {/* Barra fixa no celular: o botão nunca sai da tela. */}
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[#00ff66]/30 bg-[#0b0a09]/95 p-3 backdrop-blur sm:hidden">
+        <a href="#oferta-direta" className={`${btnNeon} w-full`}>
+          {v.barraFixa} · <PrecoDinamico moedaServidor={moedaServidor} />
+        </a>
+      </div>
     </>
   );
 }
@@ -588,8 +557,8 @@ export async function PaginaPrograma90({ idioma }: { idioma: Idioma }) {
      qualquer uma, o pagamento falharia (sem token, sem pedido) ou nunca
      seria confirmado (sem segredo, o webhook recusa tudo). */
   const vendaAberta = Boolean(
-    process.env.MERCADOPAGO_ACCESS_TOKEN &&
-      process.env.MERCADOPAGO_WEBHOOK_SECRET &&
+    process.env.STRIPE_SECRET_KEY &&
+      process.env.STRIPE_WEBHOOK_SECRET &&
       process.env.SUPABASE_SERVICE_ROLE_KEY,
   );
 
@@ -599,7 +568,8 @@ export async function PaginaPrograma90({ idioma }: { idioma: Idioma }) {
 
       <main>
         {/* Página direta: promessa, para quem é, o que recebe, prova,
-            oferta e dúvidas. O simulador de 7 passos saiu (nov/2026). */}
+            oferta e dúvidas. O simulador de 7 passos saiu (nov/2026).
+            Checkout pela Stripe desde 20/nov/2026. */}
         <Abertura moedaServidor={moedaServidor} idioma={idioma} t={t} />
         <PaginaDeVendas
           vendaAberta={vendaAberta}

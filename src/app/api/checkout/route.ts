@@ -1,10 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 
-import { marca } from "@/lib/content";
-import { criarPreferencia } from "@/lib/pagamento";
+import { marca, rotas } from "@/lib/content";
 import { criarPedido } from "@/lib/pedidos";
 import { PROGRAMA } from "@/lib/produto";
+import { criarSessaoCheckout } from "@/lib/stripe";
 import { criarSupabaseServer } from "@/lib/supabase/server";
 
 /**
@@ -82,24 +82,27 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const preferencia = await criarPreferencia({
+  /* Checkout da Stripe (nov/2026, no lugar do Mercado Pago). O retorno
+     traz `external_reference`, o mesmo nome que a página de obrigado já lê. */
+  const base = `${marca.site}${rotas.programa}`;
+  const sessao = await criarSessaoCheckout({
     referencia: pedido.referencia,
     email: entrada.data.email,
-    titulo: PROGRAMA.nome,
+    nome: PROGRAMA.nome,
     descricao: PROGRAMA.descricao,
     valorCentavos: PROGRAMA.precoCentavos,
     moeda: PROGRAMA.moeda,
-    urlBase: marca.site,
-    slug: PROGRAMA.slug,
+    urlSucesso: `${base}/obrigado?external_reference=${encodeURIComponent(pedido.referencia)}`,
+    urlCancelar: `${base}#oferta-direta`,
   });
 
-  if ("erro" in preferencia) {
-    console.error("[checkout] preferência:", preferencia.erro);
+  if ("erro" in sessao) {
+    console.error("[checkout] stripe:", sessao.erro);
     return NextResponse.json(
       { erro: "não consegui abrir o pagamento agora" },
       { status: 502 },
     );
   }
 
-  return NextResponse.json({ url: preferencia.url, referencia: pedido.referencia });
+  return NextResponse.json({ url: sessao.url, referencia: pedido.referencia });
 }
