@@ -743,3 +743,14 @@ input[type="range"]::-moz-range-thumb {
 @media (prefers-reduced-motion: reduce) {
   .esteira { animation: none; }
 }
+
+/* Tela de entrada Ele / Ela (site inteiro): só para quem nunca escolheu (o script do
+   <head> põe data-modo-novo antes da pintura; gravarModo tira). */
+.janela-modo { display: none; }
+html[data-modo-novo] .janela-modo { display: flex; }
+html[data-modo-novo] body { overflow: hidden; }
+
+/* Conteúdo que muda com o modo, decidido pelo CSS para não piscar. */
+html:not([data-modo="ela"]) .so-ela,
+html[data-modo="ela"] .so-ele { display: none !important; }
+html[data-modo="ela"] [data-sexo="f"] { order: -1; }

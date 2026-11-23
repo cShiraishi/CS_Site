@@ -210,6 +210,7 @@ export const resultados = {
   transformacoes: [
     {
       nome: "Carlos Abra",
+      sexo: "m",
       instagram: "@carlosabraoficial",
       link: "https://www.instagram.com/carlosabraoficial/",
       imagem: "/resultados/carlos-abra-v2.png",
@@ -219,6 +220,7 @@ export const resultados = {
     },
     {
       nome: "Laís",
+      sexo: "f",
       instagram: "@laisdas",
       link: "https://www.instagram.com/laisdas/",
       imagem: "/resultados/lais-das.png",
@@ -228,6 +230,7 @@ export const resultados = {
     },
     {
       nome: "Luanito Castro",
+      sexo: "m",
       instagram: "@luanitocastro",
       link: "https://www.instagram.com/luanitocastro/",
       imagem: "/resultados/luanito-castro.png",
@@ -237,6 +240,7 @@ export const resultados = {
     },
     {
       nome: "Isaías Santos",
+      sexo: "m",
       instagram: "@isaiassantos_2021",
       link: "https://www.instagram.com/isaiassantos_2021/",
       imagem: "/resultados/isaias-santos-v3.png",

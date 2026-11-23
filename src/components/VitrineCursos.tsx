@@ -26,6 +26,7 @@ export function VitrineCursos({ idioma }: { idioma: Idioma }) {
             <CapaCurso
               tom={c.tom}
               icone={c.icone}
+              imagem={c.capa}
               selo={`${t.modulo} ${c.numero}`}
               titulo={c.titulo[idioma]}
               chip={c.duracao?.[idioma]}

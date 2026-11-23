@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { EsteiraAntesDepois } from "./EsteiraAntesDepois";
 import { Logo } from "./Logo";
 import { Arrow, Button, Container, Eyebrow, Rule, Section, buttonClass } from "./ui";
 import {
@@ -49,7 +50,8 @@ export function Hero({ idioma = "pt" }: { idioma?: Idioma } = {}) {
 
       <Container className="relative">
         <div className="grid items-center gap-16 pb-12 sm:pb-24 lg:grid-cols-[1.05fr_0.95fr] lg:gap-20 lg:pb-32">
-          <div className="rise">
+          {/* min-w-0: sem ele a esteira (w-max) alarga a coluna da grid. */}
+          <div className="rise min-w-0">
             <Eyebrow>{t.hero.eyebrow}</Eyebrow>
 
             <h1 className="t-display mt-8 whitespace-pre-line text-balance">
@@ -59,6 +61,11 @@ export function Hero({ idioma = "pt" }: { idioma?: Idioma } = {}) {
             <p className="t-sub mt-8 max-w-xl text-pretty text-grafite">
               {t.hero.texto}
             </p>
+
+            {/* No celular a prova vem antes dos botões: é o que aparece ao abrir. */}
+            <div className="-mr-6 mt-9 sm:-mr-8 lg:hidden">
+              <EsteiraAntesDepois idioma={idioma} prioridade />
+            </div>
 
             <div className="mt-11 flex flex-wrap items-center gap-4">
               <Button nativo variant="consultoria" href={`${rotas.consultoria}?de=hero`}>
@@ -98,19 +105,10 @@ export function Hero({ idioma = "pt" }: { idioma?: Idioma } = {}) {
             </p>
           </div>
 
-          {/* 03 / o símbolo como expressão principal, sobre fundo de baixa interferência */}
-          <div className="rise relative mx-auto hidden w-full max-w-md lg:block lg:max-w-none" style={{ animationDelay: "160ms" }}>
-            <div className="paper drift relative aspect-square overflow-hidden rounded-[2rem] ring-1 ring-linha shadow-[0_28px_70px_-40px_rgba(29,27,25,0.5)]">
-              <Image
-                src="/brand/cs-mark.jpg"
-                alt={t.hero.altMonograma}
-                width={1024}
-                height={1024}
-                priority
-                sizes="(max-width: 1024px) 90vw, 480px"
-                className="logo-marca h-full w-full object-cover transition-[filter] duration-500"
-              />
-            </div>
+          {/* A prova no lugar do monograma: antes e depois de alunos passando sozinhos. */}
+          {/* self-start: centrada na coluna da esquerda (alta), a esteira caía abaixo da dobra. */}
+          <div className="rise relative hidden min-w-0 lg:block lg:self-start lg:pt-14" style={{ animationDelay: "160ms" }}>
+            <EsteiraAntesDepois idioma={idioma} grande prioridade />
             <p className="mt-6 text-center font-display text-lg italic text-grafite">
               {t.marca.assinatura}
             </p>

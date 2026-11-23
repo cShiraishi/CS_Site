@@ -1,19 +1,19 @@
-﻿/**
- * O que estÃ¡ Ã  venda â€” definido no servidor, de propÃ³sito.
+/**
+ * O que está à venda — definido no servidor, de propósito.
  *
- * Suporta exibiÃ§Ã£o adaptativa por geolocalizaÃ§Ã£o/VPN:
- * - Brasil (BRL): R$ 297 (sem preço âncora)
- * - Portugal / Europa (EUR): 19 â‚¬ (ancorado em 67 â‚¬)
+ * Suporta exibição adaptativa por geolocalização/VPN:
+ * - Brasil (BRL): R$ 297 (ancorado em R$ 197)
+ * - Portugal / Europa (EUR): 19 € (ancorado em 67 €)
  */
 
 export type Moeda = "BRL" | "EUR";
 
 /**
- * O preÃ§o em euro sÃ³ pode aparecer quando houver como cobrÃ¡-lo.
+ * O preço em euro só pode aparecer quando houver como cobrá-lo.
  *
- * O checkout Ã© Mercado Pago Brasil e cobra sempre em reais. Mostrar "19 â‚¬"
- * e cobrar R$ 297 seria anunciar um preÃ§o e praticar outro. Enquanto nÃ£o
- * existir um meio de pagamento em euro, todo mundo vÃª e paga em reais;
+ * O checkout é Mercado Pago Brasil e cobra sempre em reais. Mostrar "19 €"
+ * e cobrar R$ 297 seria anunciar um preço e praticar outro. Enquanto não
+ * existir um meio de pagamento em euro, todo mundo vê e paga em reais;
  * ligar isto sem esse meio reabre o problema.
  */
 export const EUR_ATIVO = false;
@@ -37,33 +37,30 @@ export const TABELA_PRECOS: Record<
     precoFormatado: "R$ 297",
     precoAncora: "R$ 197",
     stack: ["R$ 147", "R$ 67", "R$ 67", "R$ 297"],
-    meiosPagamento: "Pix, cartÃ£o ou boleto",
-    bandeira: "ðŸ‡§ðŸ‡·",
+    meiosPagamento: "Pix, cartão ou boleto",
+    bandeira: "🇧🇷",
     rotuloPais: "Brasil (R$)",
   },
   EUR: {
     moeda: "EUR",
     precoCentavos: 1900,
-    precoFormatado: "19 â‚¬",
-    precoAncora: "67 â‚¬",
-    stack: ["39 â‚¬", "19 â‚¬", "19 â‚¬", "15 â‚¬"],
-    meiosPagamento: "CartÃ£o, MB WAY ou Apple/Google Pay",
-    bandeira: "ðŸ‡µðŸ‡¹",
-    rotuloPais: "Europa (â‚¬)",
+    precoFormatado: "19 €",
+    precoAncora: "67 €",
+    stack: ["39 €", "19 €", "19 €", "15 €"],
+    meiosPagamento: "Cartão, MB WAY ou Apple/Google Pay",
+    bandeira: "🇵🇹",
+    rotuloPais: "Europa (€)",
   },
 };
 
-/** Checkout da Cakto do Reset Metabólico 21D — todo botão de compra leva aqui. */
-export const CHECKOUT_RESET = "https://pay.cakto.com.br/32qwfgp_1329725";
-
 export const PROGRAMA = {
   slug: "programa-90-dias",
-  nome: "Reset MetabÃ³lico 21 Dias",
+  nome: "Reset Metabólico 21 Dias",
   descricao:
-    "Protocolo cientÃ­fico de treino e dieta para 21 dias, dividido em 3 fases de 7 dias, com prescriÃ§Ã£o individual, plataforma CS Performance e guias prÃ¡ticos em PDF.",
-  /** Em centavos. R$ 297,00 (padrÃ£o no checkout Mercado Pago Brasil). */
+    "Protocolo científico de treino e dieta para 21 dias, dividido em 3 fases de 7 dias, com prescrição individual, plataforma CS Performance e guias práticos em PDF.",
+  /** Em centavos. R$ 297,00 (padrão no checkout Mercado Pago Brasil). */
   precoCentavos: 29700,
-  /** Valor de ancoragem em reais para exibiÃ§Ã£o na pÃ¡gina de vendas. */
+  /** Valor de ancoragem em reais para exibição na página de vendas. */
   precoAncora: "R$ 197",
   moeda: "BRL",
 } as const;
@@ -75,7 +72,7 @@ const PAISES_EUROPA = new Set([
 ]);
 
 /**
- * Detecta a moeda a partir do cÃ³digo ISO do paÃ­s (vindo do header de IP/VPN
+ * Detecta a moeda a partir do código ISO do país (vindo do header de IP/VPN
  * da Vercel `x-vercel-ip-country` ou Cloudflare `cf-ipcountry`).
  */
 export function moedaPorPais(pais?: string | null): Moeda {
@@ -86,7 +83,7 @@ export function moedaPorPais(pais?: string | null): Moeda {
   return "BRL";
 }
 
-/** "R$ 297" ou "19 â‚¬" â€” sem centavos quando sÃ£o zero, que Ã© como o preÃ§o Ã© anunciado. */
+/** "R$ 297" ou "19 €" — sem centavos quando são zero, que é como o preço é anunciado. */
 export function precoEmReais(
   centavos = PROGRAMA.precoCentavos,
   moeda: Moeda = "BRL",
@@ -96,7 +93,7 @@ export function precoEmReais(
     const texto = Number.isInteger(euros)
       ? String(euros)
       : euros.toFixed(2).replace(".", ",");
-    return `${texto} â‚¬`;
+    return `${texto} €`;
   }
   const reais = centavos / 100;
   const texto = Number.isInteger(reais)

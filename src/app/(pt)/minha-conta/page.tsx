@@ -57,6 +57,7 @@ export default async function MinhaContaPage() {
                     <CapaCurso
                       tom={c.tom}
                       icone={c.icone}
+                      imagem={c.capa}
                       selo={`${UI_CURSOS.pt.modulo} ${c.numero}`}
                       titulo={c.titulo.pt}
                       chip={c.duracao?.pt}
